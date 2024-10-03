@@ -1,6 +1,7 @@
 ﻿using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.DTOS.CityDto;
 using ExpertOffers.Core.ServicesContract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -33,7 +34,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="cityDto">The city add request containing the details of the city to be added.</param>
         /// <returns>An ActionResult containing the result of the operation.</returns>
-        [HttpPost("addCity")]
+        [HttpPost("createCity")]
+
         public async Task<ActionResult<ApiResponse>> AddCity([FromBody] CityAddRequest cityDto)
         {
             try
@@ -65,6 +67,7 @@ namespace ExpertOffers.API.Controllers
         /// <param name="cityDto">The city update request containing the details to update the city.</param>
         /// <returns>An ActionResult containing the result of the operation.</returns>
         [HttpPut("updateCity")]
+
         public async Task<ActionResult<ApiResponse>> UpdateCity([FromBody] CityUpdateRequest cityDto)
         {
             try
@@ -96,6 +99,7 @@ namespace ExpertOffers.API.Controllers
         /// <param name="cityID">The ID of the city to be deleted.</param>
         /// <returns>An ActionResult containing the result of the operation.</returns>
         [HttpDelete("deleteCity/{cityID}")]
+
         public async Task<ActionResult<ApiResponse>> DeleteCity(Guid cityID)
         {
             try
@@ -202,7 +206,7 @@ namespace ExpertOffers.API.Controllers
         {
             try
             {
-                var city = await _cityService.GetAllAsync(x => x.CityName.Contains(cityName.ToUpper()));
+                var city = await _cityService.GetAllAsync(x => x.CityName.ToUpper().Contains(cityName.ToUpper()));
 
                 return Ok(new ApiResponse
                 {

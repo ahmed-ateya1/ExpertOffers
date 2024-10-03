@@ -15,10 +15,6 @@ namespace ExpertOffers.Core.DTOS.AuthenticationDTO
         [StringLength(50, ErrorMessage = "First Name can't be longer than 50 characters.")]
         public string CompanyName { get; set; }
 
-        [Required(ErrorMessage = "Phone Number is required.")]
-        [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Phone Number is not valid. It should be in international format.")]
-        public string PhoneNumber { get; set; }
-
         [Required(ErrorMessage = "Industrial is required.")]
         public Guid IndustrialID { get; set; }
 

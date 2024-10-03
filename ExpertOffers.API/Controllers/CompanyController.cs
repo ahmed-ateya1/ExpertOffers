@@ -2,6 +2,7 @@
 using ExpertOffers.Core.Dtos.CompanyDto;
 using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.ServicesContract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -13,6 +14,7 @@ namespace ExpertOffers.API.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyServices _companyServices;
@@ -116,7 +118,7 @@ namespace ExpertOffers.API.Controllers
         {
             try
             {
-                var companies = await _companyServices.GetAllAsync(x => x.CompanyName.Contains(companyName.ToUpper()));
+                var companies = await _companyServices.GetAllAsync(x => x.CompanyName.ToUpper().Contains(companyName.ToUpper()));
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
@@ -146,6 +148,7 @@ namespace ExpertOffers.API.Controllers
         /// <response code="404">Company not found.</response>
         /// <response code="500">An error occurred while updating the company.</response>
         [HttpPut("updateCompany")]
+        [Authorize(Roles = "COMPANY")]
         public async Task<ActionResult<ApiResponse>> UpdateCompany([FromForm] CompanyUpdateRequest companyUpdate)
         {
             try

@@ -347,6 +347,59 @@
             <param name="countryName">The partial or full name of the country.</param>
             <returns>Returns a list of countries that match the given name.</returns>
         </member>
+        <member name="T:ExpertOffers.API.Controllers.IndustrialController">
+            <summary>
+            Controller for managing industrial operations.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.IndustrialController.#ctor(ExpertOffers.Core.ServicesContract.IIndustrialServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.IndustrialController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.IndustrialController"/> class.
+            </summary>
+            <param name="industrialServices">The industrial services.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.IndustrialController.CreateIndustrial(ExpertOffers.Core.Dtos.IndustrialDto.IndustrialAddRequest)">
+            <summary>
+            Creates a new industrial entity.
+            </summary>
+            <param name="industrialAddRequest">The request object containing the industrial details to be added.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the result of the creation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.IndustrialController.UpdateIndustrial(ExpertOffers.Core.Dtos.IndustrialDto.IndustrialUpdateRequest)">
+            <summary>
+            Updates an existing industrial entity.
+            </summary>
+            <param name="industrialUpdateRequest">The request object containing the updated industrial details.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the result of the update.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.IndustrialController.DeleteIndustrial(System.Guid)">
+            <summary>
+            Deletes an industrial entity by its ID.
+            </summary>
+            <param name="id">The ID of the industrial entity to delete.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the result of the deletion.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.IndustrialController.GetIndustrial(System.Guid)">
+            <summary>
+            Retrieves an industrial entity by its ID.
+            </summary>
+            <param name="id">The ID of the industrial entity.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the industrial entity details.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.IndustrialController.GetIndustrials">
+            <summary>
+            Retrieves all industrial entities.
+            </summary>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the list of all industrial entities.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.IndustrialController.GetIndustrials(System.String)">
+            <summary>
+            Retrieves industrial entities by name.
+            </summary>
+            <param name="industrialName">The name of the industrial entity to search for.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the list of matching industrial entities.</returns>
+        </member>
         <member name="T:ExpertOffers.API.FileServices.FileService">
             <summary>
             Provides file-related services for the application.

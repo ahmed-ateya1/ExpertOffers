@@ -64,8 +64,7 @@ namespace ExpertOffers.Core.Services
             var user = new ApplicationUser
             {
                 UserName = clientRegisterDTO.Email,
-                Email = clientRegisterDTO.Email,
-                PhoneNumber = clientRegisterDTO.PhoneNumber
+                Email = clientRegisterDTO.Email
             };
 
             var result = await _userManager.CreateAsync(user, clientRegisterDTO.Password);
@@ -95,9 +94,12 @@ namespace ExpertOffers.Core.Services
                     {"code", code},
                     {"email", user.Email}
                 };
-                var clientURL = clientRegisterDTO.ClientUri + "/confirmEmail";
-                var callback = QueryHelpers.AddQueryString(clientURL, param);
-                await _emailSender.SendEmailAsync(user.Email, "Confirm", $"Please Confirm Your Email by <a href='{callback}'>Clicking here</a>.");
+                if(clientRegisterDTO.ClientUri != null)
+                {
+                    var clientURL = clientRegisterDTO.ClientUri;
+                    var callback = QueryHelpers.AddQueryString(clientURL, param);
+                    await _emailSender.SendEmailAsync(user.Email, "Confirm", $"Please Confirm Your Email by <a href='{callback}'>Clicking here</a>.");
+                }
 
                 var newRefreshToken = GenerateRefreshToken();
 
@@ -128,8 +130,7 @@ namespace ExpertOffers.Core.Services
             var user = new ApplicationUser
             {
                 UserName = companyRegisterDTO.Email,
-                Email = companyRegisterDTO.Email,
-                PhoneNumber = companyRegisterDTO.PhoneNumber
+                Email = companyRegisterDTO.Email
             };
 
             var result = await _userManager.CreateAsync(user, companyRegisterDTO.Password);
@@ -159,9 +160,12 @@ namespace ExpertOffers.Core.Services
                     {"code", code},
                     {"email", user.Email}
                 };
-                var clientURL = companyRegisterDTO.ClientUri + "/confirmEmail";
-                var callback = QueryHelpers.AddQueryString(clientURL, param);
-                await _emailSender.SendEmailAsync(user.Email, "Confirm", $"Please Confirm Your Email by <a href='{callback}'>Clicking here</a>.");
+                if (companyRegisterDTO.ClientUri != null)
+                {
+                    var clientURL = companyRegisterDTO.ClientUri;
+                    var callback = QueryHelpers.AddQueryString(clientURL, param);
+                    await _emailSender.SendEmailAsync(user.Email, "Confirm", $"Please Confirm Your Email by <a href='{callback}'>Clicking here</a>.");
+                }
                 var newRefreshToken = GenerateRefreshToken();
                 authenticationUser.RefreshToken = newRefreshToken.Token;
                 authenticationUser.RefreshTokenExpiration = newRefreshToken.ExpiredOn;

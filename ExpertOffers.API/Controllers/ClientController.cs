@@ -16,7 +16,7 @@ namespace ExpertOffers.API.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "USER")]
+    [Authorize(Roles = "USER,ADMIN")]
     public class ClientController : ControllerBase
     {
         private readonly IClientServices _clientServices;
@@ -88,6 +88,7 @@ namespace ExpertOffers.API.Controllers
         /// <response code="404">Client not found.</response>
         /// <response code="500">Internal server error during the fetch operation.</response>
         [HttpGet("getClient/{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ApiResponse>> getClient(Guid id)
         {
             try

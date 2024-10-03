@@ -2,6 +2,7 @@
 using ExpertOffers.Core.Dtos.BranchDto;
 using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.ServicesContract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -13,6 +14,7 @@ namespace ExpertOffers.API.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    
     public class BranchController : ControllerBase
     {
         private readonly IBranchServices _branchServices;
@@ -35,6 +37,7 @@ namespace ExpertOffers.API.Controllers
         /// <param name="branchAddRequest">The branch add request containing the details of the branch to be added.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPost("addBranch")]
+        [Authorize(Roles = "COMPANY")]
         public async Task<IActionResult> AddBranch([FromForm] BranchAddRequest branchAddRequest)
         {
             try
@@ -67,6 +70,7 @@ namespace ExpertOffers.API.Controllers
         /// <param name="branchUpdateRequest">The branch update request containing the details to update the branch.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPut("updateBranch")]
+        [Authorize(Roles = "COMPANY")]
         public async Task<IActionResult> UpdateBranch([FromForm] BranchUpdateRequest branchUpdateRequest)
         {
             try
@@ -99,6 +103,7 @@ namespace ExpertOffers.API.Controllers
         /// <param name="branchID">The ID of the branch to be deleted.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpDelete("deleteBranch")]
+        [Authorize(Roles = "COMPANY")]
         public async Task<IActionResult> DeleteBranch(Guid branchID)
         {
             try
@@ -162,7 +167,7 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="branchID">The ID of the branch to be fetched.</param>
         /// <returns>An IActionResult containing the branch details.</returns>
-        [HttpGet("getBranch")]
+        [HttpGet("getBranch/{branchID}")]
         public async Task<IActionResult> GetBranch(Guid branchID)
         {
             try

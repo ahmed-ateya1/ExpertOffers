@@ -2,6 +2,7 @@
 using ExpertOffers.Core.DTOS.CountryDto;
 using ExpertOffers.Core.Services;
 using ExpertOffers.Core.ServicesContract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -67,6 +68,7 @@ namespace ExpertOffers.API.Controllers
         /// <param name="countryUpdateRequest">The updated details of the country.</param>
         /// <returns>Returns a response indicating whether the country was updated successfully.</returns>
         [HttpPut("updateCountry")]
+
         public async Task<ActionResult<ApiResponse>> UpdateCountry(CountryUpdateRequest countryUpdateRequest)
         {
             try
@@ -107,6 +109,7 @@ namespace ExpertOffers.API.Controllers
         /// <param name="countryID">The ID of the country to be deleted.</param>
         /// <returns>Returns a response indicating whether the country was deleted successfully.</returns>
         [HttpDelete("deleteCountry")]
+
         public async Task<ActionResult<ApiResponse>> DeleteCountry(Guid countryID)
         {
             try

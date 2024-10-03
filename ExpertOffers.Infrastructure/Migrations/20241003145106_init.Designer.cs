@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpertOffers.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241002082502_refreshtoken")]
-    partial class refreshtoken
+    [Migration("20241003145106_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -120,15 +120,10 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("CompanyID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CountryID")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CityID");
-
-                    b.HasIndex("CompanyID");
 
                     b.HasIndex("CountryID");
 
@@ -682,10 +677,6 @@ namespace ExpertOffers.Infrastructure.Migrations
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.City", b =>
                 {
-                    b.HasOne("ExpertOffers.Core.Domain.Entities.Company", null)
-                        .WithMany("Cities")
-                        .HasForeignKey("CompanyID");
-
                     b.HasOne("ExpertOffers.Core.Domain.Entities.Country", "Country")
                         .WithMany("Cities")
                         .HasForeignKey("CountryID")
@@ -977,8 +968,6 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Navigation("Branches");
 
                     b.Navigation("Bulletins");
-
-                    b.Navigation("Cities");
 
                     b.Navigation("Coupons");
 
