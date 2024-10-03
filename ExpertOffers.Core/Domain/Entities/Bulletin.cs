@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ExpertOffers.Core.Domain.Entities
+{
+    public class Bulletin
+    {
+        public Guid BulletinID { get; set; }
+        public string BulletinTitle { get; set; }
+        public string BulletinDescription { get; set; }
+        public double DiscountPercentage { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string BulletinPictureUrl { get; set; }
+        public string BulletinPdfUrl {  get; set; }
+        public bool IsActive { get; set; }
+        public long TotalViews { get; set; }
+        public long TotalSaved { get; set; }
+        public Guid CompanyID { get; set; }
+        public virtual Company Company { get; set; }
+        public virtual ICollection<SavedItem> SavedItems { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
+    }
+}
