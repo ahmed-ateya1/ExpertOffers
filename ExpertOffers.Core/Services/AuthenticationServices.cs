@@ -65,6 +65,7 @@ namespace ExpertOffers.Core.Services
             {
                 UserName = clientRegisterDTO.Email,
                 Email = clientRegisterDTO.Email,
+                PhoneNumber = clientRegisterDTO.PhoneNumber
             };
 
             var result = await _userManager.CreateAsync(user, clientRegisterDTO.Password);
@@ -94,7 +95,7 @@ namespace ExpertOffers.Core.Services
                     {"code", code},
                     {"email", user.Email}
                 };
-                var clientURL = $"{GetBaseUrl()}api/Account/confirmEmail";
+                var clientURL = clientRegisterDTO.ClientUri + "/confirmEmail";
                 var callback = QueryHelpers.AddQueryString(clientURL, param);
                 await _emailSender.SendEmailAsync(user.Email, "Confirm", $"Please Confirm Your Email by <a href='{callback}'>Clicking here</a>.");
 
@@ -128,6 +129,7 @@ namespace ExpertOffers.Core.Services
             {
                 UserName = companyRegisterDTO.Email,
                 Email = companyRegisterDTO.Email,
+                PhoneNumber = companyRegisterDTO.PhoneNumber
             };
 
             var result = await _userManager.CreateAsync(user, companyRegisterDTO.Password);
@@ -157,7 +159,7 @@ namespace ExpertOffers.Core.Services
                     {"code", code},
                     {"email", user.Email}
                 };
-                var clientURL = $"{GetBaseUrl()}api/Account/confirmEmail";
+                var clientURL = companyRegisterDTO.ClientUri + "/confirmEmail";
                 var callback = QueryHelpers.AddQueryString(clientURL, param);
                 await _emailSender.SendEmailAsync(user.Email, "Confirm", $"Please Confirm Your Email by <a href='{callback}'>Clicking here</a>.");
                 var newRefreshToken = GenerateRefreshToken();
@@ -356,7 +358,7 @@ namespace ExpertOffers.Core.Services
            var user = await _userManager.FindByEmailAsync(GetCurrentEmail());
             if (user is null)
                 throw new UnauthorizedAccessException("User is not authenticated");
-;
+
             var country = await _unitOfWork.Repository<Country>().GetByAsync(x=>x.CountryID == locationDTO.CountryID);
             var city = await _unitOfWork.Repository<City>().GetByAsync(x => x.CityID == locationDTO.CityID);
 
@@ -367,6 +369,15 @@ namespace ExpertOffers.Core.Services
             user.CityID = locationDTO.CityID;
 
             await _userManager.UpdateAsync(user);
+        }
+
+        public async Task RemoveAccount()
+        {
+            var user = await _userManager.FindByEmailAsync(GetCurrentEmail());
+            if (user is null)
+                throw new UnauthorizedAccessException("User is not authenticated");
+            await _userManager.DeleteAsync(user);
+
         }
     }
 }

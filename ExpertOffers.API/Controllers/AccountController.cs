@@ -4,6 +4,7 @@ using ExpertOffers.Core.DTOS.CityDto;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -17,6 +18,9 @@ using System.Text;
 
 namespace ExpertOffers.API.Controllers
 {
+    /// <summary>
+    /// Manages user accounts, including registration, login, password reset, roles, and token handling.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -26,7 +30,13 @@ namespace ExpertOffers.API.Controllers
         private readonly IEmailSender _emailSender;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-       
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountController"/> class.
+        /// </summary>
+        /// <param name="authenticationServices">Authentication service.</param>
+        /// <param name="userManager">User manager service.</param>
+        /// <param name="emailSender">Email sender service.</param>
+        /// <param name="signInManager">Sign-in manager service.</param>
         public AccountController(IAuthenticationServices authenticationServices, UserManager<ApplicationUser> userManager, IEmailSender emailSender , SignInManager<ApplicationUser> signInManager )
         {
             _authenticationServices = authenticationServices;
@@ -34,7 +44,11 @@ namespace ExpertOffers.API.Controllers
             _emailSender = emailSender;
             _signInManager = signInManager;
         }
-
+        /// <summary>
+        /// Registers a new client account.
+        /// </summary>
+        /// <param name="registerDTO">Client registration details.</param>
+        /// <returns>Authentication response with token and status.</returns>
         [HttpPost("register-Client")]
         public async Task<ActionResult<AuthenticationResponse>> RegisterCleintAsync([FromBody] ClientRegisterDTO registerDTO)
         {
@@ -55,7 +69,11 @@ namespace ExpertOffers.API.Controllers
 
             return Ok(result);
         }
-
+        /// <summary>
+        /// Registers a new company account.
+        /// </summary>
+        /// <param name="registerDTO">Company registration details.</param>
+        /// <returns>Authentication response with token and status.</returns>
         [HttpPost("register-Comapny")]
         public async Task<ActionResult<AuthenticationResponse>> RegisterComapnyAsync([FromForm] CompanyRegisterDTO registerDTO)
         {
@@ -76,7 +94,11 @@ namespace ExpertOffers.API.Controllers
 
             return Ok(result);
         }
-       
+        /// <summary>
+        /// Logs in a user or company.
+        /// </summary>
+        /// <param name="loginDTO">Login credentials (email, password).</param>
+        /// <returns>Authentication response with token and status.</returns>
         [HttpPost("login")]
         public async Task<ActionResult<AuthenticationResponse>> LoginAsync([FromBody] LoginDTO loginDTO)
         {
@@ -98,8 +120,12 @@ namespace ExpertOffers.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Sends a password reset link to the user's email.
+        /// </summary>
+        /// <param name="forgotPassword">Email to send the password reset link to.</param>
+        /// <returns>Status message.</returns>
 
-      
         [HttpPost("forgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPassword)
         {
@@ -126,7 +152,11 @@ namespace ExpertOffers.API.Controllers
 
             return Ok("If the email is associated with an account, a reset password link will be sent.");
         }
-       
+        /// <summary>
+        /// Resets the user's password.
+        /// </summary>
+        /// <param name="resetPassword">Reset password request details.</param>
+        /// <returns>Status message.</returns>
         [HttpPost("resetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPassword)
         {
@@ -146,7 +176,11 @@ namespace ExpertOffers.API.Controllers
             }
             return Ok();
         }
-
+        /// <summary>
+        /// Confirms the user's email address.
+        /// </summary>
+        /// <param name="confirmEmailDTO">Email confirmation details.</param>
+        /// <returns>Status message.</returns>
         [HttpGet("confirmEmail")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailDTO confirmEmailDTO)
         {
@@ -166,8 +200,12 @@ namespace ExpertOffers.API.Controllers
             }
             return Ok();
         }
-       
-        
+
+        /// <summary>
+        /// Adds a new role to the user.
+        /// </summary>
+        /// <param name="model">Role details to assign.</param>
+        /// <returns>Status message.</returns>
         [HttpPost("addrole")]
         public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleDTO model)
         {
@@ -181,6 +219,12 @@ namespace ExpertOffers.API.Controllers
 
             return Ok(model);
         }
+        /// <summary>
+        /// Adds or updates the user's location.
+        /// </summary>
+        /// <param name="locationDTO">Location details.</param>
+        /// <returns>Status message.</returns>
+        [Authorize]
         [HttpPost("addLocation")]
         public async Task<IActionResult> AddLocation([FromBody] LocationDTO locationDTO)
         {
@@ -191,6 +235,21 @@ namespace ExpertOffers.API.Controllers
 
             return Ok();
         }
+        /// <summary>
+        /// Removes the user's account.
+        /// </summary>
+        /// <returns>Status message.</returns>
+        [Authorize]
+        [HttpDelete("removeAccount")]
+        public async Task<IActionResult> RemoveAccount()
+        {
+            await _authenticationServices.RemoveAccount();
+            return Ok();
+        }
+        /// <summary>
+        /// Refreshes the user's authentication token.
+        /// </summary>
+        /// <returns>New authentication token.</returns>
         [HttpGet("refreshtoken")]
         public async Task<IActionResult> RefreshToken()
         {
@@ -205,7 +264,11 @@ namespace ExpertOffers.API.Controllers
             SetRefreshToken(result.RefreshToken, result.RefreshTokenExpiration);
             return Ok(result);
         }
-
+        /// <summary>
+        /// Revokes a refresh token.
+        /// </summary>
+        /// <param name="revokTokenDTO">Token details to revoke.</param>
+        /// <returns>Status message.</returns>
         [HttpPost("revokeToken")]
         public async Task<IActionResult> RevokeToken([FromBody] RevokTokenDTO revokTokenDTO)
         {
@@ -221,7 +284,11 @@ namespace ExpertOffers.API.Controllers
 
             return Ok();
         }
-
+        /// <summary>
+        /// Sets the refresh token cookie in the response.
+        /// </summary>
+        /// <param name="refreshToken">The refresh token string.</param>
+        /// <param name="expires">The expiration time for the token.</param>
         private void SetRefreshToken(string refreshToken, DateTime expires)
         {
             var cookieOption = new CookieOptions

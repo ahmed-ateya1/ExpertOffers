@@ -7,6 +7,9 @@ using System.Net;
 
 namespace ExpertOffers.API.Controllers
 {
+    /// <summary>
+    /// Controller for managing city operations.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CityController : ControllerBase
@@ -14,11 +17,22 @@ namespace ExpertOffers.API.Controllers
         private readonly ICityServices _cityService;
         private readonly ILogger<CityController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CityController"/> class.
+        /// </summary>
+        /// <param name="cityService">The city services.</param>
+        /// <param name="logger">The logger.</param>
         public CityController(ICityServices cityService, ILogger<CityController> logger)
         {
             _cityService = cityService;
             _logger = logger;
         }
+
+        /// <summary>
+        /// Adds a new city.
+        /// </summary>
+        /// <param name="cityDto">The city add request containing the details of the city to be added.</param>
+        /// <returns>An ActionResult containing the result of the operation.</returns>
         [HttpPost("addCity")]
         public async Task<ActionResult<ApiResponse>> AddCity([FromBody] CityAddRequest cityDto)
         {
@@ -45,6 +59,11 @@ namespace ExpertOffers.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing city.
+        /// </summary>
+        /// <param name="cityDto">The city update request containing the details to update the city.</param>
+        /// <returns>An ActionResult containing the result of the operation.</returns>
         [HttpPut("updateCity")]
         public async Task<ActionResult<ApiResponse>> UpdateCity([FromBody] CityUpdateRequest cityDto)
         {
@@ -71,6 +90,11 @@ namespace ExpertOffers.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a city by its ID.
+        /// </summary>
+        /// <param name="cityID">The ID of the city to be deleted.</param>
+        /// <returns>An ActionResult containing the result of the operation.</returns>
         [HttpDelete("deleteCity/{cityID}")]
         public async Task<ActionResult<ApiResponse>> DeleteCity(Guid cityID)
         {
@@ -106,6 +130,11 @@ namespace ExpertOffers.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets all cities for a specific country.
+        /// </summary>
+        /// <param name="countryID">The ID of the country whose cities are to be fetched.</param>
+        /// <returns>An ActionResult containing the list of cities.</returns>
         [HttpGet("getCitiesForCountry/{countryID}")]
         public async Task<ActionResult<ApiResponse>> GetCitiesForCountry(Guid countryID)
         {
@@ -116,23 +145,27 @@ namespace ExpertOffers.API.Controllers
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
-                    Messages = "Countries are fetched successfully",
+                    Messages = "Cities are fetched successfully",
                     Result = cities,
                     StatusCode = HttpStatusCode.OK
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetCountries method: An error occurred while fetched Countries");
+                _logger.LogError(ex, "GetCitiesForCountry method: An error occurred while fetching Cities");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while fetched Countries"
+                    Messages = "An error occurred while fetching Cities"
                 });
             }
         }
 
+        /// <summary>
+        /// Gets all cities.
+        /// </summary>
+        /// <returns>An ActionResult containing the list of all cities.</returns>
         [HttpGet("getCities")]
         public async Task<ActionResult<ApiResponse>> GetCities()
         {
@@ -142,23 +175,28 @@ namespace ExpertOffers.API.Controllers
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
-                    Messages = "Countries are fetched successfully",
+                    Messages = "Cities are fetched successfully",
                     Result = cities,
                     StatusCode = HttpStatusCode.OK
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetCountries method: An error occurred while fetched Countries");
+                _logger.LogError(ex, "GetCities method: An error occurred while fetching Cities");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while fetched Countries"
+                    Messages = "An error occurred while fetching Cities"
                 });
             }
         }
 
+        /// <summary>
+        /// Gets cities by name.
+        /// </summary>
+        /// <param name="cityName">The name of the cities to search for.</param>
+        /// <returns>An ActionResult containing the list of matching cities.</returns>
         [HttpGet("getCities/{cityName}")]
         public async Task<ActionResult<ApiResponse>> GetCity(string cityName)
         {
@@ -176,12 +214,12 @@ namespace ExpertOffers.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetCity method: An error occurred while fetched City");
+                _logger.LogError(ex, "GetCity method: An error occurred while fetching City");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while fetched City"
+                    Messages = "An error occurred while fetching City"
                 });
             }
         }

@@ -1,0 +1,384 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ExpertOffers.API</name>
+    </assembly>
+    <members>
+        <member name="T:ExpertOffers.API.Controllers.AccountController">
+            <summary>
+            Manages user accounts, including registration, login, password reset, roles, and token handling.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.#ctor(ExpertOffers.Core.ServicesContract.IAuthenticationServices,Microsoft.AspNetCore.Identity.UserManager{ExpertOffers.Core.Domain.IdentityEntities.ApplicationUser},Microsoft.AspNetCore.Identity.UI.Services.IEmailSender,Microsoft.AspNetCore.Identity.SignInManager{ExpertOffers.Core.Domain.IdentityEntities.ApplicationUser})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.AccountController"/> class.
+            </summary>
+            <param name="authenticationServices">Authentication service.</param>
+            <param name="userManager">User manager service.</param>
+            <param name="emailSender">Email sender service.</param>
+            <param name="signInManager">Sign-in manager service.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.RegisterCleintAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.ClientRegisterDTO)">
+            <summary>
+            Registers a new client account.
+            </summary>
+            <param name="registerDTO">Client registration details.</param>
+            <returns>Authentication response with token and status.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.RegisterComapnyAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.CompanyRegisterDTO)">
+            <summary>
+            Registers a new company account.
+            </summary>
+            <param name="registerDTO">Company registration details.</param>
+            <returns>Authentication response with token and status.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.LoginAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.LoginDTO)">
+            <summary>
+            Logs in a user or company.
+            </summary>
+            <param name="loginDTO">Login credentials (email, password).</param>
+            <returns>Authentication response with token and status.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.ForgotPassword(ExpertOffers.Core.DTOS.AuthenticationDTO.ForgotPasswordDTO)">
+            <summary>
+            Sends a password reset link to the user's email.
+            </summary>
+            <param name="forgotPassword">Email to send the password reset link to.</param>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.ResetPassword(ExpertOffers.Core.DTOS.AuthenticationDTO.ResetPasswordDTO)">
+            <summary>
+            Resets the user's password.
+            </summary>
+            <param name="resetPassword">Reset password request details.</param>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.ConfirmEmail(ExpertOffers.Core.DTOS.AuthenticationDTO.ConfirmEmailDTO)">
+            <summary>
+            Confirms the user's email address.
+            </summary>
+            <param name="confirmEmailDTO">Email confirmation details.</param>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.AddRoleAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.AddRoleDTO)">
+            <summary>
+            Adds a new role to the user.
+            </summary>
+            <param name="model">Role details to assign.</param>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.AddLocation(ExpertOffers.Core.DTOS.CityDto.LocationDTO)">
+            <summary>
+            Adds or updates the user's location.
+            </summary>
+            <param name="locationDTO">Location details.</param>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.RemoveAccount">
+            <summary>
+            Removes the user's account.
+            </summary>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.RefreshToken">
+            <summary>
+            Refreshes the user's authentication token.
+            </summary>
+            <returns>New authentication token.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.RevokeToken(ExpertOffers.Core.DTOS.AuthenticationDTO.RevokTokenDTO)">
+            <summary>
+            Revokes a refresh token.
+            </summary>
+            <param name="revokTokenDTO">Token details to revoke.</param>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.SetRefreshToken(System.String,System.DateTime)">
+            <summary>
+            Sets the refresh token cookie in the response.
+            </summary>
+            <param name="refreshToken">The refresh token string.</param>
+            <param name="expires">The expiration time for the token.</param>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.BranchController">
+            <summary>
+            Controller for managing branch operations.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BranchController.#ctor(ExpertOffers.Core.ServicesContract.IBranchServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BranchController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.BranchController"/> class.
+            </summary>
+            <param name="branchServices">The branch services.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BranchController.AddBranch(ExpertOffers.Core.Dtos.BranchDto.BranchAddRequest)">
+            <summary>
+            Adds a new branch.
+            </summary>
+            <param name="branchAddRequest">The branch add request containing the details of the branch to be added.</param>
+            <returns>An IActionResult indicating the result of the operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BranchController.UpdateBranch(ExpertOffers.Core.Dtos.BranchDto.BranchUpdateRequest)">
+            <summary>
+            Updates an existing branch.
+            </summary>
+            <param name="branchUpdateRequest">The branch update request containing the details to update the branch.</param>
+            <returns>An IActionResult indicating the result of the operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BranchController.DeleteBranch(System.Guid)">
+            <summary>
+            Deletes a branch by its ID.
+            </summary>
+            <param name="branchID">The ID of the branch to be deleted.</param>
+            <returns>An IActionResult indicating the result of the operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BranchController.GetBranchesForCompany(System.Guid)">
+            <summary>
+            Gets all branches for a specific company.
+            </summary>
+            <param name="companyID">The ID of the company whose branches are to be fetched.</param>
+            <returns>An IActionResult containing the list of branches.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BranchController.GetBranch(System.Guid)">
+            <summary>
+            Gets a branch by its ID.
+            </summary>
+            <param name="branchID">The ID of the branch to be fetched.</param>
+            <returns>An IActionResult containing the branch details.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BranchController.GetBranches">
+            <summary>
+            Gets all branches.
+            </summary>
+            <returns>An IActionResult containing the list of all branches.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BranchController.GetBranches(System.String)">
+            <summary>
+            Gets branches by name.
+            </summary>
+            <param name="branchName">The name of the branches to search for.</param>
+            <returns>An IActionResult containing the list of matching branches.</returns>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.CityController">
+            <summary>
+            Controller for managing city operations.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CityController.#ctor(ExpertOffers.Core.ServicesContract.ICityServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CityController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.CityController"/> class.
+            </summary>
+            <param name="cityService">The city services.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CityController.AddCity(ExpertOffers.Core.DTOS.CityDto.CityAddRequest)">
+            <summary>
+            Adds a new city.
+            </summary>
+            <param name="cityDto">The city add request containing the details of the city to be added.</param>
+            <returns>An ActionResult containing the result of the operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CityController.UpdateCity(ExpertOffers.Core.DTOS.CityDto.CityUpdateRequest)">
+            <summary>
+            Updates an existing city.
+            </summary>
+            <param name="cityDto">The city update request containing the details to update the city.</param>
+            <returns>An ActionResult containing the result of the operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CityController.DeleteCity(System.Guid)">
+            <summary>
+            Deletes a city by its ID.
+            </summary>
+            <param name="cityID">The ID of the city to be deleted.</param>
+            <returns>An ActionResult containing the result of the operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CityController.GetCitiesForCountry(System.Guid)">
+            <summary>
+            Gets all cities for a specific country.
+            </summary>
+            <param name="countryID">The ID of the country whose cities are to be fetched.</param>
+            <returns>An ActionResult containing the list of cities.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CityController.GetCities">
+            <summary>
+            Gets all cities.
+            </summary>
+            <returns>An ActionResult containing the list of all cities.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CityController.GetCity(System.String)">
+            <summary>
+            Gets cities by name.
+            </summary>
+            <param name="cityName">The name of the cities to search for.</param>
+            <returns>An ActionResult containing the list of matching cities.</returns>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.ClientController">
+            <summary>
+            Handles client-related operations such as updating client information and fetching client details.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:ExpertOffers.API.Controllers.ClientController.#ctor(ExpertOffers.Core.ServicesContract.IClientServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.ClientController})" -->
+        <member name="M:ExpertOffers.API.Controllers.ClientController.UpdateClient(ExpertOffers.Core.DTOS.ClientDto.ClientUpdateRequest)">
+            <summary>
+            Updates a client's information.
+            </summary>
+            <param name="clientDto">Client data to update.</param>
+            <returns>
+            An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> containing the status of the update operation.
+            If successful, the response will include the updated client data.
+            </returns>
+            <response code="200">Client updated successfully.</response>
+            <response code="404">Client not found.</response>
+            <response code="500">Internal server error during the update operation.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.ClientController.getClient(System.Guid)">
+            <summary>
+            Reterive all client information.
+            </summary>
+            <param name="id">The unique identifier (ID) of the client to retrieve.</param>
+            <returns>
+            An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> containing the client information.
+            If the client is not found, the response will include a not found status.
+            </returns>
+            <response code="200">Client fetched successfully.</response>
+            <response code="404">Client not found.</response>
+            <response code="500">Internal server error during the fetch operation.</response>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.CompanyController">
+            <summary>
+            Controller to manage company-related operations such as fetching, updating, and searching for companies.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.#ctor(ExpertOffers.Core.ServicesContract.ICompanyServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CompanyController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.CompanyController"/> class.
+            </summary>
+            <param name="companyServices">Service to handle company operations.</param>
+            <param name="logger">Logger instance to record logs and errors.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.GetCompanies">
+            <summary>
+            Fetches a list of all companies.
+            </summary>
+            <returns>An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> containing the list of companies if successful.</returns>
+            <response code="200">Companies fetched successfully.</response>
+            <response code="500">An error occurred while fetching the companies.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.GetCompany(System.Guid)">
+            <summary>
+            Fetches details of a specific company by ID.
+            </summary>
+            <param name="id">The ID of the company to fetch.</param>
+            <returns>An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> containing the company details if found.</returns>
+            <response code="200">Company fetched successfully.</response>
+            <response code="404">Company not found.</response>
+            <response code="500">An error occurred while fetching the company.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.SearchCompanies(System.String)">
+            <summary>
+            Searches for companies by name.
+            </summary>
+            <param name="companyName">The name of the company to search for.</param>
+            <returns>An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> containing the list of companies matching the search criteria.</returns>
+            <response code="200">Companies fetched successfully.</response>
+            <response code="500">An error occurred while fetching companies.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.UpdateCompany(ExpertOffers.Core.Dtos.CompanyDto.CompanyUpdateRequest)">
+            <summary>
+            Updates a company's details.
+            </summary>
+            <param name="companyUpdate">The company update request object containing updated details.</param>
+            <returns>An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> indicating the result of the update operation.</returns>
+            <response code="200">Company updated successfully.</response>
+            <response code="404">Company not found.</response>
+            <response code="500">An error occurred while updating the company.</response>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.CountryController">
+            <summary>
+            Controller for handling operations related to Countries.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CountryController.#ctor(ExpertOffers.Core.ServicesContract.ICountryServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CountryController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.CountryController"/> class.
+            </summary>
+            <param name="countryServices">The country service used to perform operations on country entities.</param>
+            <param name="logger">The logger used for logging operations and errors.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CountryController.AddCountry(ExpertOffers.Core.DTOS.CountryDto.CountryAddRequest)">
+            <summary>
+            Adds a new country to the system.
+            </summary>
+            <param name="countryAddRequest">The details of the country to be added.</param>
+            <returns>Returns a response indicating whether the country was added successfully.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CountryController.UpdateCountry(ExpertOffers.Core.DTOS.CountryDto.CountryUpdateRequest)">
+            <summary>
+            Updates the details of an existing country.
+            </summary>
+            <param name="countryUpdateRequest">The updated details of the country.</param>
+            <returns>Returns a response indicating whether the country was updated successfully.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CountryController.DeleteCountry(System.Guid)">
+            <summary>
+            Deletes a country by its ID.
+            </summary>
+            <param name="countryID">The ID of the country to be deleted.</param>
+            <returns>Returns a response indicating whether the country was deleted successfully.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CountryController.GetCountries">
+            <summary>
+            Retrieves all countries in the system.
+            </summary>
+            <returns>Returns a list of all countries.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CountryController.GetCountry(System.Guid)">
+            <summary>
+            Retrieves a country by its ID.
+            </summary>
+            <param name="countryID">The ID of the country to be retrieved.</param>
+            <returns>Returns the details of the country if found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CountryController.GetCountries(System.String)">
+            <summary>
+            Retrieves a list of countries by matching a partial or full country name.
+            </summary>
+            <param name="countryName">The partial or full name of the country.</param>
+            <returns>Returns a list of countries that match the given name.</returns>
+        </member>
+        <member name="T:ExpertOffers.API.FileServices.FileService">
+            <summary>
+            Provides file-related services for the application.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.FileServices.FileService.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.FileServices.FileService"/> class.
+            </summary>
+            <param name="environment">The web host environment.</param>
+            <param name="httpContextAccessor">The HTTP context accessor.</param>
+        </member>
+        <member name="M:ExpertOffers.API.FileServices.FileService.CreateFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Creates a new file in the "Upload" directory.
+            </summary>
+            <param name="file">The file to be created.</param>
+            <returns>The URL of the created file.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.FileServices.FileService.DeleteFile(System.String)">
+            <summary>
+            Deletes a file from the "Upload" directory.
+            </summary>
+            <param name="imageUrl">The URL of the file to be deleted.</param>
+        </member>
+        <member name="M:ExpertOffers.API.FileServices.FileService.UpdateFile(Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            Updates a file in the "Upload" directory.
+            </summary>
+            <param name="newFile">The new file to be updated.</param>
+            <param name="currentFileName">The URL of the current file to be replaced.</param>
+            <returns>The URL of the updated file.</returns>
+        </member>
+    </members>
+</doc>

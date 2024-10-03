@@ -15,6 +15,7 @@ namespace ExpertOffers.Core.ServicesContract
         Task<AuthenticationResponse> RegisterCompanyAsync(CompanyRegisterDTO companyRegisterDTO);
         Task<AuthenticationResponse> LoginAsync(LoginDTO loginDTO);
         Task<AuthenticationResponse> RefreshTokenAsync(string token);
+        Task RemoveAccount();
         Task AddLocationToUser(LocationDTO locationDTO);
         Task<bool> RevokeTokenAsync(string token);
         Task<string> AddRoleToUserAsync(AddRoleDTO model);

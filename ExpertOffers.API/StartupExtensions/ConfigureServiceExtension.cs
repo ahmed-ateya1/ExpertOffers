@@ -83,9 +83,15 @@ namespace ExpertOffers.API.StartupExtensions
             services.AddScoped<ICityServices, CityServices>();
             services.AddScoped<ICountryServices, CountryServices>();
             services.AddScoped<IClientServices, ClientServices>();
+            services.AddScoped<ICompanyServices, CompanyServices>();
+            services.AddScoped<IBranchServices, BranchServices>();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Expert Offers APP", Version = "v1" });
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "api.xml"));
+            });
 
             //services.AddAuthentication().AddFacebook(opt =>
             //{

@@ -32,6 +32,7 @@ namespace ExpertOffers.Core.DTOS.AuthenticationDTO
             ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.")]
         public string Password { get; set; }
 
+        public string? ClientUri { get; set; }
         public RolesOption Role { get; set; } = RolesOption.USER;
     }
 }

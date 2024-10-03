@@ -8,6 +8,9 @@ using System.Net;
 
 namespace ExpertOffers.API.Controllers
 {
+    /// <summary>
+    /// Controller for handling operations related to Countries.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CountryController : ControllerBase
@@ -15,11 +18,22 @@ namespace ExpertOffers.API.Controllers
         private readonly ICountryServices _countryServices;
         private readonly ILogger<CountryController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CountryController"/> class.
+        /// </summary>
+        /// <param name="countryServices">The country service used to perform operations on country entities.</param>
+        /// <param name="logger">The logger used for logging operations and errors.</param>
         public CountryController(ICountryServices countryServices, ILogger<CountryController> logger)
         {
             _countryServices = countryServices;
             _logger = logger;
         }
+
+        /// <summary>
+        /// Adds a new country to the system.
+        /// </summary>
+        /// <param name="countryAddRequest">The details of the country to be added.</param>
+        /// <returns>Returns a response indicating whether the country was added successfully.</returns>
         [HttpPost("addCountry")]
         public async Task<ActionResult<ApiResponse>> AddCountry(CountryAddRequest countryAddRequest)
         {
@@ -47,6 +61,11 @@ namespace ExpertOffers.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates the details of an existing country.
+        /// </summary>
+        /// <param name="countryUpdateRequest">The updated details of the country.</param>
+        /// <returns>Returns a response indicating whether the country was updated successfully.</returns>
         [HttpPut("updateCountry")]
         public async Task<ActionResult<ApiResponse>> UpdateCountry(CountryUpdateRequest countryUpdateRequest)
         {
@@ -81,13 +100,19 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Deletes a country by its ID.
+        /// </summary>
+        /// <param name="countryID">The ID of the country to be deleted.</param>
+        /// <returns>Returns a response indicating whether the country was deleted successfully.</returns>
         [HttpDelete("deleteCountry")]
         public async Task<ActionResult<ApiResponse>> DeleteCountry(Guid countryID)
         {
             try
             {
                 var isDeleted = await _countryServices.DeleteCountry(countryID);
-                if (isDeleted == false)
+                if (!isDeleted)
                 {
                     return NotFound(new ApiResponse
                     {
@@ -115,6 +140,11 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Retrieves all countries in the system.
+        /// </summary>
+        /// <returns>Returns a list of all countries.</returns>
         [HttpGet("getCountries")]
         public async Task<ActionResult<ApiResponse>> GetCountries()
         {
@@ -131,15 +161,21 @@ namespace ExpertOffers.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetCountries method: An error occurred while fetched Countries");
+                _logger.LogError(ex, "GetCountries method: An error occurred while fetching Countries");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while fetched Countries"
+                    Messages = "An error occurred while fetching Countries"
                 });
             }
         }
+
+        /// <summary>
+        /// Retrieves a country by its ID.
+        /// </summary>
+        /// <param name="countryID">The ID of the country to be retrieved.</param>
+        /// <returns>Returns the details of the country if found.</returns>
         [HttpGet("getCountry")]
         public async Task<ActionResult<ApiResponse>> GetCountry(Guid countryID)
         {
@@ -165,16 +201,21 @@ namespace ExpertOffers.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetCountry method: An error occurred while fetched Country");
+                _logger.LogError(ex, "GetCountry method: An error occurred while fetching Country");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while fetched Country"
+                    Messages = "An error occurred while fetching Country"
                 });
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of countries by matching a partial or full country name.
+        /// </summary>
+        /// <param name="countryName">The partial or full name of the country.</param>
+        /// <returns>Returns a list of countries that match the given name.</returns>
         [HttpGet("getCountries/{countryName}")]
         public async Task<ActionResult<ApiResponse>> GetCountries(string countryName)
         {
@@ -191,12 +232,12 @@ namespace ExpertOffers.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetCountries method: An error occurred while fetched Countries");
+                _logger.LogError(ex, "GetCountries method: An error occurred while fetching Countries");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while fetched Countries"
+                    Messages = "An error occurred while fetching Countries"
                 });
             }
         }
