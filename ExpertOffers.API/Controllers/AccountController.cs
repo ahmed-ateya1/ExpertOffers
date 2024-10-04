@@ -1,6 +1,8 @@
 ﻿using ExpertOffers.Core.Domain.IdentityEntities;
+using ExpertOffers.Core.Dtos.AuthenticationDto;
 using ExpertOffers.Core.DTOS.AuthenticationDTO;
 using ExpertOffers.Core.DTOS.CityDto;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
@@ -29,6 +32,8 @@ namespace ExpertOffers.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountController"/> class.
@@ -37,13 +42,18 @@ namespace ExpertOffers.API.Controllers
         /// <param name="userManager">User manager service.</param>
         /// <param name="emailSender">Email sender service.</param>
         /// <param name="signInManager">Sign-in manager service.</param>
-        public AccountController(IAuthenticationServices authenticationServices, UserManager<ApplicationUser> userManager, IEmailSender emailSender , SignInManager<ApplicationUser> signInManager )
+        /// <param name="unitOfWork">Unit of work service.</param>
+        /// <param name="passwordHasher">Password hasher service.</param>
+        public AccountController(IAuthenticationServices authenticationServices, UserManager<ApplicationUser> userManager, IEmailSender emailSender, SignInManager<ApplicationUser> signInManager, IUnitOfWork unitOfWork, IPasswordHasher<ApplicationUser> passwordHasher)
         {
             _authenticationServices = authenticationServices;
             _userManager = userManager;
             _emailSender = emailSender;
             _signInManager = signInManager;
+            _unitOfWork = unitOfWork;
+            _passwordHasher = passwordHasher;
         }
+
         /// <summary>
         /// Registers a new client account.
         /// </summary>
@@ -69,6 +79,7 @@ namespace ExpertOffers.API.Controllers
 
             return Ok(result);
         }
+
         /// <summary>
         /// Registers a new company account.
         /// </summary>
@@ -94,6 +105,7 @@ namespace ExpertOffers.API.Controllers
 
             return Ok(result);
         }
+
         /// <summary>
         /// Logs in a user or company.
         /// </summary>
@@ -112,7 +124,6 @@ namespace ExpertOffers.API.Controllers
             if (!result.IsAuthenticated)
                 return Problem(result.Message);
 
-            
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {
                 SetRefreshToken(result.RefreshToken, result.RefreshTokenExpiration);
@@ -125,7 +136,6 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="forgotPassword">Email to send the password reset link to.</param>
         /// <returns>Status message.</returns>
-
         [HttpPost("forgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPassword)
         {
@@ -139,12 +149,11 @@ namespace ExpertOffers.API.Controllers
 
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-
             var param = new Dictionary<string, string?>
-            {
-                {"code", code},
-                {"email", forgotPassword.Email}
-            };
+                    {
+                        {"code", code},
+                        {"email", forgotPassword.Email}
+                    };
             var callback = QueryHelpers.AddQueryString(forgotPassword.ClientUri!, param);
 
             await _emailSender.SendEmailAsync(user.Email, "Reset Password",
@@ -152,6 +161,7 @@ namespace ExpertOffers.API.Controllers
 
             return Ok("If the email is associated with an account, a reset password link will be sent.");
         }
+
         /// <summary>
         /// Resets the user's password.
         /// </summary>
@@ -176,6 +186,43 @@ namespace ExpertOffers.API.Controllers
             }
             return Ok();
         }
+
+        /// <summary>
+        /// Changes the user's password.
+        /// </summary>
+        /// <param name="model">Change password request details.</param>
+        /// <returns>Status message.</returns>
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequest model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return BadRequest(new { message = "User not found" });
+            }
+            var user = await _userManager.FindByEmailAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.OldPassword);
+            if (passwordVerificationResult == PasswordVerificationResult.Failed)
+            {
+                return BadRequest(new { message = "Current password is incorrect" });
+            }
+
+            var newHashedPassword = _passwordHasher.HashPassword(user, model.NewPassword);
+            user.PasswordHash = newHashedPassword;
+
+            await _userManager.UpdateAsync(user);
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(new { message = "Password changed successfully" });
+        }
+
         /// <summary>
         /// Confirms the user's email address.
         /// </summary>
@@ -202,6 +249,47 @@ namespace ExpertOffers.API.Controllers
         }
 
         /// <summary>
+        /// Checks if the email is already in use.
+        /// </summary>
+        /// <param name="email">The email to check.</param>
+        /// <returns>True if the email is in use; otherwise, false.</returns>
+        [HttpGet("check-email")]
+        public async Task<IActionResult> IsEmailInUse([FromQuery] string email)
+        {
+            var isInUse = await _unitOfWork.Repository<ApplicationUser>().AnyAsync(u => u.Email == email);
+            return Ok(new { isInUse });
+        }
+
+        /// <summary>
+        /// Adds or updates the user's location.
+        /// </summary>
+        /// <param name="locationDTO">Location details.</param>
+        /// <returns>Status message.</returns>
+        [Authorize]
+        [HttpPost("addLocation")]
+        public async Task<IActionResult> AddLocation([FromBody] LocationDTO locationDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _authenticationServices.AddLocationToUser(locationDTO);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Removes the user's account.
+        /// </summary>
+        /// <returns>Status message.</returns>
+        [Authorize]
+        [HttpDelete("removeAccount")]
+        public async Task<IActionResult> RemoveAccount()
+        {
+            await _authenticationServices.RemoveAccount();
+            return Ok();
+        }
+
+        /// <summary>
         /// Adds a new role to the user.
         /// </summary>
         /// <param name="model">Role details to assign.</param>
@@ -219,33 +307,7 @@ namespace ExpertOffers.API.Controllers
 
             return Ok(model);
         }
-        /// <summary>
-        /// Adds or updates the user's location.
-        /// </summary>
-        /// <param name="locationDTO">Location details.</param>
-        /// <returns>Status message.</returns>
-        [Authorize]
-        [HttpPost("addLocation")]
-        public async Task<IActionResult> AddLocation([FromBody] LocationDTO locationDTO)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            await _authenticationServices.AddLocationToUser(locationDTO);
-
-            return Ok();
-        }
-        /// <summary>
-        /// Removes the user's account.
-        /// </summary>
-        /// <returns>Status message.</returns>
-        [Authorize]
-        [HttpDelete("removeAccount")]
-        public async Task<IActionResult> RemoveAccount()
-        {
-            await _authenticationServices.RemoveAccount();
-            return Ok();
-        }
         /// <summary>
         /// Refreshes the user's authentication token.
         /// </summary>
@@ -264,6 +326,7 @@ namespace ExpertOffers.API.Controllers
             SetRefreshToken(result.RefreshToken, result.RefreshTokenExpiration);
             return Ok(result);
         }
+
         /// <summary>
         /// Revokes a refresh token.
         /// </summary>
@@ -284,6 +347,7 @@ namespace ExpertOffers.API.Controllers
 
             return Ok();
         }
+
         /// <summary>
         /// Sets the refresh token cookie in the response.
         /// </summary>

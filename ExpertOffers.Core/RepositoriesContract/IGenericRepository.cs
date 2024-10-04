@@ -13,6 +13,7 @@ namespace ExpertOffers.Core.RepositoriesContract
         Task<T> GetByAsync(Expression<Func<T, bool>>? filter = null, bool isTracked = true, string includeProperties = "");
         Task<T> CreateAsync(T model);
         Task<int> CountAsync(Expression<Func<T, bool>> filter);
+        Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
         Task AddRangeAsync(IEnumerable<T> model);
         Task RemoveRangeAsync(IEnumerable<T> model);
         Task<bool> DeleteAsync(T model);

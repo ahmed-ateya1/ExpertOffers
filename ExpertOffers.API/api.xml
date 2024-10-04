@@ -9,7 +9,7 @@
             Manages user accounts, including registration, login, password reset, roles, and token handling.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.AccountController.#ctor(ExpertOffers.Core.ServicesContract.IAuthenticationServices,Microsoft.AspNetCore.Identity.UserManager{ExpertOffers.Core.Domain.IdentityEntities.ApplicationUser},Microsoft.AspNetCore.Identity.UI.Services.IEmailSender,Microsoft.AspNetCore.Identity.SignInManager{ExpertOffers.Core.Domain.IdentityEntities.ApplicationUser})">
+        <member name="M:ExpertOffers.API.Controllers.AccountController.#ctor(ExpertOffers.Core.ServicesContract.IAuthenticationServices,Microsoft.AspNetCore.Identity.UserManager{ExpertOffers.Core.Domain.IdentityEntities.ApplicationUser},Microsoft.AspNetCore.Identity.UI.Services.IEmailSender,Microsoft.AspNetCore.Identity.SignInManager{ExpertOffers.Core.Domain.IdentityEntities.ApplicationUser},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Identity.IPasswordHasher{ExpertOffers.Core.Domain.IdentityEntities.ApplicationUser})">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.AccountController"/> class.
             </summary>
@@ -17,6 +17,8 @@
             <param name="userManager">User manager service.</param>
             <param name="emailSender">Email sender service.</param>
             <param name="signInManager">Sign-in manager service.</param>
+            <param name="unitOfWork">Unit of work service.</param>
+            <param name="passwordHasher">Password hasher service.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.RegisterCleintAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.ClientRegisterDTO)">
             <summary>
@@ -53,6 +55,13 @@
             <param name="resetPassword">Reset password request details.</param>
             <returns>Status message.</returns>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.ChangePassword(ExpertOffers.Core.Dtos.AuthenticationDto.ChangePasswordRequest)">
+            <summary>
+            Changes the user's password.
+            </summary>
+            <param name="model">Change password request details.</param>
+            <returns>Status message.</returns>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.ConfirmEmail(ExpertOffers.Core.DTOS.AuthenticationDTO.ConfirmEmailDTO)">
             <summary>
             Confirms the user's email address.
@@ -60,12 +69,12 @@
             <param name="confirmEmailDTO">Email confirmation details.</param>
             <returns>Status message.</returns>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.AccountController.AddRoleAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.AddRoleDTO)">
+        <member name="M:ExpertOffers.API.Controllers.AccountController.IsEmailInUse(System.String)">
             <summary>
-            Adds a new role to the user.
+            Checks if the email is already in use.
             </summary>
-            <param name="model">Role details to assign.</param>
-            <returns>Status message.</returns>
+            <param name="email">The email to check.</param>
+            <returns>True if the email is in use; otherwise, false.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.AddLocation(ExpertOffers.Core.DTOS.CityDto.LocationDTO)">
             <summary>
@@ -78,6 +87,13 @@
             <summary>
             Removes the user's account.
             </summary>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.AddRoleAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.AddRoleDTO)">
+            <summary>
+            Adds a new role to the user.
+            </summary>
+            <param name="model">Role details to assign.</param>
             <returns>Status message.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.RefreshToken">
