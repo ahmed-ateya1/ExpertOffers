@@ -11,6 +11,8 @@ namespace ExpertOffers.Core.Domain.IdentityEntities
 {
     public class ApplicationUser : IdentityUser<Guid>
     {
+        public string? OTPCode { get; set; }
+        public DateTime? OTPExpiration { get; set; }
         public Guid? ClientID { get; set; }
         public virtual Client Client { get; set; }
 

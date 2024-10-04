@@ -33,7 +33,12 @@ namespace ExpertOffers.API
 
             app.UseHttpsRedirection();
 
-            app.UseCors();
+            app.UseCors(options =>
+            {
+                options.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
             app.UseStaticFiles();
             app.UseHttpsRedirection();
 

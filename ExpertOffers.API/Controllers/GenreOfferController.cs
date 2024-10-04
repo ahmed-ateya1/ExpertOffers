@@ -8,6 +8,9 @@ using System.Net;
 
 namespace ExpertOffers.API.Controllers
 {
+    /// <summary>
+    /// API Controller for managing Genre Offers.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class GenreOfferController : ControllerBase
@@ -15,12 +18,22 @@ namespace ExpertOffers.API.Controllers
         private readonly IGenreOfferServices _genreOfferServices;
         private readonly ILogger<GenreOfferController> _logger;
 
-        public GenreOfferController(IGenreOfferServices genreOfferServices, 
-            ILogger<GenreOfferController> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenreOfferController"/> class.
+        /// </summary>
+        /// <param name="genreOfferServices">The genre offer services.</param>
+        /// <param name="logger">The logger.</param>
+        public GenreOfferController(IGenreOfferServices genreOfferServices, ILogger<GenreOfferController> logger)
         {
             _genreOfferServices = genreOfferServices;
             _logger = logger;
         }
+
+        /// <summary>
+        /// Creates a new genre offer.
+        /// </summary>
+        /// <param name="genreAdd">The genre addition request.</param>
+        /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
         [HttpPost("createGenre")]
         public async Task<ActionResult<ApiResponse>> CreateGenre([FromForm] GenreAddRequest genreAdd)
         {
@@ -35,7 +48,6 @@ namespace ExpertOffers.API.Controllers
                     Result = genreResponse,
                     StatusCode = HttpStatusCode.OK
                 });
-
             }
             catch (Exception ex)
             {
@@ -48,6 +60,12 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Updates an existing genre offer.
+        /// </summary>
+        /// <param name="genreUpdate">The genre update request.</param>
+        /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
         [HttpPut("updateGenre")]
         public async Task<ActionResult<ApiResponse>> UpdateGenre([FromForm] GenreUpdateRequest genreUpdate)
         {
@@ -62,7 +80,6 @@ namespace ExpertOffers.API.Controllers
                     Result = genreResponse,
                     StatusCode = HttpStatusCode.OK
                 });
-
             }
             catch (Exception ex)
             {
@@ -75,6 +92,12 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Deletes a genre offer by ID.
+        /// </summary>
+        /// <param name="id">The genre ID.</param>
+        /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
         [HttpDelete("deleteGenre/{id}")]
         public async Task<ActionResult<ApiResponse>> DeleteGenre(Guid id)
         {
@@ -97,7 +120,6 @@ namespace ExpertOffers.API.Controllers
                     Result = isDeleted,
                     StatusCode = HttpStatusCode.OK
                 });
-
             }
             catch (Exception ex)
             {
@@ -110,6 +132,11 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Gets all genre offers.
+        /// </summary>
+        /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
         [HttpGet("getGenres")]
         public async Task<ActionResult<ApiResponse>> GetGenres()
         {
@@ -123,7 +150,6 @@ namespace ExpertOffers.API.Controllers
                     Result = genres,
                     StatusCode = HttpStatusCode.OK
                 });
-
             }
             catch (Exception ex)
             {
@@ -136,6 +162,12 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Gets a genre offer by ID.
+        /// </summary>
+        /// <param name="id">The genre ID.</param>
+        /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
         [HttpGet("getGenre/{id}")]
         public async Task<ActionResult<ApiResponse>> GetGenre(Guid id)
         {
@@ -158,7 +190,6 @@ namespace ExpertOffers.API.Controllers
                     Result = genre,
                     StatusCode = HttpStatusCode.OK
                 });
-
             }
             catch (Exception ex)
             {
@@ -171,6 +202,12 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Gets genre offers by name.
+        /// </summary>
+        /// <param name="name">The genre name.</param>
+        /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
         [HttpGet("getGenresBy/{name}")]
         public async Task<ActionResult<ApiResponse>> GetGenresBy(string name)
         {
@@ -184,7 +221,6 @@ namespace ExpertOffers.API.Controllers
                     Result = genres,
                     StatusCode = HttpStatusCode.OK
                 });
-
             }
             catch (Exception ex)
             {

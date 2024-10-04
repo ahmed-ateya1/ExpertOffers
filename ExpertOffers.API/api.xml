@@ -43,16 +43,16 @@
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.ForgotPassword(ExpertOffers.Core.DTOS.AuthenticationDTO.ForgotPasswordDTO)">
             <summary>
-            Sends a password reset link to the user's email.
+            Sends a password reset OTP to the user's email.
             </summary>
             <param name="forgotPassword">Email to send the password reset link to.</param>
             <returns>Status message.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.ResetPassword(ExpertOffers.Core.DTOS.AuthenticationDTO.ResetPasswordDTO)">
             <summary>
-            Resets the user's password.
+            Resets the user's password using an OTP.
             </summary>
-            <param name="resetPassword">Reset password request details.</param>
+            <param name="resetPassword">Reset password request details, including OTP.</param>
             <returns>Status message.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.ChangePassword(ExpertOffers.Core.Dtos.AuthenticationDto.ChangePasswordRequest)">
@@ -87,6 +87,13 @@
             <summary>
             Removes the user's account.
             </summary>
+            <returns>Status message.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.AccountController.VerifyOtp(ExpertOffers.Core.Dtos.AuthenticationDto.OtpVerificationRequest)">
+            <summary>
+            Verifies the OTP code for email confirmation.
+            </summary>
+            <param name="request">OTP verification request.</param>
             <returns>Status message.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.AddRoleAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.AddRoleDTO)">
@@ -362,6 +369,59 @@
             </summary>
             <param name="countryName">The partial or full name of the country.</param>
             <returns>Returns a list of countries that match the given name.</returns>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.GenreOfferController">
+            <summary>
+            API Controller for managing Genre Offers.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.#ctor(ExpertOffers.Core.ServicesContract.IGenreOfferServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.GenreOfferController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.GenreOfferController"/> class.
+            </summary>
+            <param name="genreOfferServices">The genre offer services.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.CreateGenre(ExpertOffers.Core.Dtos.GenreOffer.GenreAddRequest)">
+            <summary>
+            Creates a new genre offer.
+            </summary>
+            <param name="genreAdd">The genre addition request.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.UpdateGenre(ExpertOffers.Core.Dtos.GenreOffer.GenreUpdateRequest)">
+            <summary>
+            Updates an existing genre offer.
+            </summary>
+            <param name="genreUpdate">The genre update request.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.DeleteGenre(System.Guid)">
+            <summary>
+            Deletes a genre offer by ID.
+            </summary>
+            <param name="id">The genre ID.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.GetGenres">
+            <summary>
+            Gets all genre offers.
+            </summary>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.GetGenre(System.Guid)">
+            <summary>
+            Gets a genre offer by ID.
+            </summary>
+            <param name="id">The genre ID.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.GetGenresBy(System.String)">
+            <summary>
+            Gets genre offers by name.
+            </summary>
+            <param name="name">The genre name.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
         </member>
         <member name="T:ExpertOffers.API.Controllers.IndustrialController">
             <summary>

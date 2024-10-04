@@ -132,7 +132,7 @@ namespace ExpertOffers.API.Controllers
         }
 
         /// <summary>
-        /// Sends a password reset link to the user's email.
+        /// Sends a password reset OTP to the user's email.
         /// </summary>
         /// <param name="forgotPassword">Email to send the password reset link to.</param>
         /// <returns>Status message.</returns>
@@ -145,27 +145,27 @@ namespace ExpertOffers.API.Controllers
             var user = await _userManager.FindByEmailAsync(forgotPassword.Email!);
 
             if (user == null)
-                return Ok("If the email is associated with an account, a reset password link will be sent.");
+                return Ok("If the email is associated with an account, an OTP will be sent.");
 
-            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            
+            var otpCode = new Random().Next(100000, 999999).ToString();
 
-            var param = new Dictionary<string, string?>
-                    {
-                        {"code", code},
-                        {"email", forgotPassword.Email}
-                    };
-            var callback = QueryHelpers.AddQueryString(forgotPassword.ClientUri!, param);
+            
+            user.OTPCode = otpCode;
+            user.OTPExpiration = DateTime.UtcNow.AddMinutes(5); 
+            await _userManager.UpdateAsync(user);
 
-            await _emailSender.SendEmailAsync(user.Email, "Reset Password",
-                $"Please reset your password by <a href='{callback}'>clicking here</a>.");
+            
+            await _emailSender.SendEmailAsync(user.Email, "Reset Password OTP", $"Your OTP code is: {otpCode}");
 
-            return Ok("If the email is associated with an account, a reset password link will be sent.");
+            return Ok("If the email is associated with an account, an OTP will be sent.");
         }
 
+
         /// <summary>
-        /// Resets the user's password.
+        /// Resets the user's password using an OTP.
         /// </summary>
-        /// <param name="resetPassword">Reset password request details.</param>
+        /// <param name="resetPassword">Reset password request details, including OTP.</param>
         /// <returns>Status message.</returns>
         [HttpPost("resetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPassword)
@@ -177,15 +177,26 @@ namespace ExpertOffers.API.Controllers
             if (user == null)
                 return BadRequest("Invalid Request");
 
-            var result = await _userManager.ResetPasswordAsync(user, resetPassword.Token, resetPassword.Password!);
+            
+            if (user.OTPCode != resetPassword.Otp || user.OTPExpiration < DateTime.UtcNow)
+                return BadRequest("Invalid or expired OTP.");
 
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(x => x.Description);
-                return BadRequest(new { Errors = errors });
-            }
-            return Ok();
+            
+            var passwordHasher = new PasswordHasher<ApplicationUser>();
+            var hashedPassword = passwordHasher.HashPassword(user, resetPassword.Password!);
+
+            
+            user.PasswordHash = hashedPassword;
+
+           
+            user.OTPCode = null;
+            user.OTPExpiration = null;
+            await _userManager.UpdateAsync(user);
+
+            return Ok("Password has been reset successfully.");
         }
+
+
 
         /// <summary>
         /// Changes the user's password.
@@ -287,6 +298,34 @@ namespace ExpertOffers.API.Controllers
         {
             await _authenticationServices.RemoveAccount();
             return Ok();
+        }
+
+        /// <summary>
+        /// Verifies the OTP code for email confirmation.
+        /// </summary>
+        /// <param name="request">OTP verification request.</param>
+        /// <returns>Status message.</returns>
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] OtpVerificationRequest request)
+        {
+
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest("Invalid email.");
+            }
+
+            if (user.OTPCode != request.Otp || user.OTPExpiration < DateTime.UtcNow)
+            {
+                return BadRequest("Invalid or expired OTP.");
+            }
+
+            user.EmailConfirmed = true;
+            user.OTPCode = null;
+            user.OTPExpiration = null;
+            await _userManager.UpdateAsync(user);
+
+            return Ok("Email confirmed successfully.");
         }
 
         /// <summary>

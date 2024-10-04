@@ -82,45 +82,41 @@ namespace ExpertOffers.Core.Services
             if (user.RefreshTokens.Any(x => x.IsActive))
             {
                 var activeRefreshToken = user.RefreshTokens.FirstOrDefault(x => x.IsActive);
-
                 authenticationUser.RefreshToken = activeRefreshToken.Token;
                 authenticationUser.RefreshTokenExpiration = activeRefreshToken.ExpiredOn;
             }
             else
             {
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var param = new Dictionary<string, string?>
-                {
-                    {"code", code},
-                    {"email", user.Email}
-                };
-                if(clientRegisterDTO.ClientUri != null)
-                {
-                    var clientURL = clientRegisterDTO.ClientUri;
-                    var callback = QueryHelpers.AddQueryString(clientURL, param);
-                    await _emailSender.SendEmailAsync(user.Email, "Confirm", $"Please Confirm Your Email by <a href='{callback}'>Clicking here</a>.");
-                }
+                var otpCode = new Random().Next(100000, 999999).ToString();
+                user.OTPCode = otpCode;
+                user.OTPExpiration = DateTime.UtcNow.AddMinutes(3); 
+                await _userManager.UpdateAsync(user);
+
+                
+                await _emailSender.SendEmailAsync(user.Email, "OTP Confirmation", $"Your OTP code is: {otpCode}");
 
                 var newRefreshToken = GenerateRefreshToken();
-
                 authenticationUser.RefreshToken = newRefreshToken.Token;
                 authenticationUser.RefreshTokenExpiration = newRefreshToken.ExpiredOn;
                 user.RefreshTokens.Add(newRefreshToken);
                 await _userManager.UpdateAsync(user);
             }
-            var client = new Client()
+
+            var client = new Client
             {
                 ClientID = Guid.NewGuid(),
                 FirstName = clientRegisterDTO.FirstName,
                 LastName = clientRegisterDTO.LastName,
-                UserID = user.Id,
+                UserID = user.Id
             };
+
             var clientAuth = await _unitOfWork.Repository<Client>().CreateAsync(client);
             user.ClientID = clientAuth.ClientID;
             await _unitOfWork.CompleteAsync();
 
             return authenticationUser;
         }
+
         public async Task<AuthenticationResponse> RegisterCompanyAsync(CompanyRegisterDTO companyRegisterDTO)
         {
 
@@ -154,18 +150,13 @@ namespace ExpertOffers.Core.Services
             }
             else
             {
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var param = new Dictionary<string, string?>
-                {
-                    {"code", code},
-                    {"email", user.Email}
-                };
-                if (companyRegisterDTO.ClientUri != null)
-                {
-                    var clientURL = companyRegisterDTO.ClientUri;
-                    var callback = QueryHelpers.AddQueryString(clientURL, param);
-                    await _emailSender.SendEmailAsync(user.Email, "Confirm", $"Please Confirm Your Email by <a href='{callback}'>Clicking here</a>.");
-                }
+                var otpCode = new Random().Next(100000, 999999).ToString();
+                user.OTPCode = otpCode;
+                user.OTPExpiration = DateTime.UtcNow.AddMinutes(3);
+                await _userManager.UpdateAsync(user);
+
+
+                await _emailSender.SendEmailAsync(user.Email, "OTP Confirmation", $"Your OTP code is: {otpCode}");
                 var newRefreshToken = GenerateRefreshToken();
                 authenticationUser.RefreshToken = newRefreshToken.Token;
                 authenticationUser.RefreshTokenExpiration = newRefreshToken.ExpiredOn;

@@ -107,6 +107,8 @@ namespace ExpertOffers.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OTPCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OTPExpiration = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ClientID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ComapnyID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CountryID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
