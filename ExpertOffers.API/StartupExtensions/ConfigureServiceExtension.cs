@@ -86,6 +86,7 @@ namespace ExpertOffers.API.StartupExtensions
             services.AddScoped<ICompanyServices, CompanyServices>();
             services.AddScoped<IBranchServices, BranchServices>();
             services.AddScoped<IIndustrialServices, IndustrialServices>();
+            services.AddScoped<IGenreOfferServices, GenreOfferServices>();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
