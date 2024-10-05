@@ -152,7 +152,7 @@ namespace ExpertOffers.API.Controllers
 
             
             user.OTPCode = otpCode;
-            user.OTPExpiration = DateTime.UtcNow.AddMinutes(5); 
+            user.OTPExpiration = DateTime.UtcNow.AddMinutes(10); 
             await _userManager.UpdateAsync(user);
 
             

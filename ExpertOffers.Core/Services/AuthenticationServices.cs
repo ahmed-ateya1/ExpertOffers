@@ -89,7 +89,7 @@ namespace ExpertOffers.Core.Services
             {
                 var otpCode = new Random().Next(100000, 999999).ToString();
                 user.OTPCode = otpCode;
-                user.OTPExpiration = DateTime.UtcNow.AddMinutes(3); 
+                user.OTPExpiration = DateTime.UtcNow.AddMinutes(10); 
                 await _userManager.UpdateAsync(user);
 
                 
@@ -152,7 +152,7 @@ namespace ExpertOffers.Core.Services
             {
                 var otpCode = new Random().Next(100000, 999999).ToString();
                 user.OTPCode = otpCode;
-                user.OTPExpiration = DateTime.UtcNow.AddMinutes(3);
+                user.OTPExpiration = DateTime.UtcNow.AddMinutes(10);
                 await _userManager.UpdateAsync(user);
 
 

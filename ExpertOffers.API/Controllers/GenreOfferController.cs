@@ -44,19 +44,19 @@ namespace ExpertOffers.API.Controllers
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
-                    Messages = "Genre Offer is added successfully",
+                    Messages = "genreID Offer is added successfully",
                     Result = genreResponse,
                     StatusCode = HttpStatusCode.OK
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "createGenre method: An error occurred while Create Genre");
+                _logger.LogError(ex, "createGenre method: An error occurred while Create genreID");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while Create Genre"
+                    Messages = "An error occurred while Create genreID"
                 });
             }
         }
@@ -76,19 +76,19 @@ namespace ExpertOffers.API.Controllers
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
-                    Messages = "Genre Offer is updated successfully",
+                    Messages = "genreID Offer is updated successfully",
                     Result = genreResponse,
                     StatusCode = HttpStatusCode.OK
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "updateGenre method: An error occurred while Update Genre");
+                _logger.LogError(ex, "updateGenre method: An error occurred while Update genreID");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while Update Genre"
+                    Messages = "An error occurred while Update genreID"
                 });
             }
         }
@@ -109,26 +109,26 @@ namespace ExpertOffers.API.Controllers
                     return NotFound(new ApiResponse
                     {
                         IsSuccess = false,
-                        Messages = "Genre Offer is not found",
+                        Messages = "genreID Offer is not found",
                         StatusCode = HttpStatusCode.NotFound
                     });
                 }
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
-                    Messages = "Genre Offer is deleted successfully",
+                    Messages = "genreID Offer is deleted successfully",
                     Result = isDeleted,
                     StatusCode = HttpStatusCode.OK
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "deleteGenre method: An error occurred while Delete Genre");
+                _logger.LogError(ex, "deleteGenre method: An error occurred while Delete genreID");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while Delete Genre"
+                    Messages = "An error occurred while Delete genreID"
                 });
             }
         }
@@ -146,7 +146,7 @@ namespace ExpertOffers.API.Controllers
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
-                    Messages = "Genre Offers are fetched successfully",
+                    Messages = "genreID Offers are fetched successfully",
                     Result = genres,
                     StatusCode = HttpStatusCode.OK
                 });
@@ -179,26 +179,26 @@ namespace ExpertOffers.API.Controllers
                     return NotFound(new ApiResponse
                     {
                         IsSuccess = false,
-                        Messages = "Genre Offer is not found",
+                        Messages = "genreID Offer is not found",
                         StatusCode = HttpStatusCode.NotFound
                     });
                 }
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
-                    Messages = "Genre Offer is fetched successfully",
+                    Messages = "genreID Offer is fetched successfully",
                     Result = genre,
                     StatusCode = HttpStatusCode.OK
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "getGenre method: An error occurred while Get Genre");
+                _logger.LogError(ex, "getGenre method: An error occurred while Get genreID");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while Get Genre"
+                    Messages = "An error occurred while Get genreID"
                 });
             }
         }
@@ -217,7 +217,7 @@ namespace ExpertOffers.API.Controllers
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
-                    Messages = "Genre Offers are fetched successfully",
+                    Messages = "genreID Offers are fetched successfully",
                     Result = genres,
                     StatusCode = HttpStatusCode.OK
                 });

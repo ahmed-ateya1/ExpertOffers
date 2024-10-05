@@ -21,14 +21,8 @@ namespace ExpertOffers.Infrastructure.Configurations
                 .HasMaxLength(100)
                 .IsRequired();
 
-            builder.Property(x => x.OfferDescription)
-                .HasMaxLength(500)
-                .IsRequired();
 
             builder.Property(x => x.OfferPrice)
-                .IsRequired();
-
-            builder.Property(x => x.OfferURL)
                 .IsRequired();
 
             builder.Property(x => x.OfferPictureURL)

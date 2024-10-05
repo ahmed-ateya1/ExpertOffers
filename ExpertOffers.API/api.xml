@@ -476,6 +476,107 @@
             <param name="industrialName">The name of the industrial entity to search for.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the list of matching industrial entities.</returns>
         </member>
+        <member name="T:ExpertOffers.API.Controllers.OfferController">
+            <summary>
+            Controller responsible for managing offers.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.#ctor(ExpertOffers.Core.ServicesContract.IOfferServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.OfferController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.OfferController"/> class.
+            </summary>
+            <param name="offerServices">Service for managing offers.</param>
+            <param name="logger">Logger for capturing logs.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:ExpertOffers.API.Controllers.OfferController.CreateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferAddRequest)" -->
+        <member name="M:ExpertOffers.API.Controllers.OfferController.UpdateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferUpdateRequest)">
+            <summary>
+            Updates an existing offer.
+            </summary>
+            <param name="request">The updated offer details.</param>
+            <returns>An API response indicating the result of the offer update.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.DeleteOffer(System.Guid)">
+            <summary>
+            Deletes an existing offer by its ID.
+            </summary>
+            <param name="offerID">The unique ID of the offer to be deleted.</param>
+            <returns>An API response indicating the result of the offer deletion.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffers">
+            <summary>
+            Retrieves all available offers.
+            </summary>
+            <returns>An API response with the list of offers.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersBy(System.String)">
+            <summary>
+            Retrieves offers based on the offer name.
+            </summary>
+            <param name="offerName">The name of the offer to search.</param>
+            <returns>An API response with the matching offers.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffer(System.Guid)">
+            <summary>
+            Retrieves an offer by its ID.
+            </summary>
+            <param name="offerID">The unique ID of the offer.</param>
+            <returns>An API response with the requested offer details.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByGenre(System.Guid)">
+            <summary>
+            Retrieves an offers by genre ID.
+            </summary>
+            <param name="genreID">The unique ID of the genreOffer.</param>
+            <returns>An API response with the requested offer details.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompany(System.Guid)">
+            <summary>
+            Retrieves an offers by company ID.
+            </summary>
+            <param name="companyID">The unique ID of the company.</param>
+            <returns>An API response with the requested offer details.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersActiveOnly">
+            <summary>
+            Retrieves active offers only.
+            </summary>
+            <returns>An API response with the list of active offers.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersInactiveOnly">
+            <summary>
+            Retrieves inactive offers only.
+            </summary>
+            <returns>An API response with the list of inactive offers.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompanyActiveOnly(System.Guid)">
+            <summary>
+            Retrieves active offers by company ID.
+            </summary>
+            <param name="companyID">The unique ID of the company.</param>
+            <returns>An API response with the list of active offers for the specified company.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompanyInactiveOnly(System.Guid)">
+            <summary>
+            Retrieves inactive offers by company ID.
+            </summary>
+            <param name="companyID">The unique ID of the company.</param>
+            <returns>An API response with the list of inactive offers for the specified company.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByGenreActiveOnly(System.Guid)">
+            <summary>
+            Retrieves active offers by genre ID.
+            </summary>
+            <param name="genreID">The unique ID of the genre.</param>
+            <returns>An API response with the list of active offers for the specified genre.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByGenreInactiveOnly(System.Guid)">
+            <summary>
+            Retrieves inactive offers by genre ID.
+            </summary>
+            <param name="genreID">The unique ID of the genre.</param>
+            <returns>An API response with the list of inactive offers for the specified genre.</returns>
+        </member>
         <member name="T:ExpertOffers.API.FileServices.FileService">
             <summary>
             Provides file-related services for the application.

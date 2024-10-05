@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpertOffers.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241004164501_init")]
-    partial class init
+    [Migration("20241005112801_updateOffersTable")]
+    partial class updateOffersTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -365,11 +365,6 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("OfferDescription")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<double>("OfferDiscount")
                         .HasColumnType("float");
 
@@ -393,6 +388,9 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .HasColumnType("date");
 
                     b.Property<long>("TotalSaved")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalUsed")
                         .HasColumnType("bigint");
 
                     b.Property<long>("TotalViews")

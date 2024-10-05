@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace ExpertOffers.Core.Dtos.OfferDto
 {
-    public class OfferAddRequest
+    public class OfferUpdateRequest
     {
+        [Required(ErrorMessage = "Offer ID is required")]
+        public Guid OfferID { get; set; }
         [Required(ErrorMessage = "Offer title is required")]
         [StringLength(100, ErrorMessage = "Offer title must be less than 100 characters")]
         public string OfferTitle { get; set; }
@@ -30,7 +32,6 @@ namespace ExpertOffers.Core.Dtos.OfferDto
         [Required(ErrorMessage = "End date is required")]
         public DateTime EndDate { get; set; }
 
-        [Required(ErrorMessage = "Offer Picture is required")]
-        public IFormFile OfferPicture { get; set; }
+        public IFormFile? OfferPicture { get; set; }
     }
 }

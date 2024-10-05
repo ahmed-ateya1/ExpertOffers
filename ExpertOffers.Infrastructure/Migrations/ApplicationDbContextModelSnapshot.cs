@@ -353,19 +353,14 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Property<Guid>("CompanyID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("GenreID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
-
-                    b.Property<string>("OfferDescription")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<double>("OfferDiscount")
                         .HasColumnType("float");
@@ -382,12 +377,8 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("OfferURL")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<long>("TotalSaved")
                         .HasColumnType("bigint");
@@ -800,7 +791,7 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ExpertOffers.Core.Domain.Entities.GenreOffer", "Genre")
+                    b.HasOne("ExpertOffers.Core.Domain.Entities.GenreOffer", "genreID")
                         .WithMany("Offers")
                         .HasForeignKey("GenreID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -808,7 +799,7 @@ namespace ExpertOffers.Infrastructure.Migrations
 
                     b.Navigation("Company");
 
-                    b.Navigation("Genre");
+                    b.Navigation("genreID");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.SavedItem", b =>

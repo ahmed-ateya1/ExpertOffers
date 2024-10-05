@@ -10,10 +10,10 @@ namespace ExpertOffers.Core.Dtos.GenreOffer
 {
     public class GenreAddRequest
     {
-        [Required(ErrorMessage = "Genre Name is required")]
-        [StringLength(50, ErrorMessage = "Genre Name must be less than 50 characters")]
+        [Required(ErrorMessage = "genreID Name is required")]
+        [StringLength(50, ErrorMessage = "genreID Name must be less than 50 characters")]
         public string GenreName { get; set; }
-        [Required(ErrorMessage = "Genre Image is required")]
+        [Required(ErrorMessage = "genreID Image is required")]
         public IFormFile GenreImg { get; set; }
 
     }

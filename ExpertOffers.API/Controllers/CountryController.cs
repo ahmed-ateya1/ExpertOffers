@@ -224,7 +224,7 @@ namespace ExpertOffers.API.Controllers
         {
             try
             {
-                var countries = await _countryServices.GetCountries(x => x.CountryName.Contains(countryName.ToUpper()));
+                var countries = await _countryServices.GetCountries(x => x.CountryName.ToUpper().Contains(countryName.ToUpper()));
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,

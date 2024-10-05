@@ -45,8 +45,8 @@ public class GenreOfferServices : IGenreOfferServices
     {
         if (genreRequest == null)
         {
-            _logger.LogWarning("CreateAsync: Genre request was null.");
-            throw new ArgumentNullException(nameof(genreRequest), "Genre request cannot be null.");
+            _logger.LogWarning("CreateAsync: genreID request was null.");
+            throw new ArgumentNullException(nameof(genreRequest), "genreID request cannot be null.");
         }
 
         ValidationHelper.ValidateModel(genreRequest);
@@ -58,7 +58,7 @@ public class GenreOfferServices : IGenreOfferServices
         try
         {
             genre.GenreImgURL = await _fileServices.CreateFile(genreRequest.GenreImg);
-            _logger.LogInformation("Genre image uploaded successfully.");
+            _logger.LogInformation("genreID image uploaded successfully.");
         }
         catch (Exception ex)
         {
@@ -72,7 +72,7 @@ public class GenreOfferServices : IGenreOfferServices
             await _unitOfWork.CompleteAsync();
         });
 
-        _logger.LogInformation("Genre created successfully with ID: {GenreID}", genre.GenreID);
+        _logger.LogInformation("genreID created successfully with ID: {GenreID}", genre.GenreID);
         return _mapper.Map<GenreResponse>(genre);
     }
 
@@ -80,25 +80,36 @@ public class GenreOfferServices : IGenreOfferServices
     {
         if (id == null)
         {
-            _logger.LogWarning("DeleteAsync: Genre ID was null.");
-            throw new ArgumentNullException(nameof(id), "Genre ID cannot be null.");
+            _logger.LogWarning("DeleteAsync: genreID ID was null.");
+            throw new ArgumentNullException(nameof(id), "genreID ID cannot be null.");
         }
 
         var genre = await _unitOfWork.Repository<GenreOffer>().GetByAsync(x => x.GenreID == id);
         if (genre == null)
         {
-            _logger.LogWarning("DeleteAsync: Genre not found with ID: {GenreID}", id);
-            throw new ArgumentNullException(nameof(genre), "Genre not found.");
+            _logger.LogWarning("DeleteAsync: genreID not found with ID: {GenreID}", id);
+            throw new ArgumentNullException(nameof(genre), "genreID not found.");
         }
 
         bool result = false;
         await ExecuteWithTransaction(async () =>
         {
+            if(genre.Offers.Count > 0)
+            {
+               await _unitOfWork.Repository<Offer>().RemoveRangeAsync(genre.Offers);   
+               _logger.LogInformation("Offers deleted successfully.");
+            }
+            if (genre.GenreImgURL != null)
+            {
+                await _fileServices.DeleteFile(Path.GetFileName(genre.GenreImgURL));
+                _logger.LogInformation("genreID image deleted successfully.");
+            }
+            
             result = await _unitOfWork.Repository<GenreOffer>().DeleteAsync(genre);
             await _unitOfWork.CompleteAsync();
         });
 
-        _logger.LogInformation("Genre deleted successfully with ID: {GenreID}", id);
+        _logger.LogInformation("genreID deleted successfully with ID: {GenreID}", id);
         return result;
     }
 
@@ -120,8 +131,8 @@ public class GenreOfferServices : IGenreOfferServices
     {
         if (genreRequest == null)
         {
-            _logger.LogWarning("UpdateAsync: Genre update request was null.");
-            throw new ArgumentNullException(nameof(genreRequest), "Genre update request cannot be null.");
+            _logger.LogWarning("UpdateAsync: genreID update request was null.");
+            throw new ArgumentNullException(nameof(genreRequest), "genreID update request cannot be null.");
         }
 
         ValidationHelper.ValidateModel(genreRequest);
@@ -130,8 +141,8 @@ public class GenreOfferServices : IGenreOfferServices
         var genre = await _unitOfWork.Repository<GenreOffer>().GetByAsync(x => x.GenreID == genreRequest.GenreID);
         if (genre == null)
         {
-            _logger.LogWarning("UpdateAsync: Genre not found with ID: {GenreID}", genreRequest.GenreID);
-            throw new ArgumentNullException(nameof(genre), "Genre not found.");
+            _logger.LogWarning("UpdateAsync: genreID not found with ID: {GenreID}", genreRequest.GenreID);
+            throw new ArgumentNullException(nameof(genre), "genreID not found.");
         }
 
         _mapper.Map(genreRequest, genre);
@@ -141,7 +152,7 @@ public class GenreOfferServices : IGenreOfferServices
             try
             {
                 genre.GenreImgURL = await _fileServices.UpdateFile(genreRequest.GenreImg, Path.GetFileName(genre.GenreImgURL));
-                _logger.LogInformation("Genre image updated successfully.");
+                _logger.LogInformation("genreID image updated successfully.");
             }
             catch (Exception ex)
             {
@@ -156,7 +167,7 @@ public class GenreOfferServices : IGenreOfferServices
             await _unitOfWork.CompleteAsync();
         });
 
-        _logger.LogInformation("Genre updated successfully with ID: {GenreID}", genre.GenreID);
+        _logger.LogInformation("genreID updated successfully with ID: {GenreID}", genre.GenreID);
         return _mapper.Map<GenreResponse>(genre);
     }
 }
