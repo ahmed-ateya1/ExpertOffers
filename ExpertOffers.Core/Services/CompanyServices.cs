@@ -104,7 +104,7 @@ public class CompanyServices : ICompanyServices
 
         if (request.CompanyLogo != null)
         {
-            companyUpdate.CompanyLogoURL = await _fileServices.CreateFile(request.CompanyLogo);
+            companyUpdate.CompanyLogoURL = await _fileServices.UpdateFile(request.CompanyLogo , Path.GetFileName(companyUpdate.CompanyLogoURL));
         }
 
 

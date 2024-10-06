@@ -30,8 +30,6 @@ namespace ExpertOffers.Infrastructure.Configurations
                 .HasMaxLength(200)
                 .IsRequired();
 
-            builder.Property(e => e.BranchLogoURL)
-                .IsRequired();
 
             builder.HasOne(x => x.Company)
                 .WithMany(x => x.Branches)

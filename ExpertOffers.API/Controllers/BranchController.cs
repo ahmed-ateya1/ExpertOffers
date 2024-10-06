@@ -38,7 +38,7 @@ namespace ExpertOffers.API.Controllers
         /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPost("addBranch")]
         [Authorize(Roles = "COMPANY")]
-        public async Task<IActionResult> AddBranch([FromForm] BranchAddRequest branchAddRequest)
+        public async Task<IActionResult> AddBranch(BranchAddRequest branchAddRequest)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ExpertOffers.API.Controllers
         /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPut("updateBranch")]
         [Authorize(Roles = "COMPANY")]
-        public async Task<IActionResult> UpdateBranch([FromForm] BranchUpdateRequest branchUpdateRequest)
+        public async Task<IActionResult> UpdateBranch(BranchUpdateRequest branchUpdateRequest)
         {
             try
             {

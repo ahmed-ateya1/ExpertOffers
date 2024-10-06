@@ -142,22 +142,7 @@ namespace ExpertOffers.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await _userManager.FindByEmailAsync(forgotPassword.Email!);
-
-            if (user == null)
-                return Ok("If the email is associated with an account, an OTP will be sent.");
-
-            
-            var otpCode = new Random().Next(100000, 999999).ToString();
-
-            
-            user.OTPCode = otpCode;
-            user.OTPExpiration = DateTime.UtcNow.AddMinutes(10); 
-            await _userManager.UpdateAsync(user);
-
-            
-            await _emailSender.SendEmailAsync(user.Email, "Reset Password OTP", $"Your OTP code is: {otpCode}");
-
+            await _authenticationServices.ForgotPassword(forgotPassword);
             return Ok("If the email is associated with an account, an OTP will be sent.");
         }
 
@@ -173,15 +158,10 @@ namespace ExpertOffers.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var user = await _userManager.FindByEmailAsync(resetPassword.Email);
+            var user = await _userManager.FindByEmailAsync(resetPassword.Email!);
             if (user == null)
                 return BadRequest("Invalid Request");
 
-            
-            if (user.OTPCode != resetPassword.Otp || user.OTPExpiration < DateTime.UtcNow)
-                return BadRequest("Invalid or expired OTP.");
-
-            
             var passwordHasher = new PasswordHasher<ApplicationUser>();
             var hashedPassword = passwordHasher.HashPassword(user, resetPassword.Password!);
 
@@ -235,31 +215,6 @@ namespace ExpertOffers.API.Controllers
         }
 
         /// <summary>
-        /// Confirms the user's email address.
-        /// </summary>
-        /// <param name="confirmEmailDTO">Email confirmation details.</param>
-        /// <returns>Status message.</returns>
-        [HttpGet("confirmEmail")]
-        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailDTO confirmEmailDTO)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var user = await _userManager.FindByEmailAsync(confirmEmailDTO.Email);
-            if (user == null)
-                return BadRequest("Invalid Request");
-
-            var result = await _userManager.ConfirmEmailAsync(user, confirmEmailDTO.Code);
-
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(x => x.Description);
-                return BadRequest(new { Errors = errors });
-            }
-            return Ok();
-        }
-
-        /// <summary>
         /// Checks if the email is already in use.
         /// </summary>
         /// <param name="email">The email to check.</param>
@@ -301,7 +256,7 @@ namespace ExpertOffers.API.Controllers
         }
 
         /// <summary>
-        /// Verifies the OTP code for email confirmation.
+        /// Verifies the OTP code.
         /// </summary>
         /// <param name="request">OTP verification request.</param>
         /// <returns>Status message.</returns>
@@ -325,7 +280,7 @@ namespace ExpertOffers.API.Controllers
             user.OTPExpiration = null;
             await _userManager.UpdateAsync(user);
 
-            return Ok("Email confirmed successfully.");
+            return Ok("Verify successfully.");
         }
 
         /// <summary>

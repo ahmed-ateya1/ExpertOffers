@@ -21,8 +21,6 @@ namespace ExpertOffers.Core.DTOS.AuthenticationDTO
 
         public string? Email { get; set; }
 
-        [Required]
-        public string? Otp { get; set; }
     }
 }
 

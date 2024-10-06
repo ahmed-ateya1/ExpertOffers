@@ -128,13 +128,13 @@ namespace ExpertOffers.Core.Services
 
         public async Task<IEnumerable<OfferResponse>> GetAllAsync(Expression<Func<Offer, bool>>? expression = null)
         {
-            var result = await _unitOfWork.Repository<Offer>().GetAllAsync(expression,includeProperties: "Company,genreID");
+            var result = await _unitOfWork.Repository<Offer>().GetAllAsync(expression,includeProperties: "Company,Genre");
             return _mapper.Map<IEnumerable<OfferResponse>>(result);
         }
 
         public async Task<OfferResponse> GetByAsync(Expression<Func<Offer, bool>> expression, bool isTracked = true)
         {
-            var result =  await _unitOfWork.Repository<Offer>().GetByAsync(expression, isTracked, includeProperties: "Company,genreID");
+            var result =  await _unitOfWork.Repository<Offer>().GetByAsync(expression, isTracked, includeProperties: "Company,Genre");
             result.TotalViews++;
             await _unitOfWork.CompleteAsync();
             return _mapper.Map<OfferResponse>(result);

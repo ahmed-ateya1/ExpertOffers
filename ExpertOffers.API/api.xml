@@ -62,13 +62,6 @@
             <param name="model">Change password request details.</param>
             <returns>Status message.</returns>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.AccountController.ConfirmEmail(ExpertOffers.Core.DTOS.AuthenticationDTO.ConfirmEmailDTO)">
-            <summary>
-            Confirms the user's email address.
-            </summary>
-            <param name="confirmEmailDTO">Email confirmation details.</param>
-            <returns>Status message.</returns>
-        </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.IsEmailInUse(System.String)">
             <summary>
             Checks if the email is already in use.
@@ -91,7 +84,7 @@
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.VerifyOtp(ExpertOffers.Core.Dtos.AuthenticationDto.OtpVerificationRequest)">
             <summary>
-            Verifies the OTP code for email confirmation.
+            Verifies the OTP code.
             </summary>
             <param name="request">OTP verification request.</param>
             <returns>Status message.</returns>

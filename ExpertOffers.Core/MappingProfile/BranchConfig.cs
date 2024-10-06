@@ -10,15 +10,14 @@ namespace ExpertOffers.Core.MappingProfile
         {
 
             CreateMap<BranchAddRequest, Branch>()
-                .ForMember(dest => dest.BranchID, opt => opt.Ignore())
-                .ForMember(dest => dest.BranchLogoURL, opt => opt.Ignore());
+                .ForMember(dest => dest.BranchID, opt => opt.Ignore());
 
 
-            CreateMap<BranchUpdateRequest, Branch>()
-                .ForMember(dest => dest.BranchLogoURL, opt => opt.Ignore());
+            CreateMap<BranchUpdateRequest, Branch>();
 
             CreateMap<Branch, BranchResponse>()
-                .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Company.CompanyName));
+                .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Company.CompanyName))
+                .ForMember(dest=>dest.CompanyLogoURL , opt=>opt.MapFrom(src=>src.Company.CompanyLogoURL));
         }
     }
 }

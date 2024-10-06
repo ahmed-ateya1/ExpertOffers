@@ -39,12 +39,7 @@ namespace ExpertOffers.Core.Services
 
             branch.BranchID = Guid.NewGuid();
             branch.Company = company;
-            if (branchAddRequest.BranchLogo != null)
-            {
-                await _fileServices.DeleteFile(Path.GetFileName(branch.BranchLogoURL));
-                branch.BranchLogoURL = await _fileServices.CreateFile(branchAddRequest.BranchLogo);
-            }
-
+           
             await _unitOfWork.Repository<Branch>().CreateAsync(branch);
             await _unitOfWork.CompleteAsync();
 
@@ -94,10 +89,6 @@ namespace ExpertOffers.Core.Services
 
             _mapper.Map(branchUpdateRequest, branch);
 
-            if (branchUpdateRequest.BranchLogo != null)
-            {
-                branch.BranchLogoURL = await _fileServices.CreateFile(branchUpdateRequest.BranchLogo);
-            }
 
             await _unitOfWork.Repository<Branch>().UpdateAsync(branch);
             await _unitOfWork.CompleteAsync();

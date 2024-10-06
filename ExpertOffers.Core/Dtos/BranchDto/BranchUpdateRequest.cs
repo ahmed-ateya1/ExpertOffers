@@ -22,7 +22,5 @@ namespace ExpertOffers.Core.Dtos.BranchDto
         public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "Location is required")]
         public string Location { get; set; }
-
-        public IFormFile? BranchLogo { get; set; }
     }
 }

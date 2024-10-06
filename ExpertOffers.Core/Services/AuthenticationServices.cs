@@ -56,6 +56,72 @@ namespace ExpertOffers.Core.Services
             var request = _httpContextAccessor.HttpContext.Request;
             return $"{request.Scheme}://{request.Host.Value}/";
         }
+        private string EmailBody(string Title ,string content , string email  , string optCode)
+        {
+            return $@"
+            <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        color: #333;
+                        line-height: 1.6;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 20px;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        background-color: #f9f9f9;
+                    }}
+                    .header {{
+                        text-align: center;
+                        padding-bottom: 20px;
+                    }}
+                    .header h1 {{
+                        color: #007BFF;
+                        font-size: 24px;
+                    }}
+                    .content {{
+                        padding: 20px;
+                        background-color: #ffffff;
+                        border-radius: 8px;
+                    }}
+                    .otp-code {{
+                        font-size: 22px;
+                        font-weight: bold;
+                        color: #007BFF;
+                        text-align: center;
+                        margin: 20px 0;
+                    }}
+                    .footer {{
+                        text-align: center;
+                        margin-top: 20px;
+                        font-size: 12px;
+                        color: #777;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>
+                        <h1>{Title}</h1>
+                    </div>
+                    <div class='content'>
+                        <p>Hello {email},</p>
+                        <p>{content}</p>
+                        <div class='otp-code'>{optCode}</div>
+                        <p>This code will expire in 10 minutes. If you did not request this, you can safely ignore this email.</p>
+                        <p>Best regards,<br/>The Expert Offers Team</p>
+                    </div>
+                    <div class='footer'>
+                        <p>&copy; 2024 Expert Offers. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>";
+        }
         public async Task<AuthenticationResponse> RegisterClientAsync(ClientRegisterDTO clientRegisterDTO)
         {
             if (await _userManager.FindByEmailAsync(clientRegisterDTO.Email) != null)
@@ -87,13 +153,14 @@ namespace ExpertOffers.Core.Services
             }
             else
             {
-                var otpCode = new Random().Next(100000, 999999).ToString();
+                var otpCode = OtpHelper.GenerateOtp();
                 user.OTPCode = otpCode;
                 user.OTPExpiration = DateTime.UtcNow.AddMinutes(10); 
                 await _userManager.UpdateAsync(user);
 
-                
-                await _emailSender.SendEmailAsync(user.Email, "OTP Confirmation", $"Your OTP code is: {otpCode}");
+
+                string emailBody = EmailBody("Confirm Your Email", "Thank you for registering with Expert Offers. To complete your registration, please confirm your email address by Using this code: ", user.Email, otpCode);
+                await _emailSender.SendEmailAsync(user.Email, "Confirm Email", emailBody);
 
                 var newRefreshToken = GenerateRefreshToken();
                 authenticationUser.RefreshToken = newRefreshToken.Token;
@@ -150,13 +217,14 @@ namespace ExpertOffers.Core.Services
             }
             else
             {
-                var otpCode = new Random().Next(100000, 999999).ToString();
+                var otpCode = OtpHelper.GenerateOtp();
                 user.OTPCode = otpCode;
                 user.OTPExpiration = DateTime.UtcNow.AddMinutes(10);
                 await _userManager.UpdateAsync(user);
 
 
-                await _emailSender.SendEmailAsync(user.Email, "OTP Confirmation", $"Your OTP code is: {otpCode}");
+                string emailBody = EmailBody("Confirm Your Email", "Thank you for registering with Expert Offers. To complete your registration, please confirm your email address by Using this code: ", user.Email, otpCode);
+                await _emailSender.SendEmailAsync(user.Email, "Confirm Email", emailBody);
                 var newRefreshToken = GenerateRefreshToken();
                 authenticationUser.RefreshToken = newRefreshToken.Token;
                 authenticationUser.RefreshTokenExpiration = newRefreshToken.ExpiredOn;
@@ -372,7 +440,27 @@ namespace ExpertOffers.Core.Services
             if (user is null)
                 throw new UnauthorizedAccessException("User is not authenticated");
             await _userManager.DeleteAsync(user);
+            await _unitOfWork.CompleteAsync();
 
+        }
+
+        public async Task<bool> ForgotPassword(ForgotPasswordDTO forgotPasswordDTO)
+        {
+            var user = await _userManager.FindByEmailAsync(forgotPasswordDTO.Email!);
+
+            if (user is null)
+                return false;
+
+
+            var otpCode = OtpHelper.GenerateOtp();
+
+
+            user.OTPCode = otpCode;
+            user.OTPExpiration = DateTime.UtcNow.AddMinutes(10);
+            await _userManager.UpdateAsync(user);
+            string emailBody = EmailBody("Reset Your Password", "We received a request to reset your password. Please use the following OTP code to proceed:", user.Email, otpCode);
+            await _emailSender.SendEmailAsync(user.Email, "Reset Password OTP", emailBody);
+            return true;
         }
     }
 }
