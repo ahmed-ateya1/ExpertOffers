@@ -26,7 +26,7 @@ namespace ExpertOffers.API.StartupExtensions
             services.AddSignalR();
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("HostingString"));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
@@ -88,6 +88,8 @@ namespace ExpertOffers.API.StartupExtensions
             services.AddScoped<IIndustrialServices, IndustrialServices>();
             services.AddScoped<IGenreOfferServices, GenreOfferServices>();
             services.AddScoped<IOfferServices, OfferServices>();
+            services.AddScoped<IGenreCouponServices, GenreCouponServices>();
+            services.AddScoped<ICouponServices, CouponServices>();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>

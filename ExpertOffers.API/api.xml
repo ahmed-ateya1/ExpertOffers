@@ -363,6 +363,166 @@
             <param name="countryName">The partial or full name of the country.</param>
             <returns>Returns a list of countries that match the given name.</returns>
         </member>
+        <member name="T:ExpertOffers.API.Controllers.CouponController">
+            <summary>
+            Represents the controller for managing coupons.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.#ctor(ExpertOffers.Core.ServicesContract.ICouponServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CouponController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.CouponController"/> class.
+            </summary>
+            <param name="couponServices">The coupon services.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.CreateCoupon(ExpertOffers.Core.Dtos.CouponDto.CouponAddRequest)">
+            <summary>
+            Creates a new coupon.
+            </summary>
+            <param name="couponAddRequest">The coupon add request.</param>
+            <returns>The created coupon.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.UpdateCoupon(ExpertOffers.Core.Dtos.CouponDto.CouponUpdateRequest)">
+            <summary>
+            Updates an existing coupon.
+            </summary>
+            <param name="couponUpdateRequest">The coupon update request.</param>
+            <returns>The updated coupon.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.DeleteCoupon(System.Guid)">
+            <summary>
+            Deletes a coupon by its ID.
+            </summary>
+            <param name="id">The ID of the coupon to delete.</param>
+            <returns>The result of the delete operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetCoupon(System.Guid)">
+            <summary>
+            Gets a coupon by its ID.
+            </summary>
+            <param name="id">The ID of the coupon to get.</param>
+            <returns>The found coupon.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponByCompany(System.Guid)">
+            <summary>
+            Gets coupons by company ID.
+            </summary>
+            <param name="companyID">The ID of the company.</param>
+            <returns>The coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponByGenre(System.Guid)">
+            <summary>
+            Gets coupons by genre ID.
+            </summary>
+            <param name="genreID">The ID of the genre.</param>
+            <returns>The coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetAllCoupons">
+            <summary>
+            Gets all coupons.
+            </summary>
+            <returns>All the coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetActiveCoupons">
+            <summary>
+            Gets active coupons.
+            </summary>
+            <returns>The active coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetInactiveCoupons">
+            <summary>
+            Gets inactive coupons.
+            </summary>
+            <returns>The inactive coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetActiveCouponsByCompany(System.Guid)">
+            <summary>
+            Gets active coupons by company ID.
+            </summary>
+            <param name="companyID">The ID of the company.</param>
+            <returns>The active coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetInActiveCouponsByCompany(System.Guid)">
+            <summary>
+            Gets inactive coupons by company ID.
+            </summary>
+            <param name="companyID">The ID of the company.</param>
+            <returns>The inactive coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetActiveCouponsByGenre(System.Guid)">
+            <summary>
+            Gets active coupons by genre ID.
+            </summary>
+            <param name="genreID">The ID of the genre.</param>
+            <returns>The active coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetInActiveCouponsByGenre(System.Guid)">
+            <summary>
+            Gets inactive coupons by genre ID.
+            </summary>
+            <param name="genreID">The ID of the genre.</param>
+            <returns>The inactive coupons found.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponsByTitle(System.String)">
+            <summary>
+            Gets coupons by title.
+            </summary>
+            <param name="title">The title of the coupons.</param>
+            <returns>The coupons found.</returns>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.GenreCouponController">
+            <summary>
+            Controller for managing genre coupons.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.#ctor(ExpertOffers.Core.ServicesContract.IGenreCouponServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.GenreCouponController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.GenreCouponController"/> class.
+            </summary>
+            <param name="genreCouponService">The genre coupon service.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.CreateGenreCoupon(ExpertOffers.Core.Dtos.GenreCouponDto.GenreCouponAddRequest)">
+            <summary>
+            Creates a new genre coupon.
+            </summary>
+            <param name="request">The genre coupon add request.</param>
+            <returns>The created genre coupon.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.UpdateGenreCoupon(ExpertOffers.Core.Dtos.GenreCouponDto.GenreCouponUpdateRequest)">
+            <summary>
+            Updates an existing genre coupon.
+            </summary>
+            <param name="request">The genre coupon update request.</param>
+            <returns>The updated genre coupon.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.DeleteGenreCoupon(System.Guid)">
+            <summary>
+            Deletes a genre coupon.
+            </summary>
+            <param name="id">The ID of the genre coupon to delete.</param>
+            <returns>A flag indicating whether the genre coupon was deleted successfully.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.GetGenreCoupon(System.Guid)">
+            <summary>
+            Gets a genre coupon by ID.
+            </summary>
+            <param name="id">The ID of the genre coupon to retrieve.</param>
+            <returns>The retrieved genre coupon.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.GetGenreCoupons">
+            <summary>
+            Gets all genre coupons.
+            </summary>
+            <returns>The retrieved genre coupons.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.GetGenreCouponsby(System.String)">
+            <summary>
+            Gets genre coupons by name.
+            </summary>
+            <param name="name">The name to search for in genre coupons.</param>
+            <returns>The retrieved genre coupons.</returns>
+        </member>
         <member name="T:ExpertOffers.API.Controllers.GenreOfferController">
             <summary>
             API Controller for managing Genre Offers.

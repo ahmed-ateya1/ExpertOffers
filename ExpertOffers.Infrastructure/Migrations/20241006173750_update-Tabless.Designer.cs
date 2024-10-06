@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpertOffers.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241006110611_update-Branch-Table")]
-    partial class updateBranchTable
+    [Migration("20241006173750_update-Tabless")]
+    partial class updateTabless
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -212,6 +212,10 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("CouponTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CouponePictureURL")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -224,14 +228,17 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Property<double>("DiscountPercentage")
                         .HasColumnType("float");
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("GenreID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<long>("TotalSaved")
                         .HasColumnType("bigint");
@@ -242,6 +249,8 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.HasKey("CouponID");
 
                     b.HasIndex("CompanyID");
+
+                    b.HasIndex("GenreID");
 
                     b.ToTable("Coupons", (string)null);
                 });
@@ -265,6 +274,20 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.HasIndex("ClientID");
 
                     b.ToTable("Favorites", (string)null);
+                });
+
+            modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.GenreCoupon", b =>
+                {
+                    b.Property<Guid>("GenreID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("GenreName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("GenreID");
+
+                    b.ToTable("GenreCoupons", (string)null);
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.GenreOffer", b =>
@@ -717,7 +740,15 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ExpertOffers.Core.Domain.Entities.GenreCoupon", "GenreCoupon")
+                        .WithMany("Coupons")
+                        .HasForeignKey("GenreID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Company");
+
+                    b.Navigation("GenreCoupon");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.Favorite", b =>
@@ -983,6 +1014,11 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Navigation("Notifications");
 
                     b.Navigation("SavedItems");
+                });
+
+            modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.GenreCoupon", b =>
+                {
+                    b.Navigation("Coupons");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.GenreOffer", b =>

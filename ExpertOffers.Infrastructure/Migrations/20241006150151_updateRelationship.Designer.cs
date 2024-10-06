@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpertOffers.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241005112801_updateOffersTable")]
-    partial class updateOffersTable
+    [Migration("20241006150151_updateRelationship")]
+    partial class updateRelationship
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,10 +29,6 @@ namespace ExpertOffers.Infrastructure.Migrations
                 {
                     b.Property<Guid>("BranchID")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BranchLogoURL")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BranchName")
                         .IsRequired()
@@ -231,6 +227,9 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
+                    b.Property<Guid>("GenreID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -246,6 +245,8 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.HasKey("CouponID");
 
                     b.HasIndex("CompanyID");
+
+                    b.HasIndex("GenreID");
 
                     b.ToTable("Coupons", (string)null);
                 });
@@ -269,6 +270,20 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.HasIndex("ClientID");
 
                     b.ToTable("Favorites", (string)null);
+                });
+
+            modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.GenreCoupon", b =>
+                {
+                    b.Property<Guid>("GenreID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("GenreName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("GenreID");
+
+                    b.ToTable("GenreCoupons", (string)null);
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.GenreOffer", b =>
@@ -356,8 +371,8 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Property<Guid>("CompanyID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("GenreID")
                         .HasColumnType("uniqueidentifier");
@@ -380,17 +395,10 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("OfferURL")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<long>("TotalSaved")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TotalUsed")
                         .HasColumnType("bigint");
 
                     b.Property<long>("TotalViews")
@@ -728,7 +736,15 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ExpertOffers.Core.Domain.Entities.GenreCoupon", "GenreCoupon")
+                        .WithMany("Coupons")
+                        .HasForeignKey("GenreID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Company");
+
+                    b.Navigation("GenreCoupon");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.Favorite", b =>
@@ -801,7 +817,7 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ExpertOffers.Core.Domain.Entities.GenreOffer", "genreID")
+                    b.HasOne("ExpertOffers.Core.Domain.Entities.GenreOffer", "Genre")
                         .WithMany("Offers")
                         .HasForeignKey("GenreID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -809,7 +825,7 @@ namespace ExpertOffers.Infrastructure.Migrations
 
                     b.Navigation("Company");
 
-                    b.Navigation("genreID");
+                    b.Navigation("Genre");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.SavedItem", b =>
@@ -994,6 +1010,11 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Navigation("Notifications");
 
                     b.Navigation("SavedItems");
+                });
+
+            modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.GenreCoupon", b =>
+                {
+                    b.Navigation("Coupons");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.GenreOffer", b =>

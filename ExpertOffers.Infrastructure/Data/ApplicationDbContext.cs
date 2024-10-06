@@ -26,6 +26,7 @@ namespace ExpertOffers.Infrastructure.Data
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
+        public DbSet<GenreCoupon> GenreCoupons { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);

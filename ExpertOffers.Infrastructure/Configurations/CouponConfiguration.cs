@@ -32,14 +32,17 @@ namespace ExpertOffers.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(x => x.CouponeURL)
-                .IsRequired();
+            builder.Property(x => x.CouponeURL);
 
             builder.HasOne(x=>x.Company)
                 .WithMany(x=> x.Coupons)
                 .HasForeignKey(x => x.CompanyID)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(x => x.GenreCoupon)
+                .WithMany(x => x.Coupons)
+                .HasForeignKey(x => x.GenreID)
+                .OnDelete(DeleteBehavior.Restrict);
             builder.ToTable("Coupons");
         }
     }

@@ -306,7 +306,6 @@ namespace ExpertOffers.Infrastructure.Migrations
                     BranchName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Location = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    BranchLogoURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CompanyID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -405,13 +404,11 @@ namespace ExpertOffers.Infrastructure.Migrations
                 {
                     OfferID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OfferTitle = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    OfferDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     OfferPrice = table.Column<double>(type: "float", nullable: false),
-                    OfferURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OfferPictureURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OfferDiscount = table.Column<double>(type: "float", nullable: false),
-                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    OfferPictureURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalViews = table.Column<long>(type: "bigint", nullable: false),
                     TotalSaved = table.Column<long>(type: "bigint", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -433,6 +430,24 @@ namespace ExpertOffers.Infrastructure.Migrations
                         principalTable: "GenreOffers",
                         principalColumn: "GenreID",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GenreCoupons",
+                columns: table => new
+                {
+                    GenreID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CouponID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GenreCoupons", x => x.GenreID);
+                    table.ForeignKey(
+                        name: "FK_GenreCoupons_Coupons_CouponID",
+                        column: x => x.CouponID,
+                        principalTable: "Coupons",
+                        principalColumn: "CouponID",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -609,6 +624,11 @@ namespace ExpertOffers.Infrastructure.Migrations
                 column: "ClientID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GenreCoupons_CouponID",
+                table: "GenreCoupons",
+                column: "CouponID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Offers_CompanyID",
                 table: "Offers",
                 column: "CompanyID");
@@ -662,6 +682,9 @@ namespace ExpertOffers.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Favorites");
+
+            migrationBuilder.DropTable(
+                name: "GenreCoupons");
 
             migrationBuilder.DropTable(
                 name: "Notifications");

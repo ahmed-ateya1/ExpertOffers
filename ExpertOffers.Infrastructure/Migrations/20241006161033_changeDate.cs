@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ExpertOffers.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class converttoDatetime : Migration
+    public partial class changeDate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<DateTime>(
                 name: "StartDate",
-                table: "Offers",
+                table: "Coupons",
                 type: "datetime2",
                 nullable: false,
                 oldClrType: typeof(DateOnly),
@@ -21,7 +21,7 @@ namespace ExpertOffers.Infrastructure.Migrations
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "EndDate",
-                table: "Offers",
+                table: "Coupons",
                 type: "datetime2",
                 nullable: false,
                 oldClrType: typeof(DateOnly),
@@ -33,7 +33,7 @@ namespace ExpertOffers.Infrastructure.Migrations
         {
             migrationBuilder.AlterColumn<DateOnly>(
                 name: "StartDate",
-                table: "Offers",
+                table: "Coupons",
                 type: "date",
                 nullable: false,
                 oldClrType: typeof(DateTime),
@@ -41,7 +41,7 @@ namespace ExpertOffers.Infrastructure.Migrations
 
             migrationBuilder.AlterColumn<DateOnly>(
                 name: "EndDate",
-                table: "Offers",
+                table: "Coupons",
                 type: "date",
                 nullable: false,
                 oldClrType: typeof(DateTime),
