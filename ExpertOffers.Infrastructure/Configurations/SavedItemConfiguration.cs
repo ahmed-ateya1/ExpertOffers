@@ -15,7 +15,7 @@ namespace ExpertOffers.Infrastructure.Configurations
         {
             builder.HasKey(x=>x.SavedItemID);
             builder.Property(x => x.SavedItemID).ValueGeneratedNever();
-
+            
             builder.HasOne(x=>x.Client)
                 .WithMany(x => x.SavedItems)
                 .HasForeignKey(x => x.ClientID)
@@ -29,11 +29,6 @@ namespace ExpertOffers.Infrastructure.Configurations
             builder.HasOne(x => x.Coupon)
                 .WithMany(x => x.SavedItems)
                 .HasForeignKey(x => x.CouponId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            builder.HasOne(x => x.Bulletin)
-                .WithMany(x => x.SavedItems)
-                .HasForeignKey(x => x.BulletinID)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.ToTable("SavedItems");

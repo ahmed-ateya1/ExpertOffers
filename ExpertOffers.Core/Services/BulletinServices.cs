@@ -135,10 +135,6 @@ namespace ExpertOffers.Core.Services
             await ExecuteWithTransaction(async () =>
             {
                 var tasks = new List<Task>();
-                if(bulletin.SavedItems.Any())
-                {
-                    tasks.Add(_unitOfWork.Repository<SavedItem>().RemoveRangeAsync(bulletin.SavedItems));
-                }
                 if (bulletin.Notifications.Any())
                 {
                     tasks.Add(_unitOfWork.Repository<Notification>().RemoveRangeAsync(bulletin.Notifications));

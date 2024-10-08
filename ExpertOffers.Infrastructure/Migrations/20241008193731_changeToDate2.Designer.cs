@@ -4,6 +4,7 @@ using ExpertOffers.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpertOffers.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241008193731_changeToDate2")]
+    partial class changeToDate2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -436,6 +439,9 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Property<Guid>("SavedItemID")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("BulletinID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ClientID")
                         .HasColumnType("uniqueidentifier");
 
@@ -449,6 +455,8 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("SavedItemID");
+
+                    b.HasIndex("BulletinID");
 
                     b.HasIndex("ClientID");
 
@@ -851,6 +859,11 @@ namespace ExpertOffers.Infrastructure.Migrations
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.SavedItem", b =>
                 {
+                    b.HasOne("ExpertOffers.Core.Domain.Entities.Bulletin", "Bulletin")
+                        .WithMany("SavedItems")
+                        .HasForeignKey("BulletinID")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("ExpertOffers.Core.Domain.Entities.Client", "Client")
                         .WithMany("SavedItems")
                         .HasForeignKey("ClientID")
@@ -866,6 +879,8 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .WithMany("SavedItems")
                         .HasForeignKey("OfferId")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Bulletin");
 
                     b.Navigation("Client");
 
@@ -979,6 +994,8 @@ namespace ExpertOffers.Infrastructure.Migrations
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.Bulletin", b =>
                 {
                     b.Navigation("Notifications");
+
+                    b.Navigation("SavedItems");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.BulletinGenre", b =>

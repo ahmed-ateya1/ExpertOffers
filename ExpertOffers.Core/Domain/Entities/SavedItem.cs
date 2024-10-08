@@ -18,10 +18,7 @@ namespace ExpertOffers.Core.Domain.Entities
         public Guid? CouponId { get; set; }
         public Coupon Coupon { get; set; }
 
-        public Guid? BulletinID { get; set; }
-        public Bulletin Bulletin { get; set; }
-
-        public Guid SavedAt { get; set; }
+        public DateTime SavedAt { get; set; } = DateTime.UtcNow;
 
     }
 }
