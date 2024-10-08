@@ -2,6 +2,7 @@
 using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.Services;
 using ExpertOffers.Core.ServicesContract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -32,9 +33,11 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Creates a new bulletin.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="request">The bulletin add request.</param>
         /// <returns>The created bulletin.</returns>
+        [Authorize(Roles = "COMPANY")] 
         [HttpPost("createBulletin")]
         public async Task<ActionResult<ApiResponse>> CreateBulletin([FromForm] BulletinAddRquest request)
         {
@@ -72,9 +75,11 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Updates an existing bulletin.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="request">The bulletin update request.</param>
         /// <returns>The updated bulletin.</returns>
+        [Authorize(Roles = "COMPANY")]
         [HttpPut("updateBulletin")]
         public async Task<ActionResult<ApiResponse>> UpdateBulletin([FromForm] BulletinUpdateRequest request)
         {
@@ -103,9 +108,11 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Deletes a bulletin by its ID.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="id">The ID of the bulletin to delete.</param>
         /// <returns>A response indicating the success of the deletion.</returns>
+        [Authorize(Roles = "COMPANY")] 
         [HttpDelete("deleteBulletin/{id}")]
         public async Task<ActionResult<ApiResponse>> DeleteBulletin(Guid id)
         {

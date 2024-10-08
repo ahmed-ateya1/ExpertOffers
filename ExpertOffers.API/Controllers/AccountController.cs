@@ -228,6 +228,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Adds or updates the user's location.
+        /// User must be authenticated to access this endpoint.
         /// </summary>
         /// <param name="locationDTO">Location details.</param>
         /// <returns>Status message.</returns>
@@ -245,6 +246,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Removes the user's account.
+        /// User must be authenticated to access this endpoint.
         /// </summary>
         /// <returns>Status message.</returns>
         [Authorize]

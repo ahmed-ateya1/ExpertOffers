@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using static Azure.Core.HttpHeader;
 
 public class CompanyServices : ICompanyServices
 {
@@ -108,14 +109,14 @@ public class CompanyServices : ICompanyServices
     }
     private async Task<Company> GetComapnyByUserIdAsync(Guid userId)
     {
-        var company = await _unitOfWork.Repository<Company>().GetByAsync(x => x.UserID == userId,includeProperties: "Industrial,User,User.Country,User.City");
+        var company = await _unitOfWork.Repository<Company>().GetByAsync(x => x.UserID == userId,includeProperties: "Industrial,User,User.Country,User.City,Bulletins");
         if (company == null)
             throw new UnauthorizedAccessException("Company not found");
         return company;
     }
     public async Task<IEnumerable<CompanyResponse>> GetAllAsync(Expression<Func<Company, bool>>? expression = null)
     {
-        var companies = await _unitOfWork.Repository<Company>().GetAllAsync(expression , includeProperties: "Industrial,User,User.Country,User.City"); 
+        var companies = await _unitOfWork.Repository<Company>().GetAllAsync(expression , includeProperties: "Industrial,User,User.Country,User.City,Bulletins"); 
 
         var result = _mapper.Map<IEnumerable<CompanyResponse>>(companies);
         var client = await GetCurrentClientAsync();
@@ -168,7 +169,8 @@ public class CompanyServices : ICompanyServices
 
         if (request.CompanyLogo != null)
         {
-            companyUpdate.CompanyLogoURL = await _fileServices.UpdateFile(request.CompanyLogo , Path.GetFileName(companyUpdate.CompanyLogoURL));
+            string fileName = new Uri(companyUpdate.CompanyLogoURL).Segments.Last();
+            companyUpdate.CompanyLogoURL = await _fileServices.UpdateFile(request.CompanyLogo , fileName);
         }
 
 
@@ -208,16 +210,19 @@ public class CompanyServices : ICompanyServices
         {
             var tasks = new List<Task>();
 
+            string fileName = null;
             if (company.CompanyLogoURL != null)
             {
-               tasks.Add(_fileServices.DeleteFile(Path.GetFileName(company.CompanyLogoURL)));
+                fileName = new Uri(company.CompanyLogoURL).Segments.Last();
+                tasks.Add(_fileServices.DeleteFile(fileName));
             }
 
             if(company.Coupons.Any())
             {
                 foreach (var coupon in company.Coupons)
                 {
-                    tasks.Add(_fileServices.DeleteFile(Path.GetFileName(coupon.CouponePictureURL)));
+                    fileName = new Uri(coupon.CouponePictureURL).Segments.Last();
+                    tasks.Add(_fileServices.DeleteFile(fileName));
                 }
                 tasks.Add(_unitOfWork.Repository<Coupon>().RemoveRangeAsync(company.Coupons));
             }
@@ -229,8 +234,10 @@ public class CompanyServices : ICompanyServices
             {
                 foreach (var bulletin in company.Bulletins)
                 {
-                    tasks.Add(_fileServices.DeleteFile(Path.GetFileName(bulletin.BulletinPdfUrl)));
-                    tasks.Add(_fileServices.DeleteFile(Path.GetFileName(bulletin.BulletinPictureUrl)));
+                    string fileName1 = new Uri(bulletin.BulletinPictureUrl).Segments.Last();
+                    string fileName2 = new Uri(bulletin.BulletinPdfUrl).Segments.Last();
+                    tasks.Add(_fileServices.DeleteFile(fileName1));
+                    tasks.Add(_fileServices.DeleteFile(fileName2));
                 }
                 tasks.Add(_unitOfWork.Repository<Bulletin>().RemoveRangeAsync(company.Bulletins));
             }
@@ -242,7 +249,8 @@ public class CompanyServices : ICompanyServices
             {
                 foreach (var offer in company.Offers)
                 {
-                    tasks.Add(_fileServices.DeleteFile(Path.GetFileName(offer.OfferPictureURL)));
+                    fileName = new Uri(offer.OfferPictureURL).Segments.Last();
+                    tasks.Add(_fileServices.DeleteFile(fileName));
                 }
                 tasks.Add(_unitOfWork.Repository<Offer>().RemoveRangeAsync(company.Offers));
             }

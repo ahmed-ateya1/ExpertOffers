@@ -9,16 +9,18 @@ namespace ExpertOffers.API.FileServices
     {
         private readonly IWebHostEnvironment _environment;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<FileService> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileService"/> class.
         /// </summary>
         /// <param name="environment">The web host environment.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-        public FileService(IWebHostEnvironment environment, IHttpContextAccessor httpContextAccessor)
+        public FileService(IWebHostEnvironment environment, IHttpContextAccessor httpContextAccessor, ILogger<FileService> logger)
         {
             _environment = environment;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         /// <summary>
@@ -55,28 +57,39 @@ namespace ExpertOffers.API.FileServices
         /// <summary>
         /// Deletes a file from the "Upload" directory.
         /// </summary>
-        /// <param name="imageUrl">The URL of the file to be deleted.</param>
-        public async Task DeleteFile(string? imageUrl)
+        /// <param name="fileName">The URL of the file to be deleted.</param>
+        public async Task DeleteFile(string? fileName)
         {
-            if (string.IsNullOrEmpty(imageUrl))
+            if (string.IsNullOrEmpty(fileName))
             {
+                _logger.LogWarning("No file name provided for deletion.");
                 return;
             }
 
             try
             {
-                string imagePath = Path.Combine(_environment.WebRootPath, "Upload", imageUrl);
+                string filePath = Path.Combine(_environment.WebRootPath, "Upload", fileName);
+                _logger.LogInformation("Attempting to delete file at path: " + filePath);
 
-                if (System.IO.File.Exists(imagePath))
+                if (System.IO.File.Exists(filePath))
                 {
-                    await Task.Run(() => System.IO.File.Delete(imagePath)).ConfigureAwait(false);
+                    _logger.LogInformation("File exists. Deleting...");
+                    System.IO.File.Delete(filePath); // Synchronous deletion
+                    _logger.LogInformation("File deleted successfully.");
+                }
+                else
+                {
+                    _logger.LogWarning("File not found at path: " + filePath);
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting file: " + fileName);
                 throw new InvalidOperationException("Error deleting file", ex);
             }
         }
+
+
 
         /// <summary>
         /// Updates a file in the "Upload" directory.

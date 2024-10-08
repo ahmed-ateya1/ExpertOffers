@@ -34,6 +34,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Creates a new coupon.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="couponAddRequest">The coupon add request.</param>
         /// <returns>The created coupon.</returns>
@@ -66,6 +67,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Updates an existing coupon.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="couponUpdateRequest">The coupon update request.</param>
         /// <returns>The updated coupon.</returns>
@@ -98,6 +100,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Deletes a coupon by its ID.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="id">The ID of the coupon to delete.</param>
         /// <returns>The result of the delete operation.</returns>

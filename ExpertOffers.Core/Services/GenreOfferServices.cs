@@ -97,13 +97,19 @@ public class GenreOfferServices : IGenreOfferServices
         {
             if(genre.Offers.Any())
             {
-               await _unitOfWork.Repository<Offer>().RemoveRangeAsync(genre.Offers);   
+                foreach (var offer in genre.Offers)
+                {
+                    string fileName = new Uri(offer.OfferPictureURL).Segments.Last();
+                    await _fileServices.DeleteFile(fileName);
+                }
+                await _unitOfWork.Repository<Offer>().RemoveRangeAsync(genre.Offers);   
                _logger.LogInformation("Offers deleted successfully.");
             }
             if (genre.GenreImgURL != null)
             {
-                await _fileServices.DeleteFile(Path.GetFileName(genre.GenreImgURL));
-                _logger.LogInformation("genreID image deleted successfully.");
+                string fileName = new Uri(genre.GenreImgURL).Segments.Last();
+                await _fileServices.DeleteFile(fileName);
+                _logger.LogInformation("genre image deleted successfully.");
             }
             
             result = await _unitOfWork.Repository<GenreOffer>().DeleteAsync(genre);
@@ -152,7 +158,9 @@ public class GenreOfferServices : IGenreOfferServices
         {
             try
             {
-                genre.GenreImgURL = await _fileServices.UpdateFile(genreRequest.GenreImg, Path.GetFileName(genre.GenreImgURL));
+                string fileName = new Uri(genre.GenreImgURL).Segments.Last();
+
+                genre.GenreImgURL = await _fileServices.UpdateFile(genreRequest.GenreImg, fileName);
                 _logger.LogInformation("genreID image updated successfully.");
             }
             catch (Exception ex)

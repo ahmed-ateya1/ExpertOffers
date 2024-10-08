@@ -19,6 +19,7 @@ namespace ExpertOffers.Core.MappingProfile
 
 
             CreateMap<Company, CompanyResponse>()
+                .ForMember(dest=>dest.NumberOfBulletins,opt=>opt.MapFrom(src => src.Bulletins.Count))
                 .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.CompanyName))
                 .ForPath(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
                 .ForPath(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))

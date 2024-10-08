@@ -19,15 +19,18 @@ namespace ExpertOffers.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<GenreCouponServices> _logger;
+        private readonly IFileServices _fileServices;
 
         public GenreCouponServices(
             IUnitOfWork unitOfWork,
-            IMapper mapper, 
-            ILogger<GenreCouponServices> logger)
+            IMapper mapper,
+            ILogger<GenreCouponServices> logger,
+            IFileServices fileServices)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _fileServices = fileServices;
         }
         private async Task ExecuteWithTransaction(Func<Task> action)
         {
@@ -79,6 +82,11 @@ namespace ExpertOffers.Core.Services
             {
                 if (genreCoupon.Coupons.Any())
                 {
+                    foreach (var coupon in genreCoupon.Coupons)
+                    {
+                        string fileName = new Uri(coupon.CouponePictureURL).Segments.Last();
+                        await _fileServices.DeleteFile(fileName);
+                    }
                     await _unitOfWork.Repository<Coupon>().RemoveRangeAsync(genreCoupon.Coupons);
                 }
                 result = await _unitOfWork.Repository<GenreCoupon>().DeleteAsync(genreCoupon);

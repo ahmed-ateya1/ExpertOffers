@@ -141,6 +141,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Updates a company's details.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="companyUpdate">The company update request object containing updated details.</param>
         /// <returns>An <see cref="ApiResponse"/> indicating the result of the update operation.</returns>

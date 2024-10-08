@@ -33,6 +33,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Adds a new branch.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="branchAddRequest">The branch add request containing the details of the branch to be added.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
@@ -66,6 +67,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Updates an existing branch.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="branchUpdateRequest">The branch update request containing the details to update the branch.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
@@ -99,6 +101,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Deletes a branch by its ID.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="branchID">The ID of the branch to be deleted.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>

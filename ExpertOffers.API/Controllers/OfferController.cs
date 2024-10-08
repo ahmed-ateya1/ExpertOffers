@@ -27,8 +27,9 @@ namespace ExpertOffers.API.Controllers
             _offerServices = offerServices;
             _logger = logger;
         }
-        // <summary>
+        /// <summary>
         /// Creates a new offer.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="request">The offer details to be created.</param>
         /// <returns>An API response indicating the result of the offer creation.</returns>
@@ -69,6 +70,7 @@ namespace ExpertOffers.API.Controllers
         }
         /// <summary>
         /// Updates an existing offer.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="request">The updated offer details.</param>
         /// <returns>An API response indicating the result of the offer update.</returns>
@@ -110,6 +112,7 @@ namespace ExpertOffers.API.Controllers
         }
         /// <summary>
         /// Deletes an existing offer by its ID.
+        /// "COMPANY" role is required to access this endpoint
         /// </summary>
         /// <param name="offerID">The unique ID of the offer to be deleted.</param>
         /// <returns>An API response indicating the result of the offer deletion.</returns>

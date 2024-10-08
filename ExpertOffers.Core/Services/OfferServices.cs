@@ -119,7 +119,8 @@ namespace ExpertOffers.Core.Services
             var result = false;
             await ExecuteWithTransaction(async () =>
             {
-                await _fileServices.DeleteFile(offer.OfferPictureURL);
+                string fileName = new Uri(offer.OfferPictureURL).Segments.Last();
+                await _fileServices.DeleteFile(fileName);
                 result = await _unitOfWork.Repository<Offer>().DeleteAsync(offer);
                 await _unitOfWork.CompleteAsync();
             });

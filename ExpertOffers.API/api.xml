@@ -72,6 +72,7 @@
         <member name="M:ExpertOffers.API.Controllers.AccountController.AddLocation(ExpertOffers.Core.DTOS.CityDto.LocationDTO)">
             <summary>
             Adds or updates the user's location.
+            User must be authenticated to access this endpoint.
             </summary>
             <param name="locationDTO">Location details.</param>
             <returns>Status message.</returns>
@@ -79,6 +80,7 @@
         <member name="M:ExpertOffers.API.Controllers.AccountController.RemoveAccount">
             <summary>
             Removes the user's account.
+            User must be authenticated to access this endpoint.
             </summary>
             <returns>Status message.</returns>
         </member>
@@ -131,6 +133,7 @@
         <member name="M:ExpertOffers.API.Controllers.BranchController.AddBranch(ExpertOffers.Core.Dtos.BranchDto.BranchAddRequest)">
             <summary>
             Adds a new branch.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="branchAddRequest">The branch add request containing the details of the branch to be added.</param>
             <returns>An IActionResult indicating the result of the operation.</returns>
@@ -138,6 +141,7 @@
         <member name="M:ExpertOffers.API.Controllers.BranchController.UpdateBranch(ExpertOffers.Core.Dtos.BranchDto.BranchUpdateRequest)">
             <summary>
             Updates an existing branch.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="branchUpdateRequest">The branch update request containing the details to update the branch.</param>
             <returns>An IActionResult indicating the result of the operation.</returns>
@@ -145,6 +149,7 @@
         <member name="M:ExpertOffers.API.Controllers.BranchController.DeleteBranch(System.Guid)">
             <summary>
             Deletes a branch by its ID.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="branchID">The ID of the branch to be deleted.</param>
             <returns>An IActionResult indicating the result of the operation.</returns>
@@ -191,6 +196,7 @@
         <member name="M:ExpertOffers.API.Controllers.BulletinController.CreateBulletin(ExpertOffers.Core.Dtos.BulletinDto.BulletinAddRquest)">
             <summary>
             Creates a new bulletin.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="request">The bulletin add request.</param>
             <returns>The created bulletin.</returns>
@@ -198,6 +204,7 @@
         <member name="M:ExpertOffers.API.Controllers.BulletinController.UpdateBulletin(ExpertOffers.Core.Dtos.BulletinDto.BulletinUpdateRequest)">
             <summary>
             Updates an existing bulletin.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="request">The bulletin update request.</param>
             <returns>The updated bulletin.</returns>
@@ -205,6 +212,7 @@
         <member name="M:ExpertOffers.API.Controllers.BulletinController.DeleteBulletin(System.Guid)">
             <summary>
             Deletes a bulletin by its ID.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="id">The ID of the bulletin to delete.</param>
             <returns>A response indicating the success of the deletion.</returns>
@@ -398,6 +406,7 @@
         <member name="M:ExpertOffers.API.Controllers.ClientController.UpdateClient(ExpertOffers.Core.DTOS.ClientDto.ClientUpdateRequest)">
             <summary>
             Updates a client's information.
+            "USER" role is required to access this endpoint
             </summary>
             <param name="clientDto">Client data to update.</param>
             <returns>
@@ -463,6 +472,7 @@
         <member name="M:ExpertOffers.API.Controllers.CompanyController.UpdateCompany(ExpertOffers.Core.Dtos.CompanyDto.CompanyUpdateRequest)">
             <summary>
             Updates a company's details.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="companyUpdate">The company update request object containing updated details.</param>
             <returns>An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> indicating the result of the update operation.</returns>
@@ -538,6 +548,7 @@
         <member name="M:ExpertOffers.API.Controllers.CouponController.CreateCoupon(ExpertOffers.Core.Dtos.CouponDto.CouponAddRequest)">
             <summary>
             Creates a new coupon.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="couponAddRequest">The coupon add request.</param>
             <returns>The created coupon.</returns>
@@ -545,6 +556,7 @@
         <member name="M:ExpertOffers.API.Controllers.CouponController.UpdateCoupon(ExpertOffers.Core.Dtos.CouponDto.CouponUpdateRequest)">
             <summary>
             Updates an existing coupon.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="couponUpdateRequest">The coupon update request.</param>
             <returns>The updated coupon.</returns>
@@ -552,6 +564,7 @@
         <member name="M:ExpertOffers.API.Controllers.CouponController.DeleteCoupon(System.Guid)">
             <summary>
             Deletes a coupon by its ID.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="id">The ID of the coupon to delete.</param>
             <returns>The result of the delete operation.</returns>
@@ -645,6 +658,7 @@
         <member name="M:ExpertOffers.API.Controllers.FavoriteController.AddFavorite(ExpertOffers.Core.Dtos.FavoriteDto.FavoriteAddRequest)">
             <summary>
             Adds a company to favorites.
+            "USER" role is required to access this endpoint
             </summary>
             <param name="favoriteRequest">The favorite request.</param>
             <returns>The result of the operation.</returns>
@@ -652,6 +666,7 @@
         <member name="M:ExpertOffers.API.Controllers.FavoriteController.RemoveFavorite(System.Guid)">
             <summary>
             Removes a company from favorites.
+            "USER" role is required to access this endpoint
             </summary>
             <param name="favoriteID">The ID of the favorite to remove.</param>
             <returns>The result of the operation.</returns>
@@ -834,10 +849,18 @@
             <param name="offerServices">Service for managing offers.</param>
             <param name="logger">Logger for capturing logs.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:ExpertOffers.API.Controllers.OfferController.CreateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferAddRequest)" -->
+        <member name="M:ExpertOffers.API.Controllers.OfferController.CreateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferAddRequest)">
+            <summary>
+            Creates a new offer.
+            "COMPANY" role is required to access this endpoint
+            </summary>
+            <param name="request">The offer details to be created.</param>
+            <returns>An API response indicating the result of the offer creation.</returns>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.UpdateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferUpdateRequest)">
             <summary>
             Updates an existing offer.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="request">The updated offer details.</param>
             <returns>An API response indicating the result of the offer update.</returns>
@@ -845,6 +868,7 @@
         <member name="M:ExpertOffers.API.Controllers.OfferController.DeleteOffer(System.Guid)">
             <summary>
             Deletes an existing offer by its ID.
+            "COMPANY" role is required to access this endpoint
             </summary>
             <param name="offerID">The unique ID of the offer to be deleted.</param>
             <returns>An API response indicating the result of the offer deletion.</returns>
@@ -928,7 +952,7 @@
             Provides file-related services for the application.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.FileServices.FileService.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+        <member name="M:ExpertOffers.API.FileServices.FileService.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.AspNetCore.Http.IHttpContextAccessor,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.FileServices.FileService})">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.FileServices.FileService"/> class.
             </summary>
@@ -946,7 +970,7 @@
             <summary>
             Deletes a file from the "Upload" directory.
             </summary>
-            <param name="imageUrl">The URL of the file to be deleted.</param>
+            <param name="fileName">The URL of the file to be deleted.</param>
         </member>
         <member name="M:ExpertOffers.API.FileServices.FileService.UpdateFile(Microsoft.AspNetCore.Http.IFormFile,System.String)">
             <summary>

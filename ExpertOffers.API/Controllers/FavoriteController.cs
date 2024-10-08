@@ -34,6 +34,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Adds a company to favorites.
+        /// "USER" role is required to access this endpoint
         /// </summary>
         /// <param name="favoriteRequest">The favorite request.</param>
         /// <returns>The result of the operation.</returns>
@@ -66,6 +67,7 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Removes a company from favorites.
+        /// "USER" role is required to access this endpoint
         /// </summary>
         /// <param name="favoriteID">The ID of the favorite to remove.</param>
         /// <returns>The result of the operation.</returns>

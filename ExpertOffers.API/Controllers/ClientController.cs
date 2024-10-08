@@ -33,6 +33,7 @@ namespace ExpertOffers.API.Controllers
         }
         /// <summary>
         /// Updates a client's information.
+        /// "USER" role is required to access this endpoint
         /// </summary>
         /// <param name="clientDto">Client data to update.</param>
         /// <returns>
@@ -43,6 +44,7 @@ namespace ExpertOffers.API.Controllers
         /// <response code="404">Client not found.</response>
         /// <response code="500">Internal server error during the update operation.</response>
         [HttpPut("updateClient")]
+        [Authorize(Roles = "USER")]
         public async Task<ActionResult<ApiResponse>> UpdateClient(ClientUpdateRequest clientDto)
         {
             try

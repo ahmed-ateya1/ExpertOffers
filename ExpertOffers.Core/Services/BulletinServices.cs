@@ -121,17 +121,20 @@ namespace ExpertOffers.Core.Services
             var bulletin = await _unitOfWork.Repository<Bulletin>()
                 .GetByAsync(b => b.BulletinID == id ,includeProperties: "Company,Genre,SavedItems,Notifications")
                 ?? throw new KeyNotFoundException("Bulletin not found.");
+
+            if(bulletin.BulletinPdfUrl!=null)
+            {
+                string fileName = new Uri(bulletin.BulletinPdfUrl).Segments.Last();
+                await _fileServices.DeleteFile(fileName);
+            }
+            if (bulletin.BulletinPictureUrl != null)
+            {
+                string fileName = new Uri(bulletin.BulletinPictureUrl).Segments.Last();
+                await _fileServices.DeleteFile(fileName);
+            }
             await ExecuteWithTransaction(async () =>
             {
                 var tasks = new List<Task>();
-                if(bulletin.BulletinPdfUrl != null)
-                {
-                    tasks.Add(_fileServices.DeleteFile(bulletin.BulletinPdfUrl));
-                }
-                if(bulletin.BulletinPictureUrl != null)
-                {
-                    tasks.Add(_fileServices.DeleteFile(bulletin.BulletinPictureUrl));
-                }
                 if(bulletin.SavedItems.Any())
                 {
                     tasks.Add(_unitOfWork.Repository<SavedItem>().RemoveRangeAsync(bulletin.SavedItems));
@@ -159,6 +162,9 @@ namespace ExpertOffers.Core.Services
             var bulletin = await _unitOfWork.Repository<Bulletin>()
                 .GetByAsync(expression, isTracked ,includeProperties: "Company,Genre")
                 ?? throw new KeyNotFoundException("Bulletin not found.");
+            bulletin.TotalViews++;
+            await _unitOfWork.CompleteAsync();
+
             return _mapper.Map<BulletinResponse>(bulletin); 
         }
 
@@ -177,11 +183,13 @@ namespace ExpertOffers.Core.Services
 
             if(request.BulletinPdf != null)
             {
-                await _fileServices.UpdateFile(request.BulletinPdf , Path.GetFileName(bulletin.BulletinPdfUrl));
+                string fileName = new Uri(bulletin.BulletinPdfUrl).Segments.Last();
+                await _fileServices.UpdateFile(request.BulletinPdf,fileName);
             }
             if (request.BulletinPicture != null)
             {
-                await _fileServices.UpdateFile(request.BulletinPicture, Path.GetFileName(bulletin.BulletinPictureUrl));
+                string fileName = new Uri(bulletin.BulletinPictureUrl).Segments.Last();
+                await _fileServices.UpdateFile(request.BulletinPicture, fileName);
             }
             _mapper.Map(request, bulletin);
             await ExecuteWithTransaction(async() =>

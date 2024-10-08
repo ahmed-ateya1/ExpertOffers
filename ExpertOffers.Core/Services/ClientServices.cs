@@ -101,17 +101,17 @@ namespace ExpertOffers.Core.Services
             await ExecuteWithTransaction(async () =>
             {
                 var tasks = new List<Task>();
-                if (client.Favorites != null)
+                if (client.Favorites.Any())
                 {
                     tasks.Add(_unitOfWork.Repository<Favorite>()
                     .RemoveRangeAsync(client.Favorites));
                 }
-                if (client.Notifications != null)
+                if (client.Notifications.Any())
                 {
                     tasks.Add(_unitOfWork.Repository<Notification>().
                     RemoveRangeAsync(client.Notifications));
                 }
-                if (client.SavedItems != null)
+                if (client.SavedItems.Any())
                 {
                     tasks.Add(_unitOfWork.Repository<SavedItem>()
                     .RemoveRangeAsync(client.SavedItems));

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static Azure.Core.HttpHeader;
 
 namespace ExpertOffers.Core.Services
 {
@@ -19,14 +20,17 @@ namespace ExpertOffers.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BulletinGenreServices> _logger;
         private readonly IMapper _mapper;
+        private readonly IFileServices _fileServices;
         public BulletinGenreServices(
             IUnitOfWork unitOfWork,
             ILogger<BulletinGenreServices> logger,
-            IMapper mapper)
+            IMapper mapper,
+            IFileServices fileServices)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
+            _fileServices = fileServices;
         }
         private async Task ExecuteWithTransaction(Func<Task> action)
         {
@@ -79,6 +83,14 @@ namespace ExpertOffers.Core.Services
             {
                 if(genre.Bulletins.Any())
                 {
+                    foreach (var Bulletin in genre.Bulletins)
+                    {
+                        string fileName1 = new Uri(Bulletin.BulletinPdfUrl).Segments.Last();
+                        string fileName2 = new Uri(Bulletin.BulletinPictureUrl).Segments.Last();
+
+                        await _fileServices.DeleteFile(fileName1);
+                        await _fileServices.DeleteFile(fileName2);
+                    }
                     await _unitOfWork.Repository<Bulletin>()
                     .RemoveRangeAsync(genre.Bulletins);
                 }

@@ -23,7 +23,7 @@ namespace ExpertOffers.Core.MappingProfile
                 .ReverseMap();
 
             CreateMap<BulletinUpdateRequest, Bulletin>()
-                .ForMember(dest => dest.BulletinID, opt => opt.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.BulletinID, opt => opt.MapFrom(src => src.BulletinID))
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
                 .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate))
                 .ForMember(dest => dest.BulletinTitle, opt => opt.MapFrom(src => src.BulletinTitle))
@@ -45,6 +45,7 @@ namespace ExpertOffers.Core.MappingProfile
                 .ForMember(dest=>dest.CompanyLogoURL, opt => opt.MapFrom(src => src.Company.CompanyLogoURL))
                 .ForMember(dest=>dest.CompanyID, opt => opt.MapFrom(src => src.CompanyID))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.StartDate <= DateTime.Now && src.EndDate >= DateTime.Now))
+                .ForMember(dest => dest.NumOfDaysRemaining, opt => opt.MapFrom(src => src.EndDate > DateTime.Now ? (src.EndDate - DateTime.Now).Days : 0))
                 .ReverseMap();
 
 
