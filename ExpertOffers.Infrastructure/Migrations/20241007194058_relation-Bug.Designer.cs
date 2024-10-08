@@ -4,6 +4,7 @@ using ExpertOffers.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpertOffers.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241007194058_relation-Bug")]
+    partial class relationBug
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,9 +87,6 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("GenreID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -103,24 +103,7 @@ namespace ExpertOffers.Infrastructure.Migrations
 
                     b.HasIndex("CompanyID");
 
-                    b.HasIndex("GenreID");
-
                     b.ToTable("Bulletins", (string)null);
-                });
-
-            modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.BulletinGenre", b =>
-                {
-                    b.Property<Guid>("GenreID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("GenreName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("GenreID");
-
-                    b.ToTable("BulletinGenres", (string)null);
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.City", b =>
@@ -707,15 +690,7 @@ namespace ExpertOffers.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ExpertOffers.Core.Domain.Entities.BulletinGenre", "Genre")
-                        .WithMany("Bulletins")
-                        .HasForeignKey("GenreID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Company");
-
-                    b.Navigation("Genre");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.City", b =>
@@ -998,11 +973,6 @@ namespace ExpertOffers.Infrastructure.Migrations
                     b.Navigation("Notifications");
 
                     b.Navigation("SavedItems");
-                });
-
-            modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.BulletinGenre", b =>
-                {
-                    b.Navigation("Bulletins");
                 });
 
             modelBuilder.Entity("ExpertOffers.Core.Domain.Entities.City", b =>

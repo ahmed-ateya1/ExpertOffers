@@ -25,7 +25,7 @@ namespace ExpertOffers.Infrastructure.Configurations
 
             builder.HasOne(x => x.Company)
                 .WithMany(x => x.Favorites)
-                .HasForeignKey(x => x.ClientID)
+                .HasForeignKey(x => x.CompanyID)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.ToTable("Favorites");

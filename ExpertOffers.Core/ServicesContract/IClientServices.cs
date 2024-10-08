@@ -11,8 +11,9 @@ namespace ExpertOffers.Core.ServicesContract
 {
     public interface IClientServices
     {
+
         Task<ClientReponse> UpdateAsync(ClientUpdateRequest? clientUpdateRequest);
-        Task<bool> DeleteAsync();
+        Task<bool> DeleteAsync(Guid clientID);
         Task<ClientReponse> GetByAsync(Expression<Func<Client,bool>> expression , bool isTracking = true);
 
     }

@@ -17,6 +17,6 @@ namespace ExpertOffers.Core.Dtos.CompanyDto
         public string CityName { get; set; }
         public string IndustrialName { get; set; }
 
-
+        public bool IsFavoriteToCurrentUser { get; set; }
     }
 }

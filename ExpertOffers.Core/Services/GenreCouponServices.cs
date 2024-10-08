@@ -69,7 +69,7 @@ namespace ExpertOffers.Core.Services
         public async Task<bool> DeleteAsync(Guid id)
         {
             var genreCoupon = await _unitOfWork.Repository<GenreCoupon>()
-                .GetByAsync(x=>x.GenreID == id);
+                .GetByAsync(x=>x.GenreID == id,includeProperties: "Coupons");
             if(genreCoupon == null)
             {
                 throw new ArgumentNullException(nameof(genreCoupon));

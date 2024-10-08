@@ -32,7 +32,8 @@ namespace ExpertOffers.Core.Services
         private readonly IEmailSender _emailSender;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly SignInManager<ApplicationUser> _signInManager;
-
+        private readonly ICompanyServices _companyServices;
+        private readonly IClientServices _clientServices;
         public AuthenticationServices(UserManager<ApplicationUser> userManager,
                                       RoleManager<ApplicationRole> roleManager,
                                       IOptions<JwtDTO> jwt,
@@ -40,7 +41,9 @@ namespace ExpertOffers.Core.Services
                                       IFileServices fileServices,
                                       IEmailSender emailSender,
                                       IHttpContextAccessor httpContextAccessor,
-                                      SignInManager<ApplicationUser> signInManager)
+                                      SignInManager<ApplicationUser> signInManager,
+                                      ICompanyServices companyServices,
+                                      IClientServices clientServices)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -50,6 +53,8 @@ namespace ExpertOffers.Core.Services
             _emailSender = emailSender;
             _httpContextAccessor = httpContextAccessor;
             _signInManager = signInManager;
+            _companyServices = companyServices;
+            _clientServices = clientServices;
         }
         private string GetBaseUrl()
         {
@@ -439,9 +444,15 @@ namespace ExpertOffers.Core.Services
             var user = await _userManager.FindByEmailAsync(GetCurrentEmail());
             if (user is null)
                 throw new UnauthorizedAccessException("User is not authenticated");
-            await _userManager.DeleteAsync(user);
+            if(user.ComapnyID!=null)
+            {
+                await _companyServices.DeleteAsync(user.ComapnyID.Value);
+            }
+            else
+            {
+                await _clientServices.DeleteAsync(user.ClientID.Value);
+            }
             await _unitOfWork.CompleteAsync();
-
         }
 
         public async Task<bool> ForgotPassword(ForgotPasswordDTO forgotPasswordDTO)

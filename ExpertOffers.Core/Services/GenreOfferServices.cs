@@ -84,7 +84,8 @@ public class GenreOfferServices : IGenreOfferServices
             throw new ArgumentNullException(nameof(id), "genreID ID cannot be null.");
         }
 
-        var genre = await _unitOfWork.Repository<GenreOffer>().GetByAsync(x => x.GenreID == id);
+        var genre = await _unitOfWork.Repository<GenreOffer>()
+            .GetByAsync(x => x.GenreID == id,includeProperties: "Offers");
         if (genre == null)
         {
             _logger.LogWarning("DeleteAsync: genreID not found with ID: {GenreID}", id);
@@ -94,7 +95,7 @@ public class GenreOfferServices : IGenreOfferServices
         bool result = false;
         await ExecuteWithTransaction(async () =>
         {
-            if(genre.Offers.Count > 0)
+            if(genre.Offers.Any())
             {
                await _unitOfWork.Repository<Offer>().RemoveRangeAsync(genre.Offers);   
                _logger.LogInformation("Offers deleted successfully.");

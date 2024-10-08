@@ -90,6 +90,8 @@ namespace ExpertOffers.API.StartupExtensions
             services.AddScoped<IOfferServices, OfferServices>();
             services.AddScoped<IGenreCouponServices, GenreCouponServices>();
             services.AddScoped<ICouponServices, CouponServices>();
+            services.AddScoped<IFavoriteServices, FavoriteServices>();
+            services.AddScoped<IBulletinGenreServices, BulletinGenreServices>();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>

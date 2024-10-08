@@ -91,17 +91,34 @@ namespace ExpertOffers.Core.Services
             return country;
         }
 
-        public async Task<bool> DeleteAsync()
+        public async Task<bool> DeleteAsync(Guid clientID)
         {
-            var user = await GetUserAsync();
-            var client = await GetClientByUserIdAsync(user.Id);
+            var client = await _unitOfWork.Repository<Client>()
+                .GetByAsync(x => x.ClientID == clientID,includeProperties: "Favorites,Notifications,SavedItems");
+            if (client == null)
+                throw new UnauthorizedAccessException("Client not found");
 
+            var result = false;
             await ExecuteWithTransaction(async () =>
             {
-                await _unitOfWork.Repository<Client>().DeleteAsync(client);
+                if(client.Favorites != null)
+                {
+                    await _unitOfWork.Repository<Favorite>()
+                    .RemoveRangeAsync(client.Favorites);
+                }
+                if (client.Notifications != null)
+                {
+                    await _unitOfWork.Repository<Notification>().
+                    RemoveRangeAsync(client.Notifications);
+                }
+                if (client.SavedItems != null)
+                {
+                    await _unitOfWork.Repository<SavedItem>()
+                    .RemoveRangeAsync(client.SavedItems);
+                }
+                result = await _unitOfWork.Repository<Client>().DeleteAsync(client);
             });
-
-            return true;
+            return result;
         }
 
         public async Task<ClientReponse> GetByAsync(Expression<Func<Client, bool>> expression, bool isTracking = true)

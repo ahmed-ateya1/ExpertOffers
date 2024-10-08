@@ -21,6 +21,8 @@ namespace ExpertOffers.Core.Domain.Entities
         public long TotalSaved { get; set; }
         public Guid CompanyID { get; set; }
         public virtual Company Company { get; set; }
+        public Guid GenreID { get; set; }
+        public virtual BulletinGenre Genre { get; set; }
         public virtual ICollection<SavedItem> SavedItems { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
     }

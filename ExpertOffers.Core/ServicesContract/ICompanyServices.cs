@@ -11,6 +11,7 @@ namespace ExpertOffers.Core.ServicesContract
 {
     public interface ICompanyServices
     {
+        Task<bool> DeleteAsync(Guid CompanyID);
         Task<CompanyResponse> UpdateAsync(CompanyUpdateRequest? request);
         Task<CompanyResponse> GetByAsync(Expression<Func<Company, bool>> expression, bool isTracked = true);
         Task<IEnumerable<CompanyResponse>> GetAllAsync(Expression<Func<Company, bool>>? expression = null);

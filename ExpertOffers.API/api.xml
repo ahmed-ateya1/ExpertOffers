@@ -176,6 +176,59 @@
             <param name="branchName">The name of the branches to search for.</param>
             <returns>An IActionResult containing the list of matching branches.</returns>
         </member>
+        <member name="T:ExpertOffers.API.Controllers.BulletinGenreController">
+            <summary>
+            Controller for managing bulletin genres.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.#ctor(ExpertOffers.Core.ServicesContract.IBulletinGenreServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BulletinGenreController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.BulletinGenreController"/> class.
+            </summary>
+            <param name="bulletinGenreServices">The bulletin genre services.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.CreateBulletinGenre(ExpertOffers.Core.Dtos.BulletinGenreDto.BulletinGenreAddRequest)">
+            <summary>
+            Creates a new bulletin genre.
+            </summary>
+            <param name="request">The bulletin genre add request.</param>
+            <returns>The created bulletin genre.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.UpdateBulletinGenre(ExpertOffers.Core.Dtos.BulletinGenreDto.BulletinGenreUpdateRequest)">
+            <summary>
+            Updates an existing bulletin genre.
+            </summary>
+            <param name="request">The bulletin genre update request.</param>
+            <returns>The updated bulletin genre.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.DeleteBulletinGenre(System.Guid)">
+            <summary>
+            Deletes a bulletin genre by ID.
+            </summary>
+            <param name="genreID">The ID of the bulletin genre to delete.</param>
+            <returns>The deleted bulletin genre.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.GetBulletinGenres">
+            <summary>
+            Gets all bulletin genres.
+            </summary>
+            <returns>The list of bulletin genres.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.GetBulletinGenre(System.Guid)">
+            <summary>
+            Gets a bulletin genre by ID.
+            </summary>
+            <param name="genreID">The ID of the bulletin genre to retrieve.</param>
+            <returns>The bulletin genre.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.GetBulletinGenresByName(System.String)">
+            <summary>
+            Gets bulletin genres by name.
+            </summary>
+            <param name="name">The name to search for.</param>
+            <returns>The list of bulletin genres matching the name.</returns>
+        </member>
         <member name="T:ExpertOffers.API.Controllers.CityController">
             <summary>
             Controller for managing city operations.
@@ -469,6 +522,39 @@
             </summary>
             <param name="title">The title of the coupons.</param>
             <returns>The coupons found.</returns>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.FavoriteController">
+            <summary>
+            Controller for managing favorite operations.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.FavoriteController.#ctor(ExpertOffers.Core.ServicesContract.IFavoriteServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.FavoriteController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.FavoriteController"/> class.
+            </summary>
+            <param name="favoriteServices">The favorite services.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.FavoriteController.AddFavorite(ExpertOffers.Core.Dtos.FavoriteDto.FavoriteAddRequest)">
+            <summary>
+            Adds a company to favorites.
+            </summary>
+            <param name="favoriteRequest">The favorite request.</param>
+            <returns>The result of the operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.FavoriteController.RemoveFavorite(System.Guid)">
+            <summary>
+            Removes a company from favorites.
+            </summary>
+            <param name="favoriteID">The ID of the favorite to remove.</param>
+            <returns>The result of the operation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.FavoriteController.GetAllFavorites(System.Guid)">
+            <summary>
+            Gets all favorites for a client.
+            </summary>
+            <param name="clientID">The ID of the client.</param>
+            <returns>The result of the operation.</returns>
         </member>
         <member name="T:ExpertOffers.API.Controllers.GenreCouponController">
             <summary>

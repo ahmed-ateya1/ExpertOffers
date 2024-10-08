@@ -41,6 +41,10 @@ namespace ExpertOffers.Infrastructure.Configurations
                 .WithMany(x => x.Bulletins)
                 .HasForeignKey(x => x.CompanyID)
                 .OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(x => x.Genre)
+                .WithMany(x => x.Bulletins)
+                .HasForeignKey(x => x.GenreID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.ToTable("Bulletins");
         }

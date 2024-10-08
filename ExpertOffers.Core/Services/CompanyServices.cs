@@ -2,6 +2,7 @@
 using ExpertOffers.Core.Domain.Entities;
 using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.CompanyDto;
+using ExpertOffers.Core.Dtos.FavoriteDto;
 using ExpertOffers.Core.DTOS.ClientDto;
 using ExpertOffers.Core.Helper;
 using ExpertOffers.Core.IUnitOfWorkConfig;
@@ -24,6 +25,57 @@ public class CompanyServices : ICompanyServices
         _mapper = mapper;
         _fileServices = fileServices;
         _httpContextAccessor = httpContextAccessor;
+    }
+    private async Task ExecuteWithTransaction(Func<Task> action)
+    {
+        using (var transaction = await _unitOfWork.BeginTransactionAsync())
+        {
+            try
+            {
+                await action();
+                await _unitOfWork.CommitTransactionAsync();
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+    }
+    private async Task SetFavoriteAsync(List<CompanyResponse> companies, Guid clientID)
+    {
+        var companyIds = companies.Select(c => c.CompanyID).ToList();
+
+        var favoriteCompanyIds = await _unitOfWork.Repository<Favorite>()
+            .GetAllAsync(x => x.ClientID == clientID && companyIds.Contains(x.CompanyID));
+
+        var ids = favoriteCompanyIds.Select(x => x.CompanyID).ToList();
+
+        var favoriteIdsSet = new HashSet<Guid>(ids);
+
+        foreach (var company in companies)
+        {
+            company.IsFavoriteToCurrentUser = favoriteIdsSet.Contains(company.CompanyID);
+        }
+    }
+
+    private async Task<Client?> GetCurrentClientAsync()
+    {
+        var email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+
+        if (email == null)
+            return null;
+
+        var user = await _unitOfWork.Repository<ApplicationUser>()
+            .GetByAsync(x => x.Email == email, includeProperties: "Country,City");
+
+        if (user == null)
+            return null;
+
+        var client = await _unitOfWork.Repository<Client>()
+            .GetByAsync(x => x.ClientID == user.ClientID);
+
+        return client;
     }
     private async Task<City> GetCityByIdAsync(Guid cityId)
     {
@@ -65,15 +117,27 @@ public class CompanyServices : ICompanyServices
     {
         var companies = await _unitOfWork.Repository<Company>().GetAllAsync(expression , includeProperties: "Industrial,User,User.Country,User.City"); 
 
-        return _mapper.Map<IEnumerable<CompanyResponse>>(companies);
+        var result = _mapper.Map<IEnumerable<CompanyResponse>>(companies);
+        var client = await GetCurrentClientAsync();
+        if(client != null)
+        {
+            await SetFavoriteAsync(result.ToList(), client.ClientID);
+        }
+        return result;
     }
 
     public async Task<CompanyResponse> GetByAsync(Expression<Func<Company, bool>> expression, bool isTracked = true)
     {
         var company = await _unitOfWork.Repository<Company>().GetByAsync(expression, isTracked , includeProperties: "Industrial,User,User.Country,User.City");
        
-       
-        return _mapper.Map<CompanyResponse>(company);
+        var result = _mapper.Map<CompanyResponse>(company);
+        var user = await GetCurrentClientAsync();
+        if (user != null)
+        {
+            result.IsFavoriteToCurrentUser = await _unitOfWork.Repository<Favorite>()
+                .AnyAsync(x => x.CompanyID == company.CompanyID && x.ClientID == user.ClientID);
+        }
+        return result;
     }
 
     public async Task<CompanyResponse> UpdateAsync(CompanyUpdateRequest? request)
@@ -133,5 +197,60 @@ public class CompanyServices : ICompanyServices
         }
 
         return _mapper.Map<CompanyResponse>(companyUpdate);
+    }
+
+    public async Task<bool> DeleteAsync(Guid CompanyID)
+    {
+        var company = await _unitOfWork.Repository<Company>()
+            .GetByAsync(x => x.CompanyID == CompanyID,includeProperties: "Coupons,Bulletins,Branches,Offers,Notifications,Favorites");
+
+        var result = false;
+        await ExecuteWithTransaction(async () =>
+        {
+            if(company.CompanyLogoURL != null)
+            {
+                await _fileServices.DeleteFile(Path.GetFileName(company.CompanyLogoURL));
+            }
+
+            if(company.Coupons.Any())
+            {
+                foreach (var coupon in company.Coupons)
+                {
+                    await _fileServices.DeleteFile(Path.GetFileName(coupon.CouponePictureURL));
+                }
+                await _unitOfWork.Repository<Coupon>().RemoveRangeAsync(company.Coupons);
+            }
+            if(company.Favorites.Any())
+            {
+                await _unitOfWork.Repository<Favorite>().RemoveRangeAsync(company.Favorites);
+            }
+            if(company.Bulletins.Any())
+            {
+                foreach (var bulletin in company.Bulletins)
+                {
+                    await _fileServices.DeleteFile(Path.GetFileName(bulletin.BulletinPdfUrl));
+                    await _fileServices.DeleteFile(Path.GetFileName(bulletin.BulletinPictureUrl));
+                }
+                await _unitOfWork.Repository<Bulletin>().RemoveRangeAsync(company.Bulletins);
+            }
+            if (company.Branches.Any())
+            {
+                await _unitOfWork.Repository<Branch>().RemoveRangeAsync(company.Branches);
+            }
+            if (company.Offers.Any())
+            {
+                foreach (var offer in company.Offers)
+                {
+                    await _fileServices.DeleteFile(Path.GetFileName(offer.OfferPictureURL));
+                }
+                await _unitOfWork.Repository<Offer>().RemoveRangeAsync(company.Offers);
+            }
+            if (company.Notifications.Any())
+            {
+                await _unitOfWork.Repository<Notification>().RemoveRangeAsync(company.Notifications);
+            }
+            result = await _unitOfWork.Repository<Company>().DeleteAsync(company);
+        });
+        return result;
     }
 }
