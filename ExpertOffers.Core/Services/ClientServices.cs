@@ -98,27 +98,28 @@ namespace ExpertOffers.Core.Services
             if (client == null)
                 throw new UnauthorizedAccessException("Client not found");
 
-            var result = false;
             await ExecuteWithTransaction(async () =>
             {
-                if(client.Favorites != null)
+                var tasks = new List<Task>();
+                if (client.Favorites != null)
                 {
-                    await _unitOfWork.Repository<Favorite>()
-                    .RemoveRangeAsync(client.Favorites);
+                    tasks.Add(_unitOfWork.Repository<Favorite>()
+                    .RemoveRangeAsync(client.Favorites));
                 }
                 if (client.Notifications != null)
                 {
-                    await _unitOfWork.Repository<Notification>().
-                    RemoveRangeAsync(client.Notifications);
+                    tasks.Add(_unitOfWork.Repository<Notification>().
+                    RemoveRangeAsync(client.Notifications));
                 }
                 if (client.SavedItems != null)
                 {
-                    await _unitOfWork.Repository<SavedItem>()
-                    .RemoveRangeAsync(client.SavedItems);
+                    tasks.Add(_unitOfWork.Repository<SavedItem>()
+                    .RemoveRangeAsync(client.SavedItems));
                 }
-                result = await _unitOfWork.Repository<Client>().DeleteAsync(client);
+                tasks.Add(_unitOfWork.Repository<Client>().DeleteAsync(client));
+                await Task.WhenAll(tasks);
             });
-            return result;
+            return true;
         }
 
         public async Task<ClientReponse> GetByAsync(Expression<Func<Client, bool>> expression, bool isTracking = true)

@@ -176,6 +176,113 @@
             <param name="branchName">The name of the branches to search for.</param>
             <returns>An IActionResult containing the list of matching branches.</returns>
         </member>
+        <member name="T:ExpertOffers.API.Controllers.BulletinController">
+            <summary>
+            Controller for managing bulletin operations.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.#ctor(ExpertOffers.Core.ServicesContract.IBulletinServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BulletinController})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.BulletinController"/> class.
+            </summary>
+            <param name="bulletinService">The bulletin service.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.CreateBulletin(ExpertOffers.Core.Dtos.BulletinDto.BulletinAddRquest)">
+            <summary>
+            Creates a new bulletin.
+            </summary>
+            <param name="request">The bulletin add request.</param>
+            <returns>The created bulletin.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.UpdateBulletin(ExpertOffers.Core.Dtos.BulletinDto.BulletinUpdateRequest)">
+            <summary>
+            Updates an existing bulletin.
+            </summary>
+            <param name="request">The bulletin update request.</param>
+            <returns>The updated bulletin.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.DeleteBulletin(System.Guid)">
+            <summary>
+            Deletes a bulletin by its ID.
+            </summary>
+            <param name="id">The ID of the bulletin to delete.</param>
+            <returns>A response indicating the success of the deletion.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinById(System.Guid)">
+            <summary>
+            Gets a bulletin by its ID.
+            </summary>
+            <param name="id">The ID of the bulletin.</param>
+            <returns>The bulletin with the specified ID.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletins">
+            <summary>
+            Gets all bulletins.
+            </summary>
+            <returns>All bulletins.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsByGenre(System.Guid)">
+            <summary>
+            Gets bulletins by genre ID.
+            </summary>
+            <param name="genreID">The ID of the genre.</param>
+            <returns>The bulletins with the specified genre ID.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsByCompany(System.Guid)">
+            <summary>
+            Gets bulletins by company ID.
+            </summary>
+            <param name="companyID">The ID of the company.</param>
+            <returns>The bulletins with the specified company ID.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsActive">
+            <summary>
+            Gets active bulletins.
+            </summary>
+            <returns>The active bulletins.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsInActive">
+            <summary>
+            Gets inactive bulletins.
+            </summary>
+            <returns>The inactive bulletins.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsActiveByGenre(System.Guid)">
+            <summary>
+            Gets active bulletins by genre ID.
+            </summary>
+            <param name="genreID">The ID of the genre.</param>
+            <returns>The active bulletins with the specified genre ID.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsInActiveByGenre(System.Guid)">
+            <summary>
+            Gets inactive bulletins by genre ID.
+            </summary>
+            <param name="genreID">The ID of the genre.</param>
+            <returns>The inactive bulletins with the specified genre ID.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsActiveByCompany(System.Guid)">
+            <summary>
+            Gets active bulletins by company ID.
+            </summary>
+            <param name="companyID">The ID of the company.</param>
+            <returns>The active bulletins with the specified company ID.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsInActiveByCompany(System.Guid)">
+            <summary>
+            Gets inactive bulletins by company ID.
+            </summary>
+            <param name="companyID">The ID of the company.</param>
+            <returns>The inactive bulletins with the specified company ID.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsByName(System.String)">
+            <summary>
+            Gets bulletins by title.
+            </summary>
+            <param name="title">The title to search for.</param>
+            <returns>The bulletins with the specified title.</returns>
+        </member>
         <member name="T:ExpertOffers.API.Controllers.BulletinGenreController">
             <summary>
             Controller for managing bulletin genres.

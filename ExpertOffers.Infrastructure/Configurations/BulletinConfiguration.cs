@@ -22,9 +22,6 @@ namespace ExpertOffers.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(x => x.BulletinDescription)
-                .IsRequired()
-                .HasMaxLength(500);
 
             builder.Property(x => x.BulletinPictureUrl)
                 .IsRequired();

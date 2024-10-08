@@ -204,53 +204,55 @@ public class CompanyServices : ICompanyServices
         var company = await _unitOfWork.Repository<Company>()
             .GetByAsync(x => x.CompanyID == CompanyID,includeProperties: "Coupons,Bulletins,Branches,Offers,Notifications,Favorites");
 
-        var result = false;
         await ExecuteWithTransaction(async () =>
         {
-            if(company.CompanyLogoURL != null)
+            var tasks = new List<Task>();
+
+            if (company.CompanyLogoURL != null)
             {
-                await _fileServices.DeleteFile(Path.GetFileName(company.CompanyLogoURL));
+               tasks.Add(_fileServices.DeleteFile(Path.GetFileName(company.CompanyLogoURL)));
             }
 
             if(company.Coupons.Any())
             {
                 foreach (var coupon in company.Coupons)
                 {
-                    await _fileServices.DeleteFile(Path.GetFileName(coupon.CouponePictureURL));
+                    tasks.Add(_fileServices.DeleteFile(Path.GetFileName(coupon.CouponePictureURL)));
                 }
-                await _unitOfWork.Repository<Coupon>().RemoveRangeAsync(company.Coupons);
+                tasks.Add(_unitOfWork.Repository<Coupon>().RemoveRangeAsync(company.Coupons));
             }
             if(company.Favorites.Any())
             {
-                await _unitOfWork.Repository<Favorite>().RemoveRangeAsync(company.Favorites);
+                tasks.Add(_unitOfWork.Repository<Favorite>().RemoveRangeAsync(company.Favorites));
             }
             if(company.Bulletins.Any())
             {
                 foreach (var bulletin in company.Bulletins)
                 {
-                    await _fileServices.DeleteFile(Path.GetFileName(bulletin.BulletinPdfUrl));
-                    await _fileServices.DeleteFile(Path.GetFileName(bulletin.BulletinPictureUrl));
+                    tasks.Add(_fileServices.DeleteFile(Path.GetFileName(bulletin.BulletinPdfUrl)));
+                    tasks.Add(_fileServices.DeleteFile(Path.GetFileName(bulletin.BulletinPictureUrl)));
                 }
-                await _unitOfWork.Repository<Bulletin>().RemoveRangeAsync(company.Bulletins);
+                tasks.Add(_unitOfWork.Repository<Bulletin>().RemoveRangeAsync(company.Bulletins));
             }
             if (company.Branches.Any())
             {
-                await _unitOfWork.Repository<Branch>().RemoveRangeAsync(company.Branches);
+                tasks.Add(_unitOfWork.Repository<Branch>().RemoveRangeAsync(company.Branches));
             }
             if (company.Offers.Any())
             {
                 foreach (var offer in company.Offers)
                 {
-                    await _fileServices.DeleteFile(Path.GetFileName(offer.OfferPictureURL));
+                    tasks.Add(_fileServices.DeleteFile(Path.GetFileName(offer.OfferPictureURL)));
                 }
-                await _unitOfWork.Repository<Offer>().RemoveRangeAsync(company.Offers);
+                tasks.Add(_unitOfWork.Repository<Offer>().RemoveRangeAsync(company.Offers));
             }
             if (company.Notifications.Any())
             {
-                await _unitOfWork.Repository<Notification>().RemoveRangeAsync(company.Notifications);
+                tasks.Add(_unitOfWork.Repository<Notification>().RemoveRangeAsync(company.Notifications));
             }
-            result = await _unitOfWork.Repository<Company>().DeleteAsync(company);
+             tasks.Add(_unitOfWork.Repository<Company>().DeleteAsync(company));
+            await Task.WhenAll(tasks);
         });
-        return result;
+        return true;
     }
 }
