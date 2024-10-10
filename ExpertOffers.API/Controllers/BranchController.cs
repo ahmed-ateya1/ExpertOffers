@@ -14,7 +14,6 @@ namespace ExpertOffers.API.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    
     public class BranchController : ControllerBase
     {
         private readonly IBranchServices _branchServices;
@@ -33,13 +32,15 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Adds a new branch.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
         /// <param name="branchAddRequest">The branch add request containing the details of the branch to be added.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
+        /// <response code="200">Branch added successfully.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPost("addBranch")]
         [Authorize(Roles = "COMPANY")]
-        public async Task<IActionResult> AddBranch(BranchAddRequest branchAddRequest)
+        public async Task<ActionResult<ApiResponse>> AddBranch(BranchAddRequest branchAddRequest)
         {
             try
             {
@@ -67,16 +68,28 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Updates an existing branch.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
         /// <param name="branchUpdateRequest">The branch update request containing the details to update the branch.</param>
-        /// <returns>An IActionResult indicating the result of the operation.</returns>
+        /// <returns>An ApiResponse indicating the result of the operation.</returns>
+        /// <response code="200">Branch updated successfully.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPut("updateBranch")]
         [Authorize(Roles = "COMPANY")]
-        public async Task<IActionResult> UpdateBranch(BranchUpdateRequest branchUpdateRequest)
+        public async Task<ActionResult<ApiResponse>> UpdateBranch(BranchUpdateRequest branchUpdateRequest)
         {
             try
             {
+                var branch = await _branchServices.GetByAsync(b => b.BranchID == branchUpdateRequest.BranchID);
+                if (branch == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Branch not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var response = await _branchServices.UpdateAsync(branchUpdateRequest);
 
                 return Ok(new ApiResponse
@@ -101,13 +114,15 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Deletes a branch by its ID.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
         /// <param name="branchID">The ID of the branch to be deleted.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
-        [HttpDelete("deleteBranch")]
+        /// <response code="200">Branch deleted successfully.</response>
+        /// <response code="500">Internal server error.</response>
+        [HttpDelete("deleteBranch/{branchID}")]
         [Authorize(Roles = "COMPANY")]
-        public async Task<IActionResult> DeleteBranch(Guid branchID)
+        public async Task<ActionResult<ApiResponse>> DeleteBranch(Guid branchID)
         {
             try
             {
@@ -137,9 +152,11 @@ namespace ExpertOffers.API.Controllers
         /// Gets all branches for a specific company.
         /// </summary>
         /// <param name="companyID">The ID of the company whose branches are to be fetched.</param>
-        /// <returns>An IActionResult containing the list of branches.</returns>
-        [HttpGet("getBranchesForCompany")]
-        public async Task<IActionResult> GetBranchesForCompany(Guid companyID)
+        /// <returns>An Api Response containing the list of branches.</returns>
+        /// <response code="200">Branches fetched successfully.</response>
+        /// <response code="500">Internal server error.</response>
+        [HttpGet("getBranchesForCompany/{companyID}")]
+        public async Task<ActionResult<ApiResponse>> GetBranchesForCompany(Guid companyID)
         {
             try
             {
@@ -170,6 +187,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="branchID">The ID of the branch to be fetched.</param>
         /// <returns>An IActionResult containing the branch details.</returns>
+        /// <response code="200">Branch fetched successfully.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpGet("getBranch/{branchID}")]
         public async Task<IActionResult> GetBranch(Guid branchID)
         {
@@ -201,8 +220,10 @@ namespace ExpertOffers.API.Controllers
         /// Gets all branches.
         /// </summary>
         /// <returns>An IActionResult containing the list of all branches.</returns>
+        /// <response code="200">Branches fetched successfully.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpGet("getBranches")]
-        public async Task<IActionResult> GetBranches()
+        public async Task<ActionResult<ApiResponse>> GetBranches()
         {
             try
             {
@@ -233,8 +254,10 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="branchName">The name of the branches to search for.</param>
         /// <returns>An IActionResult containing the list of matching branches.</returns>
+        /// <response code="200">Branches fetched successfully.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpGet("getBranches/{branchName}")]
-        public async Task<IActionResult> GetBranches(string branchName)
+        public async Task<ActionResult<ApiResponse>> GetBranches(string branchName)
         {
             try
             {

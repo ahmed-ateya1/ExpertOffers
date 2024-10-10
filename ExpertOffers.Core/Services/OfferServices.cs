@@ -130,6 +130,8 @@ namespace ExpertOffers.Core.Services
         public async Task<IEnumerable<OfferResponse>> GetAllAsync(Expression<Func<Offer, bool>>? expression = null)
         {
             var result = await _unitOfWork.Repository<Offer>().GetAllAsync(expression,includeProperties: "Company,Genre");
+            result = result.OrderByDescending(x=>x.OfferDiscount);
+
             return _mapper.Map<IEnumerable<OfferResponse>>(result);
         }
 

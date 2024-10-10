@@ -124,6 +124,7 @@ public class GenreOfferServices : IGenreOfferServices
     {
         _logger.LogInformation("Fetching all genres with the provided expression.");
         var genres = await _unitOfWork.Repository<GenreOffer>().GetAllAsync(expression);
+        genres = genres.OrderBy(x => x.GenreName);
         return _mapper.Map<IEnumerable<GenreResponse>>(genres);
     }
 

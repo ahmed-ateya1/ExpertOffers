@@ -124,6 +124,7 @@ public class CompanyServices : ICompanyServices
         {
             await SetFavoriteAsync(result.ToList(), client.ClientID);
         }
+        result = result.OrderByDescending(x => x.NumberOfBulletins);
         return result;
     }
 
@@ -204,63 +205,71 @@ public class CompanyServices : ICompanyServices
     public async Task<bool> DeleteAsync(Guid CompanyID)
     {
         var company = await _unitOfWork.Repository<Company>()
-            .GetByAsync(x => x.CompanyID == CompanyID,includeProperties: "Coupons,Bulletins,Branches,Offers,Notifications,Favorites");
+            .GetByAsync(x => x.CompanyID == CompanyID, includeProperties: "Coupons,Bulletins,Branches,Offers,Notifications,Favorites,User");
 
         await ExecuteWithTransaction(async () =>
         {
-            var tasks = new List<Task>();
-
             string fileName = null;
+
             if (company.CompanyLogoURL != null)
             {
                 fileName = new Uri(company.CompanyLogoURL).Segments.Last();
-                tasks.Add(_fileServices.DeleteFile(fileName));
+                await _fileServices.DeleteFile(fileName);
             }
 
-            if(company.Coupons.Any())
+            if (company.Coupons.Any())
             {
                 foreach (var coupon in company.Coupons)
                 {
                     fileName = new Uri(coupon.CouponePictureURL).Segments.Last();
-                    tasks.Add(_fileServices.DeleteFile(fileName));
+                    await _fileServices.DeleteFile(fileName);
                 }
-                tasks.Add(_unitOfWork.Repository<Coupon>().RemoveRangeAsync(company.Coupons));
+                await _unitOfWork.Repository<Coupon>().RemoveRangeAsync(company.Coupons);
             }
-            if(company.Favorites.Any())
+
+            if (company.Favorites.Any())
             {
-                tasks.Add(_unitOfWork.Repository<Favorite>().RemoveRangeAsync(company.Favorites));
+                await _unitOfWork.Repository<Favorite>().RemoveRangeAsync(company.Favorites);
             }
-            if(company.Bulletins.Any())
+
+            if (company.Bulletins.Any())
             {
                 foreach (var bulletin in company.Bulletins)
                 {
                     string fileName1 = new Uri(bulletin.BulletinPictureUrl).Segments.Last();
                     string fileName2 = new Uri(bulletin.BulletinPdfUrl).Segments.Last();
-                    tasks.Add(_fileServices.DeleteFile(fileName1));
-                    tasks.Add(_fileServices.DeleteFile(fileName2));
+                    await _fileServices.DeleteFile(fileName1);
+                    await _fileServices.DeleteFile(fileName2);
                 }
-                tasks.Add(_unitOfWork.Repository<Bulletin>().RemoveRangeAsync(company.Bulletins));
+                await _unitOfWork.Repository<Bulletin>().RemoveRangeAsync(company.Bulletins);
             }
+
             if (company.Branches.Any())
             {
-                tasks.Add(_unitOfWork.Repository<Branch>().RemoveRangeAsync(company.Branches));
+                await _unitOfWork.Repository<Branch>().RemoveRangeAsync(company.Branches);
             }
+
             if (company.Offers.Any())
             {
                 foreach (var offer in company.Offers)
                 {
                     fileName = new Uri(offer.OfferPictureURL).Segments.Last();
-                    tasks.Add(_fileServices.DeleteFile(fileName));
+                    await _fileServices.DeleteFile(fileName);
                 }
-                tasks.Add(_unitOfWork.Repository<Offer>().RemoveRangeAsync(company.Offers));
+                await _unitOfWork.Repository<Offer>().RemoveRangeAsync(company.Offers);
             }
+
             if (company.Notifications.Any())
             {
-                tasks.Add(_unitOfWork.Repository<Notification>().RemoveRangeAsync(company.Notifications));
+                await _unitOfWork.Repository<Notification>().RemoveRangeAsync(company.Notifications);
             }
-             tasks.Add(_unitOfWork.Repository<Company>().DeleteAsync(company));
-            await Task.WhenAll(tasks);
+
+            await _unitOfWork.Repository<Company>().DeleteAsync(company);
         });
+
+        await _unitOfWork.Repository<ApplicationUser>().DeleteAsync(company.User);
+
         return true;
     }
+
 }

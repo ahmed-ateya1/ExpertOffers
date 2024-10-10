@@ -33,7 +33,11 @@ namespace ExpertOffers.API.Controllers
         /// Adds a new city.
         /// </summary>
         /// <param name="cityDto">The city add request containing the details of the city to be added.</param>
-        /// <returns>An ActionResult containing the result of the operation.</returns>
+        /// <returns>
+        /// An ActionResult containing the result of the operation.
+        /// - Returns 200 OK if the city is added successfully.
+        /// - Returns 500 Internal Server Error if there is an issue with the operation.
+        /// </returns>
         [HttpPost("createCity")]
 
         public async Task<ActionResult<ApiResponse>> AddCity([FromBody] CityAddRequest cityDto)
@@ -65,7 +69,11 @@ namespace ExpertOffers.API.Controllers
         /// Updates an existing city.
         /// </summary>
         /// <param name="cityDto">The city update request containing the details to update the city.</param>
-        /// <returns>An ActionResult containing the result of the operation.</returns>
+        /// <returns>
+        /// An ActionResult containing the result of the operation.
+        /// <response code="200"> Returns 200 OK if the city is updated successfully.</response>
+        /// <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation.</response>
+        /// </returns>
         [HttpPut("updateCity")]
 
         public async Task<ActionResult<ApiResponse>> UpdateCity([FromBody] CityUpdateRequest cityDto)
@@ -97,7 +105,12 @@ namespace ExpertOffers.API.Controllers
         /// Deletes a city by its ID.
         /// </summary>
         /// <param name="cityID">The ID of the city to be deleted.</param>
-        /// <returns>An ActionResult containing the result of the operation.</returns>
+        /// <returns>
+        /// An ActionResult containing the result of the operation.
+        /// <response code="200"> Returns 200 OK if the city is deleted successfully.</response>
+        /// <response code="404"> Returns 404 Not Found if the city ID does not exist.</response>
+        /// <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation.</response>
+        /// </returns>
         [HttpDelete("deleteCity/{cityID}")]
 
         public async Task<ActionResult<ApiResponse>> DeleteCity(Guid cityID)
@@ -134,11 +147,15 @@ namespace ExpertOffers.API.Controllers
             }
         }
 
-        /// <summary>
+        ///<summary>
         /// Gets all cities for a specific country.
         /// </summary>
         /// <param name="countryID">The ID of the country whose cities are to be fetched.</param>
-        /// <returns>An ActionResult containing the list of cities.</returns>
+        /// <returns>
+        /// An ActionResult containing the list of cities.
+        /// <response code="200"> Returns 200 OK if the cities are fetched successfully.</response>
+        /// <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation</response>
+        /// </returns>
         [HttpGet("getCitiesForCountry/{countryID}")]
         public async Task<ActionResult<ApiResponse>> GetCitiesForCountry(Guid countryID)
         {
@@ -169,7 +186,11 @@ namespace ExpertOffers.API.Controllers
         /// <summary>
         /// Gets all cities.
         /// </summary>
-        /// <returns>An ActionResult containing the list of all cities.</returns>
+        /// <returns>
+        /// An ActionResult containing the list of all cities.
+        /// <response code="200"> Returns 200 OK if the cities are fetched successfully.</response>
+        /// <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation.</response>
+        /// </returns>
         [HttpGet("getCities")]
         public async Task<ActionResult<ApiResponse>> GetCities()
         {
@@ -200,7 +221,11 @@ namespace ExpertOffers.API.Controllers
         /// Gets cities by name.
         /// </summary>
         /// <param name="cityName">The name of the cities to search for.</param>
-        /// <returns>An ActionResult containing the list of matching cities.</returns>
+        /// <returns>
+        /// An ActionResult containing the list of matching cities.
+        /// <response code="200">Returns 200 OK if the cities are fetched successfully.</response>
+        /// <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation.</response>
+        /// </returns>
         [HttpGet("getCities/{cityName}")]
         public async Task<ActionResult<ApiResponse>> GetCity(string cityName)
         {

@@ -1,5 +1,7 @@
-﻿using ExpertOffers.Core.Dtos.IndustrialDto;
+﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Dtos.IndustrialDto;
 using ExpertOffers.Core.DTOS;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.Services;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Http;
@@ -17,16 +19,19 @@ namespace ExpertOffers.API.Controllers
     {
         private readonly IIndustrialServices _industrialServices;
         private readonly ILogger<IndustrialController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IndustrialController"/> class.
         /// </summary>
         /// <param name="industrialServices">The industrial services.</param>
+        /// <param name="unitOfWork">The unit of work.</param>
         /// <param name="logger">The logger.</param>
-        public IndustrialController(IIndustrialServices industrialServices, ILogger<IndustrialController> logger)
+        public IndustrialController(IIndustrialServices industrialServices, ILogger<IndustrialController> logger, IUnitOfWork unitOfWork)
         {
             _industrialServices = industrialServices;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -34,6 +39,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="industrialAddRequest">The request object containing the industrial details to be added.</param>
         /// <returns>An <see cref="ActionResult"/> with the result of the creation.</returns>
+        /// <response code="200">Indicates the industrial entity was created successfully.</response>
+        /// <response code="500">Indicates an internal server error occurred.</response>
         [HttpPost("createIndustrial")]
         public async Task<ActionResult<ApiResponse>> CreateIndustrial([FromBody] IndustrialAddRequest industrialAddRequest)
         {
@@ -65,11 +72,27 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="industrialUpdateRequest">The request object containing the updated industrial details.</param>
         /// <returns>An <see cref="ActionResult"/> with the result of the update.</returns>
+        /// <response code="200">Indicates the industrial entity was updated successfully.</response>
+        /// <response code="404">Indicates the industrial entity was not found.</response>
+        /// <response code="500">Indicates an internal server error occurred.</response>
         [HttpPut("updateIndustrial")]
         public async Task<ActionResult<ApiResponse>> UpdateIndustrial([FromBody] IndustrialUpdateRequest industrialUpdateRequest)
         {
             try
             {
+                var industrialF = await _unitOfWork.Repository<Industrial>()
+                    .GetByAsync(x => x.IndustrialID == industrialUpdateRequest.IndustrialID);
+
+                if (industrialF == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Industrial not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
                 var industrial = await _industrialServices.UpdateAsync(industrialUpdateRequest);
                 return Ok(new ApiResponse
                 {
@@ -96,12 +119,37 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the industrial entity to delete.</param>
         /// <returns>An <see cref="ActionResult"/> with the result of the deletion.</returns>
+        /// <response code="200">Indicates the industrial entity was deleted successfully.</response>
+        /// <response code="404">Indicates the industrial entity was not found.</response>
+        /// <response code="500">Indicates an internal server error occurred.</response>
         [HttpDelete("deleteIndustrial/{id}")]
         public async Task<ActionResult<ApiResponse>> DeleteIndustrial(Guid id)
         {
             try
             {
+                var industrialF = await _unitOfWork.Repository<Industrial>()
+                   .GetByAsync(x => x.IndustrialID == id);
+
+                if (industrialF == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Industrial not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var industrial = await _industrialServices.DeleteAsync(id);
+                if (industrial == false)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Industrial not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
@@ -127,11 +175,27 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the industrial entity.</param>
         /// <returns>An <see cref="ActionResult"/> with the industrial entity details.</returns>
+        /// <response code="200">Indicates the industrial entity was retrieved successfully.</response>
+        /// <response code="404">Indicates the industrial entity was not found.</response>
+        /// <response code="500">Indicates an internal server error occurred.</response>
         [HttpGet("getIndustrial/{id}")]
         public async Task<ActionResult<ApiResponse>> GetIndustrial(Guid id)
         {
             try
             {
+                var industrialF = await _unitOfWork.Repository<Industrial>()
+                   .GetByAsync(x => x.IndustrialID == id);
+
+                if (industrialF == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Industrial not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
                 var industrial = await _industrialServices.GetByAsync(x => x.IndustrialID == id);
                 return Ok(new ApiResponse
                 {
@@ -157,6 +221,8 @@ namespace ExpertOffers.API.Controllers
         /// Retrieves all industrial entities.
         /// </summary>
         /// <returns>An <see cref="ActionResult"/> with the list of all industrial entities.</returns>
+        /// <response code="200">Indicates the industrial entities were retrieved successfully.</response>
+        /// <response code="500">Indicates an internal server error occurred.</response>
         [HttpGet("getIndustrials")]
         public async Task<ActionResult<ApiResponse>> GetIndustrials()
         {
@@ -188,6 +254,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="industrialName">The name of the industrial entity to search for.</param>
         /// <returns>An <see cref="ActionResult"/> with the list of matching industrial entities.</returns>
+        /// <response code="200">Indicates the industrial entities matching the name were retrieved successfully.</response>
+        /// <response code="500">Indicates an internal server error occurred.</response>
         [HttpGet("getIndustrials/{industrialName}")]
         public async Task<ActionResult<ApiResponse>> GetIndustrials(string industrialName)
         {
@@ -215,3 +283,4 @@ namespace ExpertOffers.API.Controllers
         }
     }
 }
+

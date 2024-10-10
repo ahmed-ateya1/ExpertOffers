@@ -156,10 +156,22 @@ namespace ExpertOffers.Core.Services
         {
             var item = await _unitOfWork.Repository<SavedItem>()
                 .GetByAsync(s => s.SavedItemID == savedItemID);
-
+            if(item.OfferId!=null)
+            {
+                var offer = await _unitOfWork.Repository<Offer>()
+                    .GetByAsync(o => o.OfferID == item.OfferId);
+                offer.TotalSaved--;
+            }
+            else
+            {
+                var coupon = await _unitOfWork.Repository<Coupon>()
+                    .GetByAsync(c => c.CouponID == item.CouponId);
+                coupon.TotalSaved--;
+            }
             var result = false;
             await ExecuteWithTransaction(async () =>
             {
+                
                 result = await _unitOfWork.Repository<SavedItem>().DeleteAsync(item);
                 await _unitOfWork.CompleteAsync();
             });

@@ -1,5 +1,7 @@
-﻿using ExpertOffers.Core.DTOS;
+﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.DTOS.CountryDto;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.Services;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authorization;
@@ -18,16 +20,19 @@ namespace ExpertOffers.API.Controllers
     {
         private readonly ICountryServices _countryServices;
         private readonly ILogger<CountryController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CountryController"/> class.
         /// </summary>
         /// <param name="countryServices">The country service used to perform operations on country entities.</param>
         /// <param name="logger">The logger used for logging operations and errors.</param>
-        public CountryController(ICountryServices countryServices, ILogger<CountryController> logger)
+        /// <param name="unitOfWork">The unit of work used to perform database operations.</param>
+        public CountryController(ICountryServices countryServices, ILogger<CountryController> logger, IUnitOfWork unitOfWork)
         {
             _countryServices = countryServices;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -35,6 +40,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="countryAddRequest">The details of the country to be added.</param>
         /// <returns>Returns a response indicating whether the country was added successfully.</returns>
+        /// <response code="200">Country added successfully.</response>
+        /// <response code="500">An error occurred while adding the country.</response>
         [HttpPost("addCountry")]
         public async Task<ActionResult<ApiResponse>> AddCountry(CountryAddRequest countryAddRequest)
         {
@@ -67,12 +74,25 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="countryUpdateRequest">The updated details of the country.</param>
         /// <returns>Returns a response indicating whether the country was updated successfully.</returns>
+        /// <response code="200">Country updated successfully.</response>
+        /// <response code="404">Country not found.</response>
+        /// <response code="500">An error occurred while updating the country.</response>
         [HttpPut("updateCountry")]
-
         public async Task<ActionResult<ApiResponse>> UpdateCountry(CountryUpdateRequest countryUpdateRequest)
         {
             try
             {
+                var countryF = await _unitOfWork.Repository<Country>()
+                    .GetByAsync(x => x.CountryID == countryUpdateRequest.CountryID);
+                if (countryF == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Country not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var country = await _countryServices.UpdateCountry(countryUpdateRequest);
                 if (country == null)
                 {
@@ -108,12 +128,24 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="countryID">The ID of the country to be deleted.</param>
         /// <returns>Returns a response indicating whether the country was deleted successfully.</returns>
+        /// <response code="200">Country deleted successfully.</response>
+        /// <response code="404">Country not found.</response>
+        /// <response code="500">An error occurred while deleting the country.</response>
         [HttpDelete("deleteCountry")]
-
         public async Task<ActionResult<ApiResponse>> DeleteCountry(Guid countryID)
         {
             try
             {
+                var country = await _unitOfWork.Repository<Country>().GetByAsync(x => x.CountryID == countryID);
+                if (country == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Country not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var isDeleted = await _countryServices.DeleteCountry(countryID);
                 if (!isDeleted)
                 {
@@ -148,6 +180,8 @@ namespace ExpertOffers.API.Controllers
         /// Retrieves all countries in the system.
         /// </summary>
         /// <returns>Returns a list of all countries.</returns>
+        /// <response code="200">Countries fetched successfully.</response>
+        /// <response code="500">An error occurred while fetching the countries.</response>
         [HttpGet("getCountries")]
         public async Task<ActionResult<ApiResponse>> GetCountries()
         {
@@ -179,7 +213,10 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="countryID">The ID of the country to be retrieved.</param>
         /// <returns>Returns the details of the country if found.</returns>
-        [HttpGet("getCountry")]
+        /// <response code="200">Country fetched successfully.</response>
+        /// <response code="404">Country not found.</response>
+        /// <response code="500">An error occurred while fetching the country.</response>
+        [HttpGet("getCountry/{countryID}")]
         public async Task<ActionResult<ApiResponse>> GetCountry(Guid countryID)
         {
             try
@@ -219,6 +256,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="countryName">The partial or full name of the country.</param>
         /// <returns>Returns a list of countries that match the given name.</returns>
+        /// <response code="200">Countries fetched successfully.</response>
+        /// <response code="500">An error occurred while fetching the countries.</response>
         [HttpGet("getCountries/{countryName}")]
         public async Task<ActionResult<ApiResponse>> GetCountries(string countryName)
         {
@@ -246,3 +285,4 @@ namespace ExpertOffers.API.Controllers
         }
     }
 }
+

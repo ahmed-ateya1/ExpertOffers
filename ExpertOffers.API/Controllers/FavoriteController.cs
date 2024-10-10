@@ -1,5 +1,7 @@
-﻿using ExpertOffers.Core.Dtos.FavoriteDto;
+﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Dtos.FavoriteDto;
 using ExpertOffers.Core.DTOS;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,27 +19,32 @@ namespace ExpertOffers.API.Controllers
     {
         private readonly IFavoriteServices _favoriteServices;
         private readonly ILogger<FavoriteController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FavoriteController"/> class.
         /// </summary>
         /// <param name="favoriteServices">The favorite services.</param>
         /// <param name="logger">The logger.</param>
+        /// <param name="unitOfWork">The unit of work.</param>
         public FavoriteController(
             IFavoriteServices favoriteServices,
-            ILogger<FavoriteController> logger
-            )
+            ILogger<FavoriteController> logger,
+            IUnitOfWork unitOfWork)
         {
             _favoriteServices = favoriteServices;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
         /// Adds a company to favorites.
-        /// "USER" role is required to access this endpoint
+        /// "USER" role is required to access this endpoint.
         /// </summary>
         /// <param name="favoriteRequest">The favorite request.</param>
         /// <returns>The result of the operation.</returns>
+        /// <response code="200">Company added to favorites successfully.</response>
+        /// <response code="500">An error occurred while adding the favorite.</response>
         [Authorize(Roles = "USER")]
         [HttpPost("addToFavorite")]
         public async Task<ActionResult<ApiResponse>> AddFavorite([FromBody] FavoriteAddRequest favoriteRequest)
@@ -55,7 +62,7 @@ namespace ExpertOffers.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "AddFavorite method: An error occurred while Add company to favorite.");
+                _logger.LogError(ex, "AddFavorite method: An error occurred while adding company to favorite.");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
@@ -67,16 +74,29 @@ namespace ExpertOffers.API.Controllers
 
         /// <summary>
         /// Removes a company from favorites.
-        /// "USER" role is required to access this endpoint
+        /// "USER" role is required to access this endpoint.
         /// </summary>
         /// <param name="favoriteID">The ID of the favorite to remove.</param>
         /// <returns>The result of the operation.</returns>
+        /// <response code="200">Company removed from favorites successfully.</response>
+        /// <response code="404">Favorite not found.</response>
+        /// <response code="500">An error occurred while removing the favorite.</response>
         [Authorize(Roles = "USER")]
         [HttpDelete("removeFromFavorite/{favoriteID}")]
         public async Task<ActionResult<ApiResponse>> RemoveFavorite(Guid favoriteID)
         {
             try
             {
+                var fav = await _unitOfWork.Repository<Favorite>().GetByAsync(x => x.FavoriteID == favoriteID);
+                if (fav == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Favorite not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var result = await _favoriteServices.RemoveFavorite(favoriteID);
                 return Ok(new ApiResponse
                 {
@@ -103,6 +123,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="clientID">The ID of the client.</param>
         /// <returns>The result of the operation.</returns>
+        /// <response code="200">Favorites retrieved successfully.</response>
+        /// <response code="500">An error occurred while retrieving favorites.</response>
         [HttpGet("getAllFavorites/{clientID}")]
         public async Task<ActionResult<ApiResponse>> GetAllFavorites(Guid clientID)
         {
@@ -130,3 +152,4 @@ namespace ExpertOffers.API.Controllers
         }
     }
 }
+

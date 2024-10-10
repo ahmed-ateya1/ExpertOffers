@@ -104,6 +104,7 @@ namespace ExpertOffers.Core.Services
         {
             var result = await _unitOfWork.Repository<BulletinGenre>()
                 .GetAllAsync(expression);
+            result= result.OrderBy(x => x.GenreName);
             return _mapper.Map<IEnumerable<BulletinGenreResponse>>(result);
         }
 

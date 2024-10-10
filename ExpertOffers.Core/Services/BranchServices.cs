@@ -62,6 +62,7 @@ namespace ExpertOffers.Core.Services
         public async Task<List<BranchResponse>> GetAllAsync(Expression<Func<Branch, bool>>? expression = null)
         {
             var branches = await _unitOfWork.Repository<Branch>().GetAllAsync(expression, includeProperties: "Company");
+            branches= branches.OrderBy(x => x.BranchName);
             return _mapper.Map<List<BranchResponse>>(branches);
         }
 

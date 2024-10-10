@@ -26,13 +26,19 @@
             </summary>
             <param name="registerDTO">Client registration details.</param>
             <returns>Authentication response with token and status.</returns>
+            <response code="200">Client registered successfully.</response>
+            <response code="400">Invalid input or request.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.RegisterComapnyAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.CompanyRegisterDTO)">
             <summary>
-            Registers a new company account.
-            </summary>
-            <param name="registerDTO">Company registration details.</param>
-            <returns>Authentication response with token and status.</returns>
+             Registers a new company account.
+             </summary>
+             <param name="registerDTO">Company registration details.</param>
+             <returns>Authentication response with token and status.</returns>
+             <response code="200">Company registered successfully.</response>
+             <response code="400">Invalid input or request.</response>
+             <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.LoginAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.LoginDTO)">
             <summary>
@@ -40,6 +46,9 @@
             </summary>
             <param name="loginDTO">Login credentials (email, password).</param>
             <returns>Authentication response with token and status.</returns>
+            <response code="200">Login successful.</response>
+            <response code="400">Invalid credentials or input.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.ForgotPassword(ExpertOffers.Core.DTOS.AuthenticationDTO.ForgotPasswordDTO)">
             <summary>
@@ -47,6 +56,9 @@
             </summary>
             <param name="forgotPassword">Email to send the password reset link to.</param>
             <returns>Status message.</returns>
+            <response code="200">Password reset OTP sent successfully.</response>
+            <response code="400">Invalid input.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.ResetPassword(ExpertOffers.Core.DTOS.AuthenticationDTO.ResetPasswordDTO)">
             <summary>
@@ -54,6 +66,9 @@
             </summary>
             <param name="resetPassword">Reset password request details, including OTP.</param>
             <returns>Status message.</returns>
+            <response code="200">Password reset successfully.</response>
+            <response code="400">Invalid OTP or request.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.ChangePassword(ExpertOffers.Core.Dtos.AuthenticationDto.ChangePasswordRequest)">
             <summary>
@@ -61,6 +76,10 @@
             </summary>
             <param name="model">Change password request details.</param>
             <returns>Status message.</returns>
+            <response code="200">Password changed successfully.</response>
+            <response code="400">Invalid current password.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.IsEmailInUse(System.String)">
             <summary>
@@ -68,21 +87,19 @@
             </summary>
             <param name="email">The email to check.</param>
             <returns>True if the email is in use; otherwise, false.</returns>
+            <response code="200">Check successful, result returned.</response>
+            <response code="500">Internal server error.</response>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.AccountController.AddLocation(ExpertOffers.Core.DTOS.CityDto.LocationDTO)">
-            <summary>
-            Adds or updates the user's location.
-            User must be authenticated to access this endpoint.
-            </summary>
-            <param name="locationDTO">Location details.</param>
-            <returns>Status message.</returns>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:ExpertOffers.API.Controllers.AccountController.AddLocation(ExpertOffers.Core.DTOS.CityDto.LocationDTO)" -->
         <member name="M:ExpertOffers.API.Controllers.AccountController.RemoveAccount">
             <summary>
             Removes the user's account.
             User must be authenticated to access this endpoint.
             </summary>
             <returns>Status message.</returns>
+            <response code="200">Account removed successfully.</response>
+            <response code="401">Unauthorized user.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.VerifyOtp(ExpertOffers.Core.Dtos.AuthenticationDto.OtpVerificationRequest)">
             <summary>
@@ -90,6 +107,9 @@
             </summary>
             <param name="request">OTP verification request.</param>
             <returns>Status message.</returns>
+            <response code="200">OTP verified successfully.</response>
+            <response code="400">Invalid or expired OTP.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.AddRoleAsync(ExpertOffers.Core.DTOS.AuthenticationDTO.AddRoleDTO)">
             <summary>
@@ -133,33 +153,41 @@
         <member name="M:ExpertOffers.API.Controllers.BranchController.AddBranch(ExpertOffers.Core.Dtos.BranchDto.BranchAddRequest)">
             <summary>
             Adds a new branch.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="branchAddRequest">The branch add request containing the details of the branch to be added.</param>
             <returns>An IActionResult indicating the result of the operation.</returns>
+            <response code="200">Branch added successfully.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BranchController.UpdateBranch(ExpertOffers.Core.Dtos.BranchDto.BranchUpdateRequest)">
             <summary>
             Updates an existing branch.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="branchUpdateRequest">The branch update request containing the details to update the branch.</param>
-            <returns>An IActionResult indicating the result of the operation.</returns>
+            <returns>An ApiResponse indicating the result of the operation.</returns>
+            <response code="200">Branch updated successfully.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BranchController.DeleteBranch(System.Guid)">
             <summary>
             Deletes a branch by its ID.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="branchID">The ID of the branch to be deleted.</param>
             <returns>An IActionResult indicating the result of the operation.</returns>
+            <response code="200">Branch deleted successfully.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BranchController.GetBranchesForCompany(System.Guid)">
             <summary>
             Gets all branches for a specific company.
             </summary>
             <param name="companyID">The ID of the company whose branches are to be fetched.</param>
-            <returns>An IActionResult containing the list of branches.</returns>
+            <returns>An Api Response containing the list of branches.</returns>
+            <response code="200">Branches fetched successfully.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BranchController.GetBranch(System.Guid)">
             <summary>
@@ -167,12 +195,16 @@
             </summary>
             <param name="branchID">The ID of the branch to be fetched.</param>
             <returns>An IActionResult containing the branch details.</returns>
+            <response code="200">Branch fetched successfully.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BranchController.GetBranches">
             <summary>
             Gets all branches.
             </summary>
             <returns>An IActionResult containing the list of all branches.</returns>
+            <response code="200">Branches fetched successfully.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BranchController.GetBranches(System.String)">
             <summary>
@@ -180,55 +212,71 @@
             </summary>
             <param name="branchName">The name of the branches to search for.</param>
             <returns>An IActionResult containing the list of matching branches.</returns>
+            <response code="200">Branches fetched successfully.</response>
+            <response code="500">Internal server error.</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.BulletinController">
             <summary>
             Controller for managing bulletin operations.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.BulletinController.#ctor(ExpertOffers.Core.ServicesContract.IBulletinServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BulletinController})">
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.#ctor(ExpertOffers.Core.ServicesContract.IBulletinServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BulletinController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.BulletinController"/> class.
             </summary>
             <param name="bulletinService">The bulletin service.</param>
             <param name="logger">The logger.</param>
+            <param name="unitOfWork">The unit of work.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.CreateBulletin(ExpertOffers.Core.Dtos.BulletinDto.BulletinAddRquest)">
             <summary>
             Creates a new bulletin.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="request">The bulletin add request.</param>
-            <returns>The created bulletin.</returns>
+            <returns>An ApiResponse containing the created bulletin.</returns>
+            <response code="200">Bulletin created successfully.</response>
+            <response code="500">An error occurred while creating the bulletin.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.UpdateBulletin(ExpertOffers.Core.Dtos.BulletinDto.BulletinUpdateRequest)">
             <summary>
             Updates an existing bulletin.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="request">The bulletin update request.</param>
-            <returns>The updated bulletin.</returns>
+            <returns>An ApiResponse containing the updated bulletin.</returns>
+            <response code="200">Bulletin updated successfully.</response>
+            <response code="404">Bulletin not foun.</response>
+            <response code="500">An error occurred while updating the bulletin.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.DeleteBulletin(System.Guid)">
             <summary>
             Deletes a bulletin by its ID.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="id">The ID of the bulletin to delete.</param>
-            <returns>A response indicating the success of the deletion.</returns>
+            <returns>An ApiResponse indicating the result of the deletion.</returns>
+            <response code="200">Bulletin deleted successfully.</response>
+            <response code="404">Bulletin not found.</response>
+            <response code="500">An error occurred while deleting the bulletin.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinById(System.Guid)">
             <summary>
             Gets a bulletin by its ID.
             </summary>
             <param name="id">The ID of the bulletin.</param>
-            <returns>The bulletin with the specified ID.</returns>
+            <returns>An ApiResponse containing the bulletin with the specified ID.</returns>
+            <response code="200">Bulletin found.</response>
+            <response code="404">Bulletin not found.</response>
+            <response code="500">An error occurred while retrieving the bulletin.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletins">
             <summary>
             Gets all bulletins.
             </summary>
             <returns>All bulletins.</returns>
+            <response code="200">Returns all bulletins.</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsByGenre(System.Guid)">
             <summary>
@@ -236,6 +284,8 @@
             </summary>
             <param name="genreID">The ID of the genre.</param>
             <returns>The bulletins with the specified genre ID.</returns>
+            <response code="200">Returns bulletins matching the genre ID.</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsByCompany(System.Guid)">
             <summary>
@@ -243,18 +293,25 @@
             </summary>
             <param name="companyID">The ID of the company.</param>
             <returns>The bulletins with the specified company ID.</returns>
+            <response code="200">Returns bulletins matching the company ID.</response>
+            <response code="404">Returns when company NotFound</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsActive">
             <summary>
             Gets active bulletins.
             </summary>
             <returns>The active bulletins.</returns>
+            <response code="200">Returns active bulletins.</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsInActive">
             <summary>
             Gets inactive bulletins.
             </summary>
             <returns>The inactive bulletins.</returns>
+            <response code="200">Returns inactive bulletins.</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsActiveByGenre(System.Guid)">
             <summary>
@@ -262,6 +319,9 @@
             </summary>
             <param name="genreID">The ID of the genre.</param>
             <returns>The active bulletins with the specified genre ID.</returns>
+            <response code="200">Returns active bulletins matching the genre ID.</response>
+            <response code="404">Returns when genre not found</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsInActiveByGenre(System.Guid)">
             <summary>
@@ -269,6 +329,9 @@
             </summary>
             <param name="genreID">The ID of the genre.</param>
             <returns>The inactive bulletins with the specified genre ID.</returns>
+            <response code="200">Returns inactive bulletins matching the genre ID.</response>
+            <response code="404">Returns when genre not found</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsActiveByCompany(System.Guid)">
             <summary>
@@ -276,6 +339,9 @@
             </summary>
             <param name="companyID">The ID of the company.</param>
             <returns>The active bulletins with the specified company ID.</returns>
+            <response code="200">Returns active bulletins matching the company ID.</response>
+            <response code="404">Returns when country not found.</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsInActiveByCompany(System.Guid)">
             <summary>
@@ -283,6 +349,9 @@
             </summary>
             <param name="companyID">The ID of the company.</param>
             <returns>The inactive bulletins with the specified company ID.</returns>
+            <response code="200">Returns inactive bulletins matching the company ID.</response>
+            <response code="404">Returns when country not found.</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsByName(System.String)">
             <summary>
@@ -290,6 +359,8 @@
             </summary>
             <param name="title">The title to search for.</param>
             <returns>The bulletins with the specified title.</returns>
+            <response code="200">Returns bulletins matching the title.</response>
+            <response code="500">If an error occurs while processing the request.</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.BulletinGenreController">
             <summary>
@@ -309,6 +380,8 @@
             </summary>
             <param name="request">The bulletin genre add request.</param>
             <returns>The created bulletin genre.</returns>
+            <response code="200">Returns the created bulletin genre</response>
+            <response code="500">Returns an error if creation fails</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.UpdateBulletinGenre(ExpertOffers.Core.Dtos.BulletinGenreDto.BulletinGenreUpdateRequest)">
             <summary>
@@ -316,6 +389,8 @@
             </summary>
             <param name="request">The bulletin genre update request.</param>
             <returns>The updated bulletin genre.</returns>
+            <response code="200">Returns the updated bulletin genre</response>
+            <response code="500">Returns an error if update fails</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.DeleteBulletinGenre(System.Guid)">
             <summary>
@@ -323,12 +398,17 @@
             </summary>
             <param name="genreID">The ID of the bulletin genre to delete.</param>
             <returns>The deleted bulletin genre.</returns>
+            <response code="200">Returns the deleted bulletin genre</response>
+            <response code="404">If the bulletin genre is not found</response>
+            <response code="500">Returns an error if deletion fails</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.GetBulletinGenres">
             <summary>
             Gets all bulletin genres.
             </summary>
             <returns>The list of bulletin genres.</returns>
+            <response code="200">Returns the list of bulletin genres</response>
+            <response code="500">Returns an error if fetching fails</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.GetBulletinGenre(System.Guid)">
             <summary>
@@ -336,6 +416,9 @@
             </summary>
             <param name="genreID">The ID of the bulletin genre to retrieve.</param>
             <returns>The bulletin genre.</returns>
+            <response code="200">Returns the bulletin genre</response>
+            <response code="404">If the bulletin genre is not found</response>
+            <response code="500">Returns an error if fetching fails</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinGenreController.GetBulletinGenresByName(System.String)">
             <summary>
@@ -343,6 +426,8 @@
             </summary>
             <param name="name">The name to search for.</param>
             <returns>The list of bulletin genres matching the name.</returns>
+            <response code="200">Returns the list of bulletin genres matching the name</response>
+            <response code="500">Returns an error if fetching fails</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.CityController">
             <summary>
@@ -361,48 +446,73 @@
             Adds a new city.
             </summary>
             <param name="cityDto">The city add request containing the details of the city to be added.</param>
-            <returns>An ActionResult containing the result of the operation.</returns>
+            <returns>
+            An ActionResult containing the result of the operation.
+            - Returns 200 OK if the city is added successfully.
+            - Returns 500 Internal Server Error if there is an issue with the operation.
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CityController.UpdateCity(ExpertOffers.Core.DTOS.CityDto.CityUpdateRequest)">
             <summary>
             Updates an existing city.
             </summary>
             <param name="cityDto">The city update request containing the details to update the city.</param>
-            <returns>An ActionResult containing the result of the operation.</returns>
+            <returns>
+            An ActionResult containing the result of the operation.
+            <response code="200"> Returns 200 OK if the city is updated successfully.</response>
+            <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation.</response>
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CityController.DeleteCity(System.Guid)">
             <summary>
             Deletes a city by its ID.
             </summary>
             <param name="cityID">The ID of the city to be deleted.</param>
-            <returns>An ActionResult containing the result of the operation.</returns>
+            <returns>
+            An ActionResult containing the result of the operation.
+            <response code="200"> Returns 200 OK if the city is deleted successfully.</response>
+            <response code="404"> Returns 404 Not Found if the city ID does not exist.</response>
+            <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation.</response>
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CityController.GetCitiesForCountry(System.Guid)">
             <summary>
-            Gets all cities for a specific country.
-            </summary>
-            <param name="countryID">The ID of the country whose cities are to be fetched.</param>
-            <returns>An ActionResult containing the list of cities.</returns>
+             Gets all cities for a specific country.
+             </summary>
+             <param name="countryID">The ID of the country whose cities are to be fetched.</param>
+             <returns>
+             An ActionResult containing the list of cities.
+             <response code="200"> Returns 200 OK if the cities are fetched successfully.</response>
+             <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation</response>
+             </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CityController.GetCities">
             <summary>
             Gets all cities.
             </summary>
-            <returns>An ActionResult containing the list of all cities.</returns>
+            <returns>
+            An ActionResult containing the list of all cities.
+            <response code="200"> Returns 200 OK if the cities are fetched successfully.</response>
+            <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation.</response>
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CityController.GetCity(System.String)">
             <summary>
             Gets cities by name.
             </summary>
             <param name="cityName">The name of the cities to search for.</param>
-            <returns>An ActionResult containing the list of matching cities.</returns>
+            <returns>
+            An ActionResult containing the list of matching cities.
+            <response code="200">Returns 200 OK if the cities are fetched successfully.</response>
+            <response code="500"> Returns 500 Internal Server Error if there is an issue with the operation.</response>
+            </returns>
         </member>
         <member name="T:ExpertOffers.API.Controllers.ClientController">
             <summary>
             Handles client-related operations such as updating client information and fetching client details.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:ExpertOffers.API.Controllers.ClientController.#ctor(ExpertOffers.Core.ServicesContract.IClientServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.ClientController})" -->
+        <!-- Badly formed XML comment ignored for member "M:ExpertOffers.API.Controllers.ClientController.#ctor(ExpertOffers.Core.ServicesContract.IClientServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.ClientController},Microsoft.AspNetCore.Http.IHttpContextAccessor,ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)" -->
         <member name="M:ExpertOffers.API.Controllers.ClientController.UpdateClient(ExpertOffers.Core.DTOS.ClientDto.ClientUpdateRequest)">
             <summary>
             Updates a client's information.
@@ -417,16 +527,16 @@
             <response code="404">Client not found.</response>
             <response code="500">Internal server error during the update operation.</response>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.ClientController.getClient(System.Guid)">
+        <member name="M:ExpertOffers.API.Controllers.ClientController.getClient">
             <summary>
             Reterive all client information.
             </summary>
-            <param name="id">The unique identifier (ID) of the client to retrieve.</param>
             <returns>
             An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> containing the client information.
             If the client is not found, the response will include a not found status.
             </returns>
             <response code="200">Client fetched successfully.</response>
+            <response code="401">Unauthorized</response>
             <response code="404">Client not found.</response>
             <response code="500">Internal server error during the fetch operation.</response>
         </member>
@@ -435,12 +545,14 @@
             Controller to manage company-related operations such as fetching, updating, and searching for companies.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.CompanyController.#ctor(ExpertOffers.Core.ServicesContract.ICompanyServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CompanyController})">
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.#ctor(ExpertOffers.Core.ServicesContract.ICompanyServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CompanyController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.CompanyController"/> class.
             </summary>
             <param name="companyServices">Service to handle company operations.</param>
             <param name="logger">Logger instance to record logs and errors.</param>
+            <param name="unitOfWork">Unit of work instance to handle database operations.</param>
+            <param name="httpContextAccessor">HTTP context accessor instance to access HTTP context data.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CompanyController.GetCompanies">
             <summary>
@@ -477,20 +589,33 @@
             <param name="companyUpdate">The company update request object containing updated details.</param>
             <returns>An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> indicating the result of the update operation.</returns>
             <response code="200">Company updated successfully.</response>
+            <response code="401">User unauthorized</response>
             <response code="404">Company not found.</response>
             <response code="500">An error occurred while updating the company.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.GetCompanyByIndustrial(System.Guid)">
+            <summary>
+            Updates a company's details.
+            "COMPANY" role is required to access this endpoint
+            </summary>
+            <param name="id">The unique identifier for industrial</param>
+            <returns>An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> indicating the result of the update operation.</returns>
+            <response code="200">Company updated successfully.</response>
+            <response code="404">industrial not found.</response>
+            <response code="500">An error occurred while fetching the companies.</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.CountryController">
             <summary>
             Controller for handling operations related to Countries.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.CountryController.#ctor(ExpertOffers.Core.ServicesContract.ICountryServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CountryController})">
+        <member name="M:ExpertOffers.API.Controllers.CountryController.#ctor(ExpertOffers.Core.ServicesContract.ICountryServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CountryController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.CountryController"/> class.
             </summary>
             <param name="countryServices">The country service used to perform operations on country entities.</param>
             <param name="logger">The logger used for logging operations and errors.</param>
+            <param name="unitOfWork">The unit of work used to perform database operations.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CountryController.AddCountry(ExpertOffers.Core.DTOS.CountryDto.CountryAddRequest)">
             <summary>
@@ -498,6 +623,8 @@
             </summary>
             <param name="countryAddRequest">The details of the country to be added.</param>
             <returns>Returns a response indicating whether the country was added successfully.</returns>
+            <response code="200">Country added successfully.</response>
+            <response code="500">An error occurred while adding the country.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CountryController.UpdateCountry(ExpertOffers.Core.DTOS.CountryDto.CountryUpdateRequest)">
             <summary>
@@ -505,6 +632,9 @@
             </summary>
             <param name="countryUpdateRequest">The updated details of the country.</param>
             <returns>Returns a response indicating whether the country was updated successfully.</returns>
+            <response code="200">Country updated successfully.</response>
+            <response code="404">Country not found.</response>
+            <response code="500">An error occurred while updating the country.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CountryController.DeleteCountry(System.Guid)">
             <summary>
@@ -512,12 +642,17 @@
             </summary>
             <param name="countryID">The ID of the country to be deleted.</param>
             <returns>Returns a response indicating whether the country was deleted successfully.</returns>
+            <response code="200">Country deleted successfully.</response>
+            <response code="404">Country not found.</response>
+            <response code="500">An error occurred while deleting the country.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CountryController.GetCountries">
             <summary>
             Retrieves all countries in the system.
             </summary>
             <returns>Returns a list of all countries.</returns>
+            <response code="200">Countries fetched successfully.</response>
+            <response code="500">An error occurred while fetching the countries.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CountryController.GetCountry(System.Guid)">
             <summary>
@@ -525,6 +660,9 @@
             </summary>
             <param name="countryID">The ID of the country to be retrieved.</param>
             <returns>Returns the details of the country if found.</returns>
+            <response code="200">Country fetched successfully.</response>
+            <response code="404">Country not found.</response>
+            <response code="500">An error occurred while fetching the country.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CountryController.GetCountries(System.String)">
             <summary>
@@ -532,42 +670,53 @@
             </summary>
             <param name="countryName">The partial or full name of the country.</param>
             <returns>Returns a list of countries that match the given name.</returns>
+            <response code="200">Countries fetched successfully.</response>
+            <response code="500">An error occurred while fetching the countries.</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.CouponController">
             <summary>
             Represents the controller for managing coupons.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.CouponController.#ctor(ExpertOffers.Core.ServicesContract.ICouponServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CouponController})">
+        <member name="M:ExpertOffers.API.Controllers.CouponController.#ctor(ExpertOffers.Core.ServicesContract.ICouponServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CouponController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.CouponController"/> class.
             </summary>
             <param name="couponServices">The coupon services.</param>
             <param name="logger">The logger.</param>
+            <param name="unitOfWork">The unit of work.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.CreateCoupon(ExpertOffers.Core.Dtos.CouponDto.CouponAddRequest)">
             <summary>
             Creates a new coupon.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="couponAddRequest">The coupon add request.</param>
             <returns>The created coupon.</returns>
+            <response code="200">Coupon created successfully.</response>
+            <response code="500">An error occurred while creating the coupon.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.UpdateCoupon(ExpertOffers.Core.Dtos.CouponDto.CouponUpdateRequest)">
             <summary>
             Updates an existing coupon.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="couponUpdateRequest">The coupon update request.</param>
             <returns>The updated coupon.</returns>
+            <response code="200">Coupon updated successfully.</response>
+            <response code="404">Coupon not found.</response>
+            <response code="500">An error occurred while updating the coupon.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.DeleteCoupon(System.Guid)">
             <summary>
             Deletes a coupon by its ID.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="id">The ID of the coupon to delete.</param>
             <returns>The result of the delete operation.</returns>
+            <response code="200">Coupon deleted successfully.</response>
+            <response code="404">Coupon not found.</response>
+            <response code="500">An error occurred while deleting the coupon.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetCoupon(System.Guid)">
             <summary>
@@ -575,6 +724,9 @@
             </summary>
             <param name="id">The ID of the coupon to get.</param>
             <returns>The found coupon.</returns>
+            <response code="200">Coupon found successfully.</response>
+            <response code="404">Coupon not found.</response>
+            <response code="500">An error occurred while retrieving the coupon.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponByCompany(System.Guid)">
             <summary>
@@ -582,6 +734,8 @@
             </summary>
             <param name="companyID">The ID of the company.</param>
             <returns>The coupons found.</returns>
+            <response code="200">Coupons found successfully.</response>
+            <response code="500">An error occurred while retrieving the coupons.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponByGenre(System.Guid)">
             <summary>
@@ -589,87 +743,118 @@
             </summary>
             <param name="genreID">The ID of the genre.</param>
             <returns>The coupons found.</returns>
+            <response code="200">Coupons found successfully.</response>
+            <response code="500">An error occurred while retrieving the coupons.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetAllCoupons">
             <summary>
             Gets all coupons.
             </summary>
             <returns>All the coupons found.</returns>
+            <response code="200">Coupons found successfully.</response>
+            <response code="500">An error occurred while retrieving the coupons.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetActiveCoupons">
             <summary>
             Gets active coupons.
             </summary>
-            <returns>The active coupons found.</returns>
+            <returns>
+            <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetInactiveCoupons">
             <summary>
             Gets inactive coupons.
             </summary>
-            <returns>The inactive coupons found.</returns>
+            <returns>
+            <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetActiveCouponsByCompany(System.Guid)">
             <summary>
             Gets active coupons by company ID.
             </summary>
             <param name="companyID">The ID of the company.</param>
-            <returns>The active coupons found.</returns>
+            <returns>
+            <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
+            </returns>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.CouponController.GetInActiveCouponsByCompany(System.Guid)">
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetInactiveCouponsByCompany(System.Guid)">
             <summary>
             Gets inactive coupons by company ID.
             </summary>
             <param name="companyID">The ID of the company.</param>
-            <returns>The inactive coupons found.</returns>
+            <returns>
+            <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetActiveCouponsByGenre(System.Guid)">
             <summary>
             Gets active coupons by genre ID.
             </summary>
             <param name="genreID">The ID of the genre.</param>
-            <returns>The active coupons found.</returns>
+            <returns>
+            <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
+            </returns>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.CouponController.GetInActiveCouponsByGenre(System.Guid)">
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetInactiveCouponsByGenre(System.Guid)">
             <summary>
             Gets inactive coupons by genre ID.
             </summary>
             <param name="genreID">The ID of the genre.</param>
-            <returns>The inactive coupons found.</returns>
+            <returns>
+            <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponsByTitle(System.String)">
             <summary>
             Gets coupons by title.
             </summary>
             <param name="title">The title of the coupons.</param>
-            <returns>The coupons found.</returns>
+            <returns>
+            <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
+            </returns>
         </member>
         <member name="T:ExpertOffers.API.Controllers.FavoriteController">
             <summary>
             Controller for managing favorite operations.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.FavoriteController.#ctor(ExpertOffers.Core.ServicesContract.IFavoriteServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.FavoriteController})">
+        <member name="M:ExpertOffers.API.Controllers.FavoriteController.#ctor(ExpertOffers.Core.ServicesContract.IFavoriteServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.FavoriteController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.FavoriteController"/> class.
             </summary>
             <param name="favoriteServices">The favorite services.</param>
             <param name="logger">The logger.</param>
+            <param name="unitOfWork">The unit of work.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.FavoriteController.AddFavorite(ExpertOffers.Core.Dtos.FavoriteDto.FavoriteAddRequest)">
             <summary>
             Adds a company to favorites.
-            "USER" role is required to access this endpoint
+            "USER" role is required to access this endpoint.
             </summary>
             <param name="favoriteRequest">The favorite request.</param>
             <returns>The result of the operation.</returns>
+            <response code="200">Company added to favorites successfully.</response>
+            <response code="500">An error occurred while adding the favorite.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.FavoriteController.RemoveFavorite(System.Guid)">
             <summary>
             Removes a company from favorites.
-            "USER" role is required to access this endpoint
+            "USER" role is required to access this endpoint.
             </summary>
             <param name="favoriteID">The ID of the favorite to remove.</param>
             <returns>The result of the operation.</returns>
+            <response code="200">Company removed from favorites successfully.</response>
+            <response code="404">Favorite not found.</response>
+            <response code="500">An error occurred while removing the favorite.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.FavoriteController.GetAllFavorites(System.Guid)">
             <summary>
@@ -677,18 +862,21 @@
             </summary>
             <param name="clientID">The ID of the client.</param>
             <returns>The result of the operation.</returns>
+            <response code="200">Favorites retrieved successfully.</response>
+            <response code="500">An error occurred while retrieving favorites.</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.GenreCouponController">
             <summary>
             Controller for managing genre coupons.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.#ctor(ExpertOffers.Core.ServicesContract.IGenreCouponServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.GenreCouponController})">
+        <member name="M:ExpertOffers.API.Controllers.GenreCouponController.#ctor(ExpertOffers.Core.ServicesContract.IGenreCouponServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.GenreCouponController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.GenreCouponController"/> class.
             </summary>
             <param name="genreCouponService">The genre coupon service.</param>
             <param name="logger">The logger.</param>
+            <param name="unitOfWork">The unit of work.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreCouponController.CreateGenreCoupon(ExpertOffers.Core.Dtos.GenreCouponDto.GenreCouponAddRequest)">
             <summary>
@@ -696,6 +884,8 @@
             </summary>
             <param name="request">The genre coupon add request.</param>
             <returns>The created genre coupon.</returns>
+            <response code="200">Genre coupon added successfully.</response>
+            <response code="500">An error occurred while creating the genre coupon.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreCouponController.UpdateGenreCoupon(ExpertOffers.Core.Dtos.GenreCouponDto.GenreCouponUpdateRequest)">
             <summary>
@@ -703,6 +893,9 @@
             </summary>
             <param name="request">The genre coupon update request.</param>
             <returns>The updated genre coupon.</returns>
+            <response code="200">Genre coupon updated successfully.</response>
+            <response code="404">Genre not found.</response>
+            <response code="500">An error occurred while updating the genre coupon.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreCouponController.DeleteGenreCoupon(System.Guid)">
             <summary>
@@ -710,6 +903,9 @@
             </summary>
             <param name="id">The ID of the genre coupon to delete.</param>
             <returns>A flag indicating whether the genre coupon was deleted successfully.</returns>
+            <response code="200">Genre coupon deleted successfully.</response>
+            <response code="404">Genre not found.</response>
+            <response code="500">An error occurred while deleting the genre coupon.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreCouponController.GetGenreCoupon(System.Guid)">
             <summary>
@@ -717,12 +913,17 @@
             </summary>
             <param name="id">The ID of the genre coupon to retrieve.</param>
             <returns>The retrieved genre coupon.</returns>
+            <response code="200">Genre coupon retrieved successfully.</response>
+            <response code="404">Genre not found.</response>
+            <response code="500">An error occurred while retrieving the genre coupon.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreCouponController.GetGenreCoupons">
             <summary>
             Gets all genre coupons.
             </summary>
             <returns>The retrieved genre coupons.</returns>
+            <response code="200">Genre coupons retrieved successfully.</response>
+            <response code="500">An error occurred while retrieving the genre coupons.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreCouponController.GetGenreCouponsby(System.String)">
             <summary>
@@ -730,18 +931,21 @@
             </summary>
             <param name="name">The name to search for in genre coupons.</param>
             <returns>The retrieved genre coupons.</returns>
+            <response code="200">Genre coupons retrieved successfully.</response>
+            <response code="500">An error occurred while retrieving the genre coupons.</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.GenreOfferController">
             <summary>
             API Controller for managing Genre Offers.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.#ctor(ExpertOffers.Core.ServicesContract.IGenreOfferServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.GenreOfferController})">
+        <member name="M:ExpertOffers.API.Controllers.GenreOfferController.#ctor(ExpertOffers.Core.ServicesContract.IGenreOfferServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.GenreOfferController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.GenreOfferController"/> class.
             </summary>
             <param name="genreOfferServices">The genre offer services.</param>
             <param name="logger">The logger.</param>
+            <param name="unitOfWork"></param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreOfferController.CreateGenre(ExpertOffers.Core.Dtos.GenreOffer.GenreAddRequest)">
             <summary>
@@ -749,6 +953,8 @@
             </summary>
             <param name="genreAdd">The genre addition request.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+            <response code="200">Returns the created genre offer.</response>
+            <response code="500">Returns an error message if an unexpected error occurs.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreOfferController.UpdateGenre(ExpertOffers.Core.Dtos.GenreOffer.GenreUpdateRequest)">
             <summary>
@@ -756,6 +962,9 @@
             </summary>
             <param name="genreUpdate">The genre update request.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+            <response code="200">Returns the updated genre offer.</response>
+            <response code="404">Returns an error message if the genre is not found.</response>
+            <response code="500">Returns an error message if an unexpected error occurs.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreOfferController.DeleteGenre(System.Guid)">
             <summary>
@@ -763,12 +972,17 @@
             </summary>
             <param name="id">The genre ID.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+            <response code="200">Returns a success message if the genre offer is deleted.</response>
+            <response code="404">Returns an error message if the genre offer is not found.</response>
+            <response code="500">Returns an error message if an unexpected error occurs.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreOfferController.GetGenres">
             <summary>
             Gets all genre offers.
             </summary>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+            <response code="200">Returns the list of genre offers.</response>
+            <response code="500">Returns an error message if an unexpected error occurs.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreOfferController.GetGenre(System.Guid)">
             <summary>
@@ -776,6 +990,9 @@
             </summary>
             <param name="id">The genre ID.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+            <response code="200">Returns the genre offer.</response>
+            <response code="404">Returns an error message if the genre offer is not found.</response>
+            <response code="500">Returns an error message if an unexpected error occurs.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.GenreOfferController.GetGenresBy(System.String)">
             <summary>
@@ -783,17 +1000,20 @@
             </summary>
             <param name="name">The genre name.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the response.</returns>
+            <response code="200">Returns the list of genre offers matching the name.</response>
+            <response code="500">Returns an error message if an unexpected error occurs.</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.IndustrialController">
             <summary>
             Controller for managing industrial operations.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.IndustrialController.#ctor(ExpertOffers.Core.ServicesContract.IIndustrialServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.IndustrialController})">
+        <member name="M:ExpertOffers.API.Controllers.IndustrialController.#ctor(ExpertOffers.Core.ServicesContract.IIndustrialServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.IndustrialController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.IndustrialController"/> class.
             </summary>
             <param name="industrialServices">The industrial services.</param>
+            <param name="unitOfWork">The unit of work.</param>
             <param name="logger">The logger.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.IndustrialController.CreateIndustrial(ExpertOffers.Core.Dtos.IndustrialDto.IndustrialAddRequest)">
@@ -802,6 +1022,8 @@
             </summary>
             <param name="industrialAddRequest">The request object containing the industrial details to be added.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the result of the creation.</returns>
+            <response code="200">Indicates the industrial entity was created successfully.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.IndustrialController.UpdateIndustrial(ExpertOffers.Core.Dtos.IndustrialDto.IndustrialUpdateRequest)">
             <summary>
@@ -809,6 +1031,9 @@
             </summary>
             <param name="industrialUpdateRequest">The request object containing the updated industrial details.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the result of the update.</returns>
+            <response code="200">Indicates the industrial entity was updated successfully.</response>
+            <response code="404">Indicates the industrial entity was not found.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.IndustrialController.DeleteIndustrial(System.Guid)">
             <summary>
@@ -816,6 +1041,9 @@
             </summary>
             <param name="id">The ID of the industrial entity to delete.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the result of the deletion.</returns>
+            <response code="200">Indicates the industrial entity was deleted successfully.</response>
+            <response code="404">Indicates the industrial entity was not found.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.IndustrialController.GetIndustrial(System.Guid)">
             <summary>
@@ -823,12 +1051,17 @@
             </summary>
             <param name="id">The ID of the industrial entity.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the industrial entity details.</returns>
+            <response code="200">Indicates the industrial entity was retrieved successfully.</response>
+            <response code="404">Indicates the industrial entity was not found.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.IndustrialController.GetIndustrials">
             <summary>
             Retrieves all industrial entities.
             </summary>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the list of all industrial entities.</returns>
+            <response code="200">Indicates the industrial entities were retrieved successfully.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.IndustrialController.GetIndustrials(System.String)">
             <summary>
@@ -836,6 +1069,8 @@
             </summary>
             <param name="industrialName">The name of the industrial entity to search for.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> with the list of matching industrial entities.</returns>
+            <response code="200">Indicates the industrial entities matching the name were retrieved successfully.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
         </member>
         <member name="T:ExpertOffers.API.Controllers.OfferController">
             <summary>
@@ -946,6 +1181,49 @@
             </summary>
             <param name="genreID">The unique ID of the genre.</param>
             <returns>An API response with the list of inactive offers for the specified genre.</returns>
+        </member>
+        <member name="T:ExpertOffers.API.Controllers.SavedItemController">
+            <summary>
+            Controller for managing saved items in the system.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.SavedItemController.#ctor(ExpertOffers.Core.ServicesContract.ISavedItemServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.SavedItemController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.SavedItemController"/> class.
+            </summary>
+            <param name="savedItemServices">The service for handling saved items.</param>
+            <param name="logger">The logger for this controller.</param>
+            <param name="unitOfWork">The unit of work for database transactions.</param>
+            <param name="httpContextAccessor">Accessor for HTTP context.</param>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.SavedItemController.AddToSaved(ExpertOffers.Core.Dtos.SavedItemDto.SavedItemAddRequest)">
+            <summary>
+            Adds a new item to the user's saved items.
+            </summary>
+            <param name="savedItem">The saved item request object containing the details of the item to be saved.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the result of the operation.</returns>
+            <response code="200">Indicates the saved item was added successfully.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.SavedItemController.DeleteSavedItem(System.Guid)">
+            <summary>
+            Deletes an item from the user's saved items.
+            </summary>
+            <param name="savedItemID">The ID of the saved item to delete.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the result of the deletion.</returns>
+            <response code="200">Indicates the saved item was deleted successfully.</response>
+            <response code="404">Indicates the saved item was not found.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.SavedItemController.GetSavedItems">
+            <summary>
+            Retrieves all saved items for the authenticated user.
+            </summary>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the list of saved items.</returns>
+            <response code="200">Indicates the saved items were retrieved successfully.</response>
+            <response code="401">Indicates the user is not authenticated.</response>
+            <response code="404">Indicates the client was not found.</response>
+            <response code="500">Indicates an internal server error occurred.</response>
         </member>
         <member name="T:ExpertOffers.API.FileServices.FileService">
             <summary>

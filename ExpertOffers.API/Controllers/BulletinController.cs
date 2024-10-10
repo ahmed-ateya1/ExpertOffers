@@ -1,7 +1,10 @@
-﻿using ExpertOffers.Core.Dtos.BulletinDto;
+﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Dtos.BulletinDto;
 using ExpertOffers.Core.DTOS;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.Services;
 using ExpertOffers.Core.ServicesContract;
+using ExpertOffers.Infrastructure.Migrations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,26 +21,31 @@ namespace ExpertOffers.API.Controllers
     {
         private readonly IBulletinServices _bulletinService;
         private readonly ILogger<BulletinController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BulletinController"/> class.
         /// </summary>
         /// <param name="bulletinService">The bulletin service.</param>
         /// <param name="logger">The logger.</param>
+        /// <param name="unitOfWork">The unit of work.</param>
         public BulletinController(IBulletinServices bulletinService,
-            ILogger<BulletinController> logger)
+            ILogger<BulletinController> logger,
+            IUnitOfWork unitOfWork)
         {
             _bulletinService = bulletinService;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
-
         /// <summary>
         /// Creates a new bulletin.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
         /// <param name="request">The bulletin add request.</param>
-        /// <returns>The created bulletin.</returns>
-        [Authorize(Roles = "COMPANY")] 
+        /// <returns>An ApiResponse containing the created bulletin.</returns>
+        /// <response code="200">Bulletin created successfully.</response>
+        /// <response code="500">An error occurred while creating the bulletin.</response>
+        [Authorize(Roles = "COMPANY")]
         [HttpPost("createBulletin")]
         public async Task<ActionResult<ApiResponse>> CreateBulletin([FromForm] BulletinAddRquest request)
         {
@@ -50,7 +58,7 @@ namespace ExpertOffers.API.Controllers
                     {
                         StatusCode = HttpStatusCode.InternalServerError,
                         IsSuccess = false,
-                        Messages = "An error occurred while create Bulletin"
+                        Messages = "An error occurred while creating Bulletin"
                     });
                 }
                 return Ok(new ApiResponse
@@ -63,65 +71,96 @@ namespace ExpertOffers.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "createBulletin method: An error occurred while Create Bulletin");
+                _logger.LogError(ex, "createBulletin method: An error occurred while creating the bulletin");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while create Bulletin"
+                    Messages = "An error occurred while creating Bulletin"
                 });
             }
         }
 
         /// <summary>
         /// Updates an existing bulletin.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
         /// <param name="request">The bulletin update request.</param>
-        /// <returns>The updated bulletin.</returns>
+        /// <returns>An ApiResponse containing the updated bulletin.</returns>
+        /// <response code="200">Bulletin updated successfully.</response>
+        /// <response code="404">Bulletin not foun.</response>
+        /// <response code="500">An error occurred while updating the bulletin.</response>
         [Authorize(Roles = "COMPANY")]
         [HttpPut("updateBulletin")]
         public async Task<ActionResult<ApiResponse>> UpdateBulletin([FromForm] BulletinUpdateRequest request)
         {
             try
             {
+                var bulletin = await _unitOfWork.Repository<Bulletin>()
+                   .GetByAsync(x => x.BulletinID == request.BulletinID);
+
+                if (bulletin == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Bulletin not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var result = await _bulletinService.UpdateAsync(request);
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
-                    Messages = "Bulletin Updated Successfully",
+                    Messages = "Bulletin updated successfully",
                     Result = result,
                     StatusCode = HttpStatusCode.OK
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "updateBulletin method: An error occurred while Update Bulletin");
+                _logger.LogError(ex, "updateBulletin method: An error occurred while updating the bulletin");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while create Bulletin"
+                    Messages = "An error occurred while updating the bulletin"
                 });
             }
         }
 
         /// <summary>
         /// Deletes a bulletin by its ID.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
         /// <param name="id">The ID of the bulletin to delete.</param>
-        /// <returns>A response indicating the success of the deletion.</returns>
-        [Authorize(Roles = "COMPANY")] 
+        /// <returns>An ApiResponse indicating the result of the deletion.</returns>
+        /// <response code="200">Bulletin deleted successfully.</response>
+        /// <response code="404">Bulletin not found.</response>
+        /// <response code="500">An error occurred while deleting the bulletin.</response>
+        [Authorize(Roles = "COMPANY")]
         [HttpDelete("deleteBulletin/{id}")]
         public async Task<ActionResult<ApiResponse>> DeleteBulletin(Guid id)
         {
             try
             {
+
+                var bulletin = await _unitOfWork.Repository<Bulletin>()
+                    .GetByAsync(x => x.BulletinID == id);
+
+                if (bulletin == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Bulletin not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var result = await _bulletinService.DeleteAsync(id);
                 if (!result)
                 {
-                    return BadRequest(new ApiResponse()
+                    return NotFound(new ApiResponse()
                     {
                         IsSuccess = false,
                         Messages = "Bulletin not found",
@@ -131,19 +170,19 @@ namespace ExpertOffers.API.Controllers
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
-                    Messages = "Bulletin Deleted Successfully",
+                    Messages = "Bulletin deleted successfully",
                     Result = result,
                     StatusCode = HttpStatusCode.OK
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "deleteBulletin method: An error occurred while Delete Bulletin");
+                _logger.LogError(ex, "deleteBulletin method: An error occurred while deleting the bulletin");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while create Bulletin"
+                    Messages = "An error occurred while deleting the bulletin"
                 });
             }
         }
@@ -152,20 +191,35 @@ namespace ExpertOffers.API.Controllers
         /// Gets a bulletin by its ID.
         /// </summary>
         /// <param name="id">The ID of the bulletin.</param>
-        /// <returns>The bulletin with the specified ID.</returns>
+        /// <returns>An ApiResponse containing the bulletin with the specified ID.</returns>
+        /// <response code="200">Bulletin found.</response>
+        /// <response code="404">Bulletin not found.</response>
+        /// <response code="500">An error occurred while retrieving the bulletin.</response>
         [HttpGet("getBulletinById/{id}")]
         public async Task<ActionResult<ApiResponse>> GetBulletinById(Guid id)
         {
             try
             {
-                var result = await _bulletinService.GetByAsync(x => x.BulletinID == id);
-                if (result == null)
+                var bulletin = await _unitOfWork.Repository<Bulletin>()
+                    .GetByAsync(x => x.BulletinID == id);
+
+                if (bulletin == null)
                 {
-                    return BadRequest(new ApiResponse()
+                    return NotFound(new ApiResponse()
                     {
                         IsSuccess = false,
                         Messages = "Bulletin not found",
-                        StatusCode = HttpStatusCode.BadRequest
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var result = await _bulletinService.GetByAsync(x => x.BulletinID == id);
+                if (result == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Bulletin not found",
+                        StatusCode = HttpStatusCode.NotFound
                     });
                 }
                 return Ok(new ApiResponse()
@@ -183,7 +237,7 @@ namespace ExpertOffers.API.Controllers
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
-                    Messages = "An error occurred while getting the bulletin"
+                    Messages = "An error occurred while retrieving the bulletin"
                 });
             }
         }
@@ -192,21 +246,15 @@ namespace ExpertOffers.API.Controllers
         /// Gets all bulletins.
         /// </summary>
         /// <returns>All bulletins.</returns>
+        /// <response code="200">Returns all bulletins.</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletins")]
         public async Task<ActionResult<ApiResponse>> GetBulletins()
         {
             try
             {
                 var result = await _bulletinService.GetAllAsync();
-                if (result == null)
-                {
-                    return BadRequest(new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
-                    });
-                }
+               
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -232,21 +280,27 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="genreID">The ID of the genre.</param>
         /// <returns>The bulletins with the specified genre ID.</returns>
+        /// <response code="200">Returns bulletins matching the genre ID.</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsByGenre/{genreID}")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsByGenre(Guid genreID)
         {
             try
             {
-                var result = await _bulletinService.GetAllAsync(x => x.GenreID == genreID);
-                if (result == null)
+                var genre = await _unitOfWork.Repository<BulletinGenre>()
+                                             .GetByAsync(x => x.GenreID == genreID);
+                if (genre == null)
                 {
-                    return BadRequest(new ApiResponse()
+                    return NotFound(new ApiResponse
                     {
+                        StatusCode = HttpStatusCode.NotFound,
                         IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
+                        Messages = "Genre not found"
                     });
                 }
+
+                var result = await _bulletinService.GetAllAsync(x => x.GenreID == genreID);
+                
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -272,21 +326,27 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="companyID">The ID of the company.</param>
         /// <returns>The bulletins with the specified company ID.</returns>
+        /// <response code="200">Returns bulletins matching the company ID.</response>
+        /// <response code="404">Returns when company NotFound</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsByCompany/{companyID}")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsByCompany(Guid companyID)
         {
             try
             {
-                var result = await _bulletinService.GetAllAsync(x => x.CompanyID == companyID);
-                if (result == null)
+                var company = await _unitOfWork.Repository<Company>()
+                  .GetByAsync(x => x.CompanyID == companyID);
+                if (company == null)
                 {
-                    return BadRequest(new ApiResponse()
+                    return NotFound(new ApiResponse
                     {
+                        StatusCode = HttpStatusCode.NotFound,
                         IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
+                        Messages = "Company not found"
                     });
                 }
+                var result = await _bulletinService.GetAllAsync(x => x.CompanyID == companyID);
+                
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -311,21 +371,14 @@ namespace ExpertOffers.API.Controllers
         /// Gets active bulletins.
         /// </summary>
         /// <returns>The active bulletins.</returns>
+        /// <response code="200">Returns active bulletins.</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsActive")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsActive()
         {
             try
             {
                 var result = await _bulletinService.GetAllAsync(x => x.IsActive == true);
-                if (result == null)
-                {
-                    return BadRequest(new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
-                    });
-                }
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -350,21 +403,15 @@ namespace ExpertOffers.API.Controllers
         /// Gets inactive bulletins.
         /// </summary>
         /// <returns>The inactive bulletins.</returns>
+        /// <response code="200">Returns inactive bulletins.</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsInActive")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsInActive()
         {
             try
             {
                 var result = await _bulletinService.GetAllAsync(x => x.IsActive == false);
-                if (result == null)
-                {
-                    return BadRequest(new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
-                    });
-                }
+               
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -390,22 +437,28 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="genreID">The ID of the genre.</param>
         /// <returns>The active bulletins with the specified genre ID.</returns>
+        /// <response code="200">Returns active bulletins matching the genre ID.</response>
+        /// <response code="404">Returns when genre not found</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsActiveByGenre/{genreID}")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsActiveByGenre(Guid genreID)
         {
             try
             {
-                var result = await _bulletinService
-                    .GetAllAsync(x => x.IsActive == true && x.GenreID == genreID);
-                if (result == null)
+                var genre = await _unitOfWork.Repository<BulletinGenre>()
+                    .GetByAsync(x => x.GenreID == genreID);
+                if (genre == null)
                 {
-                    return BadRequest(new ApiResponse()
+                    return NotFound(new ApiResponse
                     {
+                        StatusCode = HttpStatusCode.NotFound,
                         IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
+                        Messages = "Genre not found"
                     });
                 }
+                var result = await _bulletinService
+                .GetAllAsync(x => x.IsActive == true && x.GenreID == genreID);
+                
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -431,22 +484,28 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="genreID">The ID of the genre.</param>
         /// <returns>The inactive bulletins with the specified genre ID.</returns>
+        /// <response code="200">Returns inactive bulletins matching the genre ID.</response>
+        /// <response code="404">Returns when genre not found</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsInActiveByGenre/{genreID}")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsInActiveByGenre(Guid genreID)
         {
             try
             {
-                var result = await _bulletinService
-                    .GetAllAsync(x => x.IsActive == false && x.GenreID == genreID);
-                if (result == null)
+                var genre = await _unitOfWork.Repository<BulletinGenre>()
+                   .GetByAsync(x => x.GenreID == genreID);
+                if (genre == null)
                 {
-                    return BadRequest(new ApiResponse()
+                    return NotFound(new ApiResponse
                     {
+                        StatusCode = HttpStatusCode.NotFound,
                         IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
+                        Messages = "Genre not found"
                     });
                 }
+                var result = await _bulletinService
+                    .GetAllAsync(x => x.IsActive == false && x.GenreID == genreID);
+
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -473,22 +532,28 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="companyID">The ID of the company.</param>
         /// <returns>The active bulletins with the specified company ID.</returns>
+        /// <response code="200">Returns active bulletins matching the company ID.</response>
+        /// <response code="404">Returns when country not found.</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsActiveByCompany/{companyID}")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsActiveByCompany(Guid companyID)
         {
             try
             {
-                var result = await _bulletinService
-                    .GetAllAsync(x => x.IsActive == true && x.CompanyID == companyID);
-                if (result == null)
+                var company = await _unitOfWork.Repository<Company>()
+                   .GetByAsync(x => x.CompanyID == companyID);
+                if (company == null)
                 {
-                    return BadRequest(new ApiResponse()
+                    return NotFound(new ApiResponse
                     {
+                        StatusCode = HttpStatusCode.NotFound,
                         IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
+                        Messages = "Company not found"
                     });
                 }
+                var result = await _bulletinService
+                    .GetAllAsync(x => x.IsActive == true && x.CompanyID == companyID);
+
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -514,22 +579,28 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="companyID">The ID of the company.</param>
         /// <returns>The inactive bulletins with the specified company ID.</returns>
+        /// <response code="200">Returns inactive bulletins matching the company ID.</response>
+        /// <response code="404">Returns when country not found.</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsInActiveByCompany/{companyID}")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsInActiveByCompany(Guid companyID)
         {
             try
             {
-                var result = await _bulletinService
-                    .GetAllAsync(x => x.IsActive == false && x.CompanyID == companyID);
-                if (result == null)
+                var company = await _unitOfWork.Repository<Company>()
+                   .GetByAsync(x => x.CompanyID == companyID);
+                if (company == null)
                 {
-                    return BadRequest(new ApiResponse()
+                    return NotFound(new ApiResponse
                     {
+                        StatusCode = HttpStatusCode.NotFound,
                         IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
+                        Messages = "Company not found"
                     });
                 }
+                var result = await _bulletinService
+                    .GetAllAsync(x => x.IsActive == false && x.CompanyID == companyID);
+                
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,
@@ -549,12 +620,13 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
-
         /// <summary>
         /// Gets bulletins by title.
         /// </summary>
         /// <param name="title">The title to search for.</param>
         /// <returns>The bulletins with the specified title.</returns>
+        /// <response code="200">Returns bulletins matching the title.</response>
+        /// <response code="500">If an error occurs while processing the request.</response>
         [HttpGet("getBulletinsByTitle/{title}")]
         public async Task<ActionResult<ApiResponse>> GetBulletinsByName(string title)
         {
@@ -562,15 +634,6 @@ namespace ExpertOffers.API.Controllers
             {
                 var result = await _bulletinService
                     .GetAllAsync(x => x.BulletinTitle.ToUpper().Contains(title.ToUpper()));
-                if (result == null)
-                {
-                    return BadRequest(new ApiResponse()
-                    {
-                        IsSuccess = false,
-                        Messages = "Bulletins not found",
-                        StatusCode = HttpStatusCode.BadRequest
-                    });
-                }
                 return Ok(new ApiResponse()
                 {
                     IsSuccess = true,

@@ -1,11 +1,14 @@
 ﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.CompanyDto;
 using ExpertOffers.Core.DTOS;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace ExpertOffers.API.Controllers
 {
@@ -19,16 +22,22 @@ namespace ExpertOffers.API.Controllers
     {
         private readonly ICompanyServices _companyServices;
         private readonly ILogger<CompanyController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompanyController"/> class.
         /// </summary>
         /// <param name="companyServices">Service to handle company operations.</param>
         /// <param name="logger">Logger instance to record logs and errors.</param>
-        public CompanyController(ICompanyServices companyServices, ILogger<CompanyController> logger)
+        /// <param name="unitOfWork">Unit of work instance to handle database operations.</param>
+        /// <param name="httpContextAccessor">HTTP context accessor instance to access HTTP context data.</param>
+        public CompanyController(ICompanyServices companyServices, ILogger<CompanyController> logger, IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
             _companyServices = companyServices;
             _logger = logger;
+            _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -146,6 +155,7 @@ namespace ExpertOffers.API.Controllers
         /// <param name="companyUpdate">The company update request object containing updated details.</param>
         /// <returns>An <see cref="ApiResponse"/> indicating the result of the update operation.</returns>
         /// <response code="200">Company updated successfully.</response>
+        /// <response code="401">User unauthorized</response>
         /// <response code="404">Company not found.</response>
         /// <response code="500">An error occurred while updating the company.</response>
         [HttpPut("updateCompany")]
@@ -154,7 +164,30 @@ namespace ExpertOffers.API.Controllers
         {
             try
             {
-                var company = await _companyServices.UpdateAsync(companyUpdate);
+                var email =  _httpContextAccessor.HttpContext
+                .User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User is not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(u => u.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User is not authenticated",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(c => c.UserID == user.Id);
                 if (company == null)
                 {
                     return NotFound(new ApiResponse
@@ -175,6 +208,52 @@ namespace ExpertOffers.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "UpdateCompany method: An error occurred while updating the company.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while updating the company."
+                });
+            }
+        }
+        /// <summary>
+        /// Updates a company's details.
+        /// "COMPANY" role is required to access this endpoint
+        /// </summary>
+        /// <param name="id">The unique identifier for industrial</param>
+        /// <returns>An <see cref="ApiResponse"/> indicating the result of the update operation.</returns>
+        /// <response code="200">Company updated successfully.</response>
+        /// <response code="404">industrial not found.</response>
+        /// <response code="500">An error occurred while fetching the companies.</response>
+        [HttpGet("getCompanyByIndustrial/{id:guid}")]
+        public async Task<ActionResult<ApiResponse>> GetCompanyByIndustrial(Guid id)
+        {
+            try
+            {
+                var indstrial = await _unitOfWork.Repository<Industrial>()
+                    .GetByAsync(x => x.IndustrialID == id);
+                if (indstrial == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Industrial not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var companies = await _companyServices.GetAllAsync(x => x.IndustrialID == id);
+                return Ok(new ApiResponse
+                {
+                    IsSuccess = true,
+                    Messages = "Companies fetched successfully",
+                    Result = companies,
+                    StatusCode = HttpStatusCode.OK
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetCompanyByIndustrial method: An error occurred while get the companies.");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,

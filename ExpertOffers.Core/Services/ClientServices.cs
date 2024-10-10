@@ -94,31 +94,29 @@ namespace ExpertOffers.Core.Services
         public async Task<bool> DeleteAsync(Guid clientID)
         {
             var client = await _unitOfWork.Repository<Client>()
-                .GetByAsync(x => x.ClientID == clientID,includeProperties: "Favorites,Notifications,SavedItems");
+                .GetByAsync(x => x.ClientID == clientID,includeProperties: "Favorites,Notifications,SavedItems,User");
             if (client == null)
                 throw new UnauthorizedAccessException("Client not found");
 
             await ExecuteWithTransaction(async () =>
             {
-                var tasks = new List<Task>();
                 if (client.Favorites.Any())
                 {
-                    tasks.Add(_unitOfWork.Repository<Favorite>()
-                    .RemoveRangeAsync(client.Favorites));
+                    await _unitOfWork.Repository<Favorite>().RemoveRangeAsync(client.Favorites);
                 }
                 if (client.Notifications.Any())
                 {
-                    tasks.Add(_unitOfWork.Repository<Notification>().
-                    RemoveRangeAsync(client.Notifications));
+                    await _unitOfWork.Repository<Notification>().RemoveRangeAsync(client.Notifications);
                 }
                 if (client.SavedItems.Any())
                 {
-                    tasks.Add(_unitOfWork.Repository<SavedItem>()
-                    .RemoveRangeAsync(client.SavedItems));
+                    await _unitOfWork.Repository<SavedItem>().RemoveRangeAsync(client.SavedItems);
                 }
-                tasks.Add(_unitOfWork.Repository<Client>().DeleteAsync(client));
-                await Task.WhenAll(tasks);
+                await _unitOfWork.Repository<Client>().DeleteAsync(client);
             });
+
+            await _unitOfWork.Repository<ApplicationUser>().DeleteAsync(client.User);
+
             return true;
         }
 

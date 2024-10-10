@@ -1,6 +1,8 @@
 ﻿using Azure;
+using ExpertOffers.Core.Domain.Entities;
 using ExpertOffers.Core.Dtos.GenreOffer;
 using ExpertOffers.Core.DTOS;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +19,19 @@ namespace ExpertOffers.API.Controllers
     {
         private readonly IGenreOfferServices _genreOfferServices;
         private readonly ILogger<GenreOfferController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenreOfferController"/> class.
         /// </summary>
         /// <param name="genreOfferServices">The genre offer services.</param>
         /// <param name="logger">The logger.</param>
-        public GenreOfferController(IGenreOfferServices genreOfferServices, ILogger<GenreOfferController> logger)
+        /// <param name="unitOfWork"></param>
+        public GenreOfferController(IGenreOfferServices genreOfferServices, ILogger<GenreOfferController> logger, IUnitOfWork unitOfWork)
         {
             _genreOfferServices = genreOfferServices;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -34,13 +39,14 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="genreAdd">The genre addition request.</param>
         /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
+        /// <response code="200">Returns the created genre offer.</response>
+        /// <response code="500">Returns an error message if an unexpected error occurs.</response>
         [HttpPost("createGenre")]
         public async Task<ActionResult<ApiResponse>> CreateGenre([FromForm] GenreAddRequest genreAdd)
         {
             try
             {
                 var genreResponse = await _genreOfferServices.CreateAsync(genreAdd);
-
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
@@ -66,13 +72,28 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="genreUpdate">The genre update request.</param>
         /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
+        /// <response code="200">Returns the updated genre offer.</response>
+        /// <response code="404">Returns an error message if the genre is not found.</response>
+        /// <response code="500">Returns an error message if an unexpected error occurs.</response>
         [HttpPut("updateGenre")]
         public async Task<ActionResult<ApiResponse>> UpdateGenre([FromForm] GenreUpdateRequest genreUpdate)
         {
             try
             {
-                var genreResponse = await _genreOfferServices.UpdateAsync(genreUpdate);
+                var genre = await _unitOfWork.Repository<GenreOffer>()
+                    .GetByAsync(x => x.GenreID == genreUpdate.GenreID);
 
+                if (genre == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Genre Not Found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var genreResponse = await _genreOfferServices.UpdateAsync(genreUpdate);
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
@@ -98,11 +119,25 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="id">The genre ID.</param>
         /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
+        /// <response code="200">Returns a success message if the genre offer is deleted.</response>
+        /// <response code="404">Returns an error message if the genre offer is not found.</response>
+        /// <response code="500">Returns an error message if an unexpected error occurs.</response>
         [HttpDelete("deleteGenre/{id}")]
         public async Task<ActionResult<ApiResponse>> DeleteGenre(Guid id)
         {
             try
             {
+                var genre = await _unitOfWork.Repository<GenreOffer>()
+                    .GetByAsync(x => x.GenreID == id);
+                if (genre == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "genreID Offer is not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var isDeleted = await _genreOfferServices.DeleteAsync(id);
                 if (!isDeleted)
                 {
@@ -137,6 +172,8 @@ namespace ExpertOffers.API.Controllers
         /// Gets all genre offers.
         /// </summary>
         /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
+        /// <response code="200">Returns the list of genre offers.</response>
+        /// <response code="500">Returns an error message if an unexpected error occurs.</response>
         [HttpGet("getGenres")]
         public async Task<ActionResult<ApiResponse>> GetGenres()
         {
@@ -168,11 +205,25 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="id">The genre ID.</param>
         /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
+        /// <response code="200">Returns the genre offer.</response>
+        /// <response code="404">Returns an error message if the genre offer is not found.</response>
+        /// <response code="500">Returns an error message if an unexpected error occurs.</response>
         [HttpGet("getGenre/{id}")]
         public async Task<ActionResult<ApiResponse>> GetGenre(Guid id)
         {
             try
             {
+                var genreF = await _unitOfWork.Repository<GenreOffer>()
+                    .GetByAsync(x => x.GenreID == id);
+                if (genreF == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "genreID Offer is not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var genre = await _genreOfferServices.GetByAsync(x => x.GenreID == id);
                 if (genre == null)
                 {
@@ -208,6 +259,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="name">The genre name.</param>
         /// <returns>An <see cref="ActionResult"/> containing the response.</returns>
+        /// <response code="200">Returns the list of genre offers matching the name.</response>
+        /// <response code="500">Returns an error message if an unexpected error occurs.</response>
         [HttpGet("getGenresBy/{name}")]
         public async Task<ActionResult<ApiResponse>> GetGenresBy(string name)
         {

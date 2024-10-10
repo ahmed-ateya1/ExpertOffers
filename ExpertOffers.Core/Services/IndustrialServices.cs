@@ -63,11 +63,12 @@ namespace ExpertOffers.Core.Services
         {
             var industrials = await _unitOfWork.Repository<Industrial>().GetAllAsync(expression , includeProperties: "Companies");
 
-           return industrials.Select(x => new IndustrialResponse()
-           {
+            industrials = industrials.OrderBy(x => x.IndustrialName).ToList();
+            return industrials.Select(x => new IndustrialResponse()
+            {
                IndustrialID = x.IndustrialID,
                IndustrialName = x.IndustrialName,
-           }).ToList();
+            }).ToList();
         }
 
         public async Task<IndustrialResponse> GetByAsync(Expression<Func<Industrial, bool>> expression, bool isTracked = true)

@@ -119,7 +119,7 @@ namespace ExpertOffers.Core.Services
         public async Task<bool> DeleteAsync(Guid? id)
         {
             var bulletin = await _unitOfWork.Repository<Bulletin>()
-                .GetByAsync(b => b.BulletinID == id ,includeProperties: "Company,Genre,SavedItems,Notifications")
+                .GetByAsync(b => b.BulletinID == id ,includeProperties: "Company,Genre,Notifications")
                 ?? throw new KeyNotFoundException("Bulletin not found.");
 
             if(bulletin.BulletinPdfUrl!=null)
@@ -149,6 +149,8 @@ namespace ExpertOffers.Core.Services
         {
             var bulletins = await _unitOfWork.Repository<Bulletin>()
                 .GetAllAsync(expression, includeProperties: "Company,Genre");
+
+            bulletins= bulletins.OrderByDescending(x=>x.DiscountPercentage);
 
             return _mapper.Map<IEnumerable<BulletinResponse>>(bulletins);
         }

@@ -99,6 +99,7 @@ namespace ExpertOffers.Core.Services
         public async Task<IEnumerable<GenreCouponResponse>> GetAllAsync(Expression<Func<GenreCoupon, bool>>? expression = null)
         {
            var response = await _unitOfWork.Repository<GenreCoupon>().GetAllAsync(expression);
+            response = response.OrderBy(x=>x.GenreName);
             return _mapper.Map<IEnumerable<GenreCouponResponse>>(response);
         }
 

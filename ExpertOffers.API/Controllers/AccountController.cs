@@ -59,6 +59,9 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="registerDTO">Client registration details.</param>
         /// <returns>Authentication response with token and status.</returns>
+        /// <response code="200">Client registered successfully.</response>
+        /// <response code="400">Invalid input or request.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPost("register-Client")]
         public async Task<ActionResult<AuthenticationResponse>> RegisterCleintAsync([FromBody] ClientRegisterDTO registerDTO)
         {
@@ -80,11 +83,14 @@ namespace ExpertOffers.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>
+        ///<summary>
         /// Registers a new company account.
         /// </summary>
         /// <param name="registerDTO">Company registration details.</param>
         /// <returns>Authentication response with token and status.</returns>
+        /// <response code="200">Company registered successfully.</response>
+        /// <response code="400">Invalid input or request.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPost("register-Comapny")]
         public async Task<ActionResult<AuthenticationResponse>> RegisterComapnyAsync([FromForm] CompanyRegisterDTO registerDTO)
         {
@@ -111,6 +117,9 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="loginDTO">Login credentials (email, password).</param>
         /// <returns>Authentication response with token and status.</returns>
+        /// <response code="200">Login successful.</response>
+        /// <response code="400">Invalid credentials or input.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPost("login")]
         public async Task<ActionResult<AuthenticationResponse>> LoginAsync([FromBody] LoginDTO loginDTO)
         {
@@ -122,7 +131,7 @@ namespace ExpertOffers.API.Controllers
 
             var result = await _authenticationServices.LoginAsync(loginDTO);
             if (!result.IsAuthenticated)
-                return Problem(result.Message);
+                return BadRequest(result.Message);
 
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {
@@ -136,6 +145,9 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="forgotPassword">Email to send the password reset link to.</param>
         /// <returns>Status message.</returns>
+        /// <response code="200">Password reset OTP sent successfully.</response>
+        /// <response code="400">Invalid input.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPost("forgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO forgotPassword)
         {
@@ -152,6 +164,9 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="resetPassword">Reset password request details, including OTP.</param>
         /// <returns>Status message.</returns>
+        /// <response code="200">Password reset successfully.</response>
+        /// <response code="400">Invalid OTP or request.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPost("resetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPassword)
         {
@@ -183,6 +198,10 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="model">Change password request details.</param>
         /// <returns>Status message.</returns>
+        /// <response code="200">Password changed successfully.</response>
+        /// <response code="400">Invalid current password.</response>
+        /// <response code="404">User not found.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPost("change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest model)
@@ -219,6 +238,8 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="email">The email to check.</param>
         /// <returns>True if the email is in use; otherwise, false.</returns>
+        /// <response code="200">Check successful, result returned.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpGet("check-email")]
         public async Task<IActionResult> IsEmailInUse([FromQuery] string email)
         {
@@ -226,12 +247,16 @@ namespace ExpertOffers.API.Controllers
             return Ok(new { isInUse });
         }
 
-        /// <summary>
+        //// <summary>
         /// Adds or updates the user's location.
         /// User must be authenticated to access this endpoint.
         /// </summary>
         /// <param name="locationDTO">Location details.</param>
         /// <returns>Status message.</returns>
+        /// <response code="200">Location added/updated successfully.</response>
+        /// <response code="400">Invalid input.</response>
+        /// <response code="401">Unauthorized user.</response>
+        /// <response code="500">Internal server error.</response>
         [Authorize]
         [HttpPost("addLocation")]
         public async Task<IActionResult> AddLocation([FromBody] LocationDTO locationDTO)
@@ -249,6 +274,9 @@ namespace ExpertOffers.API.Controllers
         /// User must be authenticated to access this endpoint.
         /// </summary>
         /// <returns>Status message.</returns>
+        /// <response code="200">Account removed successfully.</response>
+        /// <response code="401">Unauthorized user.</response>
+        /// <response code="500">Internal server error.</response>
         [Authorize]
         [HttpDelete("removeAccount")]
         public async Task<IActionResult> RemoveAccount()
@@ -262,6 +290,9 @@ namespace ExpertOffers.API.Controllers
         /// </summary>
         /// <param name="request">OTP verification request.</param>
         /// <returns>Status message.</returns>
+        /// <response code="200">OTP verified successfully.</response>
+        /// <response code="400">Invalid or expired OTP.</response>
+        /// <response code="500">Internal server error.</response>
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] OtpVerificationRequest request)
         {
