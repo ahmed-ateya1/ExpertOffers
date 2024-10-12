@@ -30,27 +30,27 @@ namespace ExpertOffers.Infrastructure.Configurations
 
             builder.HasOne(x => x.Coupon)
                 .WithMany(x => x.Notifications)
-                .HasForeignKey(x => x.NotificationID)
+                .HasForeignKey(x => x.CouponId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(x => x.Bulletin)
                 .WithMany(x => x.Notifications)
-                .HasForeignKey(x => x.NotificationID)
+                .HasForeignKey(x => x.BulletinId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(x => x.Company)
                 .WithMany(x => x.Notifications)
-                .HasForeignKey(x => x.NotificationID)
+                .HasForeignKey(x => x.CompanyID)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(x => x.Offer)
                 .WithMany(x => x.Notifications)
-                .HasForeignKey(x => x.NotificationID)
+                .HasForeignKey(x => x.OfferId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(x => x.Client)
                 .WithMany(x => x.Notifications)
-                .HasForeignKey(x => x.NotificationID)
+                .HasForeignKey(x => x.ClientID)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.ToTable("Notifications");

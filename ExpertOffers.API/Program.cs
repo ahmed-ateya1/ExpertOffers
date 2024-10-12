@@ -1,5 +1,6 @@
 
 using ExpertOffers.API.StartupExtensions;
+using ExpertOffers.Core.Hubs;
 
 namespace ExpertOffers.API
 {
@@ -47,6 +48,7 @@ namespace ExpertOffers.API
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapHub<NotificationHub>("/notificationHub");
 
 
             app.Run();

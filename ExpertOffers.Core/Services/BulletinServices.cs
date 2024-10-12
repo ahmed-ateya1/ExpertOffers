@@ -78,6 +78,31 @@ namespace ExpertOffers.Core.Services
                 .GetByAsync(g => g.GenreID == genreID)?? throw new ArgumentException("Genre Not Found");
             return genre;
         }
+        private string GetBaseUrl()
+        {
+            var request = _httpContextAccessor.HttpContext.Request;
+            return $"{request.Scheme}://{request.Host.Value}/api/";
+        }
+        private async Task HandleNotificationAsync(Bulletin bulletin)
+        {
+            var favorites = await _unitOfWork.Repository<Favorite>()
+                .GetAllAsync(f => f.CompanyID == bulletin.CompanyID, includeProperties: "Client");
+
+            var notifications = favorites.Select(f => new Notification
+            {
+                ClientID = f.Client.ClientID,
+                BulletinId = bulletin.BulletinID,
+                Message = $"New Bulletin from {bulletin.Company.CompanyName}",
+                CreatedDate = DateTime.Now,
+                IsRead = false,
+                CompanyID = bulletin.CompanyID,
+                NotificationID = Guid.NewGuid(),
+                NotificationType = NotificationOptions.NEW_BULLETIN.ToString(),
+                ReferenceURL = $"{GetBaseUrl()}Bulletin/getBulletinById/{bulletin.BulletinID}"
+            }).ToList();
+
+            await _unitOfWork.Repository<Notification>().AddRangeAsync(notifications);
+        }
         public async Task<BulletinResponse?> CreateAsync(BulletinAddRquest? request)
         {
             if(request is null)

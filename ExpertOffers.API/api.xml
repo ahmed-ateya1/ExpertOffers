@@ -1353,5 +1353,40 @@
             <param name="currentFileName">The URL of the current file to be replaced.</param>
             <returns>The URL of the updated file.</returns>
         </member>
+        <member name="T:ExpertOffers.Core.Hubs.NotificationHub">
+            <summary>
+            Represents a SignalR hub for handling notifications.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.Core.Hubs.NotificationHub.#ctor(ExpertOffers.Core.ServicesContract.INotificationServices,Microsoft.AspNetCore.Identity.UserManager{ExpertOffers.Core.Domain.IdentityEntities.ApplicationUser},Microsoft.AspNetCore.Http.IHttpContextAccessor,ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ExpertOffers.Core.Hubs.NotificationHub"/> class.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.Core.Hubs.NotificationHub.OnConnectedAsync">
+            <summary>
+            Called when a client is connected to the hub.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.Core.Hubs.NotificationHub.OnDisconnectedAsync(System.Exception)">
+            <summary>
+            Called when a client is disconnected from the hub.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.Core.Hubs.NotificationHub.GetUnreadNotificationCount">
+            <summary>
+            Gets the number of unread notifications for the connected user.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.Core.Hubs.NotificationHub.SendNotificationToUser(System.String,ExpertOffers.Core.Domain.Entities.Notification)">
+            <summary>
+            Sends a notification to a specific user.
+            </summary>
+        </member>
+        <member name="M:ExpertOffers.Core.Hubs.NotificationHub.FetchNotifications(System.String)">
+            <summary>
+            Fetches notifications for a specific email.
+            </summary>
+        </member>
     </members>
 </doc>

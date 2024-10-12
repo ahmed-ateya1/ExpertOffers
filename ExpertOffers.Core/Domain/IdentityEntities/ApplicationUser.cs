@@ -1,6 +1,7 @@
 ﻿using ExpertOffers.Core.Domain.Entities;
 using ExpertOffers.Core.DTOS.AuthenticationDTO;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,6 @@ namespace ExpertOffers.Core.Domain.IdentityEntities
 
         public Guid? CityID { get; set; }
         public virtual City City { get; set; }
-
         public ICollection<RefreshToken>? RefreshTokens { get; set; }
     }
 }

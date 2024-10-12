@@ -16,6 +16,7 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static Azure.Core.HttpHeader;
 
 namespace ExpertOffers.Core.Services
 {
@@ -112,20 +113,48 @@ namespace ExpertOffers.Core.Services
                 .GetByAsync(g => g.GenreID == genreID);
             return genre;
         }
+        private string GetBaseUrl()
+        {
+            var request = _httpContextAccessor.HttpContext.Request;
+            return $"{request.Scheme}://{request.Host.Value}/api/";
+        }
+        private async Task HandleNotificationAsync(Offer offer)
+        {
+            var favorites = await _unitOfWork.Repository<Favorite>()
+                .GetAllAsync(f => f.CompanyID == offer.CompanyID, includeProperties: "Client");
+
+            var notifications = favorites.Select(f => new Notification
+            {
+                ClientID = f.Client.ClientID,
+                OfferId = offer.OfferID,
+                Message = $"New offer from {offer.Company.CompanyName}",
+                CreatedDate = DateTime.Now,
+                IsRead = false,
+                CompanyID = offer.CompanyID,
+                NotificationID = Guid.NewGuid(),
+                NotificationType = NotificationOptions.NEW_OFFER.ToString(),
+                ReferenceURL = $"{GetBaseUrl()}Offer/getOffer/{offer.OfferID}"
+            }).ToList();
+
+            await _unitOfWork.Repository<Notification>().AddRangeAsync(notifications);
+            await _unitOfWork.CompleteAsync();
+        }
+
         public async Task<OfferResponse> CreateAsync(OfferAddRequest? offerAddRequest)
         {
-            if(offerAddRequest == null)
+            if (offerAddRequest == null)
             {
                 throw new ArgumentNullException(nameof(offerAddRequest));
             }
             ValidationHelper.ValidateModel(offerAddRequest);
 
             var company = await GetCurrentCompanyAsync();
-            var genreOffer = await CheckGenreIsValid(offerAddRequest.GenreID) 
+            var genreOffer = await CheckGenreIsValid(offerAddRequest.GenreID)
                 ?? throw new ArgumentNullException(nameof(offerAddRequest.GenreID));
 
             var offer = _mapper.Map<Offer>(offerAddRequest);
-            await ExecuteWithTransaction(async() =>
+
+            await ExecuteWithTransaction(async () =>
             {
                 if (offerAddRequest.OfferPicture.Length > 0)
                 {
@@ -135,15 +164,22 @@ namespace ExpertOffers.Core.Services
                 offer.Company = company;
                 offer.GenreID = genreOffer.GenreID;
                 offer.Genre = genreOffer;
+
                 await _unitOfWork.Repository<Offer>().CreateAsync(offer);
+
+                await HandleNotificationAsync(offer);
+
                 await _unitOfWork.CompleteAsync();
+
             });
-            
-            var result =  _mapper.Map<OfferResponse>(offer);
+
+            var result = _mapper.Map<OfferResponse>(offer);
             offer.IsActive = result.IsActive;
             await _unitOfWork.CompleteAsync();
+
             return result;
         }
+
 
         public async Task<bool> DeleteAsync(Guid? offerID)
         {

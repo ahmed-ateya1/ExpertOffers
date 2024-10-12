@@ -93,6 +93,31 @@ namespace ExpertOffers.Core.Services
                 coupon.CurrentUserIsSaved = ids.Contains(coupon.CouponID);
             }
         }
+        private string GetBaseUrl()
+        {
+            var request = _httpContextAccessor.HttpContext.Request;
+            return $"{request.Scheme}://{request.Host.Value}/api/";
+        }
+        private async Task HandleNotificationAsync(Coupon coupon)
+        {
+            var favorites = await _unitOfWork.Repository<Favorite>()
+                .GetAllAsync(f => f.CompanyID == coupon.CompanyID, includeProperties: "Client");
+
+            var notifications = favorites.Select(f => new Notification
+            {
+                ClientID = f.Client.ClientID,
+                CouponId = coupon.CompanyID,
+                Message = $"New Coupon from {coupon.Company.CompanyName}",
+                CreatedDate = DateTime.Now,
+                IsRead = false,
+                CompanyID = coupon.CompanyID,
+                NotificationID = Guid.NewGuid(),
+                NotificationType = NotificationOptions.NEW_COUPON.ToString(),
+                ReferenceURL = $"{GetBaseUrl()}Coupon/getCoupon/{coupon.CouponID}"
+            }).ToList();
+
+            await _unitOfWork.Repository<Notification>().AddRangeAsync(notifications);
+        }
         private async Task<Company> GetCurrentCompanyAsync()
         {
             var email = _httpContextAccessor.HttpContext
@@ -138,6 +163,8 @@ namespace ExpertOffers.Core.Services
                    coupon.CouponePictureURL =  await _fileServices.CreateFile(couponAddRequest.CouponePicture);
                 }
                 await _unitOfWork.Repository<Coupon>().CreateAsync(coupon);
+                await HandleNotificationAsync(coupon);
+                await _unitOfWork.CompleteAsync();
             });
             var response = _mapper.Map<CouponResponse>(coupon);
             coupon.IsActive = response.IsActive;

@@ -26,7 +26,7 @@ namespace ExpertOffers.API.StartupExtensions
             services.AddSignalR();
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("HostingString"));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
@@ -94,6 +94,7 @@ namespace ExpertOffers.API.StartupExtensions
             services.AddScoped<IBulletinGenreServices, BulletinGenreServices>();
             services.AddScoped<IBulletinServices, BulletinServices>();
             services.AddScoped<ISavedItemServices, SavedItemServices>();
+            services.AddScoped<INotificationServices, NotificationServices>();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
