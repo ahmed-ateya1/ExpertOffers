@@ -95,7 +95,6 @@ namespace ExpertOffers.Core.Services
                 Message = $"New Bulletin from {bulletin.Company.CompanyName}",
                 CreatedDate = DateTime.Now,
                 IsRead = false,
-                CompanyID = bulletin.CompanyID,
                 NotificationID = Guid.NewGuid(),
                 NotificationType = NotificationOptions.NEW_BULLETIN.ToString(),
                 ReferenceURL = $"{GetBaseUrl()}Bulletin/getBulletinById/{bulletin.BulletinID}"

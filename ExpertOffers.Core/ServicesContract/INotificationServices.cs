@@ -12,5 +12,6 @@ namespace ExpertOffers.Core.ServicesContract
     public interface INotificationServices
     {
         Task<IEnumerable<NotificationResponse>> GetAllAsync(Expression<Func<Notification, bool>>? expression = null);
+        Task<bool> DeleteAsync(Guid notificationID);
     }
 }

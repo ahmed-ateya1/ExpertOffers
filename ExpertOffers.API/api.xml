@@ -1106,6 +1106,47 @@
             <response code="200">Indicates the industrial entities matching the name were retrieved successfully.</response>
             <response code="500">Indicates an internal server error occurred.</response>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.NotificationController.DeleteNotification(System.Guid)">
+            <summary>
+            Deletes a notification by its ID.
+            </summary>
+            <remarks>
+            This endpoint deletes a specific notification from the system using its unique identifier (NotificationID). 
+            It requires the user to be authorized. If the notification is not found, a 404 status code is returned.
+            </remarks>
+            <param name="notificationID">The unique identifier of the notification to be deleted.</param>
+            <returns>
+            An ActionResult containing the result of the operation:
+            - 200 OK: If the notification was successfully deleted.
+            - 404 Not Found: If the notification with the given ID does not exist.
+            - 500 Internal Server Error: If an error occurred on the server while processing the request.
+            </returns>
+            <response code="200">Notification deleted successfully.</response>
+            <response code="404">Notification not found.</response>
+            <response code="500">An error occurred while processing your request.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.NotificationController.GetNotifications">
+            <summary>
+            Fetches all notifications for the authenticated user.
+            </summary>
+            <remarks>
+            Note this endpoint not work in real time if you want to work in real time used notificationhub
+            This endpoint retrieves all notifications for the currently authenticated user. 
+            The user can either be a client or a company representative, and the relevant notifications 
+            are fetched based on their ID. The user must be authenticated to use this endpoint.
+            </remarks>
+            <returns>
+            An ActionResult containing the user's notifications:
+            - 200 OK: If the notifications are successfully retrieved.
+            - 401 Unauthorized: If the user is not authenticated.
+            - 404 Not Found: If the user is not found.
+            - 500 Internal Server Error: If an error occurred on the server while processing the request.
+            </returns>
+            <response code="200">Notifications fetched successfully.</response>
+            <response code="401">User not authenticated.</response>
+            <response code="404">User not found.</response>
+            <response code="500">An error occurred while processing your request.</response>
+        </member>
         <member name="T:ExpertOffers.API.Controllers.OfferController">
             <summary>
             Controller responsible for managing offers.

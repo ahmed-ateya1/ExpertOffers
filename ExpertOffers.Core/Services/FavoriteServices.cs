@@ -6,6 +6,7 @@ using ExpertOffers.Core.Helper;
 using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -75,6 +76,7 @@ namespace ExpertOffers.Core.Services
                 .GetByAsync(c => c.CompanyID == companyID ,includeProperties: "Bulletins")
                 ?? throw new KeyNotFoundException("Company not found.");
         }
+        
         public async Task<FavoriteResponse> AddFavorite(FavoriteAddRequest? favoriteAdd)
         {
             if(favoriteAdd == null)
@@ -104,6 +106,18 @@ namespace ExpertOffers.Core.Services
                 await _unitOfWork.Repository<Favorite>().CreateAsync(favorite);
                 await _unitOfWork.CompleteAsync();
             });
+
+            var notification = new Notification()
+            {
+                CompanyID = company.CompanyID,
+                Message = $"{client.FirstName + " " + client.LastName} has added your company to his favorites list.",
+                CreatedDate = DateTime.Now,
+                IsRead = false,
+                NotificationType = NotificationOptions.NEW_FAV.ToString(),
+                NotificationID = Guid.NewGuid()
+            };
+            await _unitOfWork.Repository<Notification>().CreateAsync(notification);
+            await _unitOfWork.CompleteAsync();
             return _mapper.Map<FavoriteResponse>(favorite);
         }
 

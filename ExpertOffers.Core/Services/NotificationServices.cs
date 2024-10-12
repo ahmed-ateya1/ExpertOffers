@@ -3,6 +3,7 @@ using ExpertOffers.Core.Dtos.NotificationDto;
 using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using System.Linq.Expressions;
+using System.Security.AccessControl;
 
 public class NotificationServices : INotificationServices
 {
@@ -47,6 +48,10 @@ public class NotificationServices : INotificationServices
         {
             return HandleCommonNotification(notification, notification.Bulletin.BulletinTitle, notification.Bulletin.BulletinPictureUrl, notification.Bulletin.DiscountPercentage, notification.Bulletin.BulletinID, notification.Bulletin.Company);
         }
+        else if(notification.Company != null)
+        {
+            return HandleCommonNotification(notification, "", "", 0, Guid.Empty, notification.Company);
+        }
 
         throw new InvalidOperationException("Unknown notification type.");
     }
@@ -69,5 +74,17 @@ public class NotificationServices : INotificationServices
             .GetAllAsync(expression, includeProperties: "Client,Offer.Company,Coupon.Company,Bulletin.Company");
 
         return await SetNotificationsAsync(notifications);
+    }
+
+    public async Task<bool> DeleteAsync(Guid notificationID)
+    {
+        var notification = await _unitOfWork.Repository<Notification>()
+            .GetByAsync(x => x.NotificationID == notificationID);
+        if (notification == null)
+        {
+            return false;
+        }
+        return await _unitOfWork.Repository<Notification>()
+            .DeleteAsync(notification);
     }
 }

@@ -130,7 +130,6 @@ namespace ExpertOffers.Core.Services
                 Message = $"New offer from {offer.Company.CompanyName}",
                 CreatedDate = DateTime.Now,
                 IsRead = false,
-                CompanyID = offer.CompanyID,
                 NotificationID = Guid.NewGuid(),
                 NotificationType = NotificationOptions.NEW_OFFER.ToString(),
                 ReferenceURL = $"{GetBaseUrl()}Offer/getOffer/{offer.OfferID}"

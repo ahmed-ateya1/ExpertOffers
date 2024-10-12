@@ -110,7 +110,6 @@ namespace ExpertOffers.Core.Services
                 Message = $"New Coupon from {coupon.Company.CompanyName}",
                 CreatedDate = DateTime.Now,
                 IsRead = false,
-                CompanyID = coupon.CompanyID,
                 NotificationID = Guid.NewGuid(),
                 NotificationType = NotificationOptions.NEW_COUPON.ToString(),
                 ReferenceURL = $"{GetBaseUrl()}Coupon/getCoupon/{coupon.CouponID}"
