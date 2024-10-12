@@ -2,7 +2,9 @@
 using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.CompanyDto;
 using ExpertOffers.Core.DTOS;
+using ExpertOffers.Core.Helper;
 using ExpertOffers.Core.IUnitOfWorkConfig;
+using ExpertOffers.Core.Services;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -259,6 +261,128 @@ namespace ExpertOffers.API.Controllers
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
                     Messages = "An error occurred while updating the company."
+                });
+            }
+        }
+
+
+        /// <summary>
+        /// Retrieves companies by country ID.
+        /// </summary>
+        /// <response code="200">Companies fetched successfully.</response>
+        /// <response code="400">Invalid country ID.</response>
+        /// <response code="401">if user not authenticated.</response>
+        /// <response code="404">Country not found.</response>
+        /// <response code="500">An error occurred while fetching companies.</response>
+        /// <returns>An API response with the list of companies for the specified country.</returns>
+        [HttpGet("getCompanyForCurrentUserByCountry")]
+        [Authorize]
+        public async Task<ActionResult<ApiResponse>> getCompanyByCountry()
+        {
+            try
+            {
+                var email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User is not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email,includeProperties: "Country,City");
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var companies = await _companyServices.
+                    GetAllAsync(x => x.User.CountryID == user.CountryID);
+                return Ok(new ApiResponse
+                {
+                    IsSuccess = true,
+                    Messages = "Companies fetched successfully",
+                    Result = companies,
+                    StatusCode = HttpStatusCode.OK
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "getCompanyByCountry method: An error occurred while fetching Companies");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while fetching Companies"
+                });
+            }
+        }
+
+
+        /// <summary>
+        /// Retrieves companies by country ID.
+        /// User Must Be Authenticated for use this endpoint
+        /// </summary>
+        /// <response code="200">Companies fetched successfully.</response>
+        /// <response code="400">Invalid city ID.</response>
+        /// <response code="401">if user not authenticated.</response>
+        /// <response code="404">City not found.</response>
+        /// <response code="500">An error occurred while fetching companies.</response>
+        /// <returns>An API response with the list of companies for the specified country.</returns>
+        [HttpGet("getCompanyByCity")]
+        [Authorize]
+        public async Task<ActionResult<ApiResponse>> getCompanyByCity()
+        {
+            try
+            {
+                var email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User is not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email, includeProperties: "Country,City");
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "City not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var companies = await _companyServices.
+                    GetAllAsync(x => x.User.CityID == user.CityID);
+
+                return Ok(new ApiResponse
+                {
+                    IsSuccess = true,
+                    Messages = "Companies fetched successfully",
+                    Result = companies,
+                    StatusCode = HttpStatusCode.OK
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "getCompanyByCountry method: An error occurred while fetching Companies");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while fetching Companies"
                 });
             }
         }

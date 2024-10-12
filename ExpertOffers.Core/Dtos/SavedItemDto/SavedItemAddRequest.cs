@@ -11,5 +11,6 @@ namespace ExpertOffers.Core.Dtos.SavedItemDto
     {
         [Required(ErrorMessage ="Item ID is required.")]
         public Guid ItemID { get; set; }
+
     }
 }

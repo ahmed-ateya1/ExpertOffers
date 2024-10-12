@@ -247,7 +247,7 @@ namespace ExpertOffers.API.Controllers
             return Ok(new { isInUse });
         }
 
-        //// <summary>
+        ///<summary>
         /// Adds or updates the user's location.
         /// User must be authenticated to access this endpoint.
         /// </summary>

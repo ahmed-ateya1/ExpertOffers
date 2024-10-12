@@ -25,5 +25,7 @@ namespace ExpertOffers.Core.Dtos.OfferDto
         public string CompanyLogoURL { get; set; }
         public Guid genreID { get; set; }
         public string GenreName { get; set; }
+
+        public bool CurrentUserIsSaved { get; set; }
     }
 }

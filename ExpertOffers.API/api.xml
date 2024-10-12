@@ -90,7 +90,18 @@
             <response code="200">Check successful, result returned.</response>
             <response code="500">Internal server error.</response>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:ExpertOffers.API.Controllers.AccountController.AddLocation(ExpertOffers.Core.DTOS.CityDto.LocationDTO)" -->
+        <member name="M:ExpertOffers.API.Controllers.AccountController.AddLocation(ExpertOffers.Core.DTOS.CityDto.LocationDTO)">
+            <summary>
+             Adds or updates the user's location.
+             User must be authenticated to access this endpoint.
+             </summary>
+             <param name="locationDTO">Location details.</param>
+             <returns>Status message.</returns>
+             <response code="200">Location added/updated successfully.</response>
+             <response code="400">Invalid input.</response>
+             <response code="401">Unauthorized user.</response>
+             <response code="500">Internal server error.</response>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.AccountController.RemoveAccount">
             <summary>
             Removes the user's account.
@@ -604,6 +615,29 @@
             <response code="404">industrial not found.</response>
             <response code="500">An error occurred while fetching the companies.</response>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.getCompanyByCountry">
+            <summary>
+            Retrieves companies by country ID.
+            </summary>
+            <response code="200">Companies fetched successfully.</response>
+            <response code="400">Invalid country ID.</response>
+            <response code="401">if user not authenticated.</response>
+            <response code="404">Country not found.</response>
+            <response code="500">An error occurred while fetching companies.</response>
+            <returns>An API response with the list of companies for the specified country.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.getCompanyByCity">
+            <summary>
+            Retrieves companies by country ID.
+            User Must Be Authenticated for use this endpoint
+            </summary>
+            <response code="200">Companies fetched successfully.</response>
+            <response code="400">Invalid city ID.</response>
+            <response code="401">if user not authenticated.</response>
+            <response code="404">City not found.</response>
+            <response code="500">An error occurred while fetching companies.</response>
+            <returns>An API response with the list of companies for the specified country.</returns>
+        </member>
         <member name="T:ExpertOffers.API.Controllers.CountryController">
             <summary>
             Controller for handling operations related to Countries.
@@ -1077,41 +1111,53 @@
             Controller responsible for managing offers.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.OfferController.#ctor(ExpertOffers.Core.ServicesContract.IOfferServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.OfferController})">
+        <member name="M:ExpertOffers.API.Controllers.OfferController.#ctor(ExpertOffers.Core.ServicesContract.IOfferServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.OfferController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.OfferController"/> class.
             </summary>
             <param name="offerServices">Service for managing offers.</param>
             <param name="logger">Logger for capturing logs.</param>
+            <param name="unitOfWork">Unit of work for managing transactions.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.CreateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferAddRequest)">
             <summary>
             Creates a new offer.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
-            <param name="request">The offer details to be created.</param>
+            <param name="request">The request containing the offer details.</param>
+            <response code="200">Offer created successfully.</response>
+            <response code="500">An error occurred while creating the offer.</response>
             <returns>An API response indicating the result of the offer creation.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.UpdateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferUpdateRequest)">
             <summary>
             Updates an existing offer.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="request">The updated offer details.</param>
+            <response code="200">Offer updated successfully.</response>
+            <response code="404">Offer not found.</response>
+            <response code="500">An error occurred while updating the offer.</response>
             <returns>An API response indicating the result of the offer update.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.DeleteOffer(System.Guid)">
             <summary>
             Deletes an existing offer by its ID.
-            "COMPANY" role is required to access this endpoint
+            "COMPANY" role is required to access this endpoint.
             </summary>
             <param name="offerID">The unique ID of the offer to be deleted.</param>
+            <response code="200">Offer deleted successfully.</response>
+            <response code="400">Offer ID is required.</response>
+            <response code="404">Offer not found.</response>
+            <response code="500">An error occurred while deleting the offer.</response>
             <returns>An API response indicating the result of the offer deletion.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffers">
             <summary>
             Retrieves all available offers.
             </summary>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="500">An error occurred while retrieving the offers.</response>
             <returns>An API response with the list of offers.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersBy(System.String)">
@@ -1119,6 +1165,9 @@
             Retrieves offers based on the offer name.
             </summary>
             <param name="offerName">The name of the offer to search.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Offer name is required.</response>
+            <response code="500">An error occurred while retrieving the offers.</response>
             <returns>An API response with the matching offers.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffer(System.Guid)">
@@ -1126,32 +1175,46 @@
             Retrieves an offer by its ID.
             </summary>
             <param name="offerID">The unique ID of the offer.</param>
+            <response code="200">Offer retrieved successfully.</response>
+            <response code="400">Offer ID is required.</response>
+            <response code="404">Offer not found.</response>
+            <response code="500">An error occurred while retrieving the offer.</response>
             <returns>An API response with the requested offer details.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByGenre(System.Guid)">
             <summary>
-            Retrieves an offers by genre ID.
+            Retrieves offers by genre ID.
             </summary>
-            <param name="genreID">The unique ID of the genreOffer.</param>
+            <param name="genreID">The unique ID of the genre.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Genre ID is required.</response>
+            <response code="404">Genre not found.</response>
             <returns>An API response with the requested offer details.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompany(System.Guid)">
             <summary>
-            Retrieves an offers by company ID.
+            Retrieves offers by company ID.
             </summary>
             <param name="companyID">The unique ID of the company.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Company ID is required.</response>
+            <response code="404">Company not found.</response>
             <returns>An API response with the requested offer details.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersActiveOnly">
             <summary>
             Retrieves active offers only.
             </summary>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="500">An error occurred while retrieving active offers.</response>
             <returns>An API response with the list of active offers.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersInactiveOnly">
             <summary>
             Retrieves inactive offers only.
             </summary>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="500">An error occurred while retrieving inactive offers.</response>
             <returns>An API response with the list of inactive offers.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompanyActiveOnly(System.Guid)">
@@ -1159,6 +1222,9 @@
             Retrieves active offers by company ID.
             </summary>
             <param name="companyID">The unique ID of the company.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Company ID is required.</response>
+            <response code="404">Company not found.</response>
             <returns>An API response with the list of active offers for the specified company.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompanyInactiveOnly(System.Guid)">
@@ -1166,6 +1232,9 @@
             Retrieves inactive offers by company ID.
             </summary>
             <param name="companyID">The unique ID of the company.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Company ID is required.</response>
+            <response code="404">Company not found.</response>
             <returns>An API response with the list of inactive offers for the specified company.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByGenreActiveOnly(System.Guid)">
@@ -1173,6 +1242,9 @@
             Retrieves active offers by genre ID.
             </summary>
             <param name="genreID">The unique ID of the genre.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Genre ID is required.</response>
+            <response code="404">Genre not found.</response>
             <returns>An API response with the list of active offers for the specified genre.</returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByGenreInactiveOnly(System.Guid)">
@@ -1180,6 +1252,9 @@
             Retrieves inactive offers by genre ID.
             </summary>
             <param name="genreID">The unique ID of the genre.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Genre ID is required.</response>
+            <response code="404">Genre not found.</response>
             <returns>An API response with the list of inactive offers for the specified genre.</returns>
         </member>
         <member name="T:ExpertOffers.API.Controllers.SavedItemController">
@@ -1187,7 +1262,7 @@
             Controller for managing saved items in the system.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.SavedItemController.#ctor(ExpertOffers.Core.ServicesContract.ISavedItemServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.SavedItemController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+        <member name="M:ExpertOffers.API.Controllers.SavedItemController.#ctor(ExpertOffers.Core.ServicesContract.ISavedItemServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.SavedItemController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Http.IHttpContextAccessor,ExpertOffers.Core.ServicesContract.ICouponServices,ExpertOffers.Core.ServicesContract.IOfferServices)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.SavedItemController"/> class.
             </summary>
@@ -1195,6 +1270,8 @@
             <param name="logger">The logger for this controller.</param>
             <param name="unitOfWork">The unit of work for database transactions.</param>
             <param name="httpContextAccessor">Accessor for HTTP context.</param>
+            <param name="couponServices"></param>
+            <param name="offerServices"></param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.SavedItemController.AddToSaved(ExpertOffers.Core.Dtos.SavedItemDto.SavedItemAddRequest)">
             <summary>
@@ -1215,15 +1292,33 @@
             <response code="404">Indicates the saved item was not found.</response>
             <response code="500">Indicates an internal server error occurred.</response>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.SavedItemController.GetSavedItems">
+        <member name="M:ExpertOffers.API.Controllers.SavedItemController.GetSavedCouponsForCurrentUser">
             <summary>
-            Retrieves all saved items for the authenticated user.
+            Retrieves the saved coupons for the currently authenticated user.
             </summary>
-            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the list of saved items.</returns>
-            <response code="200">Indicates the saved items were retrieved successfully.</response>
-            <response code="401">Indicates the user is not authenticated.</response>
-            <response code="404">Indicates the client was not found.</response>
-            <response code="500">Indicates an internal server error occurred.</response>
+            <remarks>
+            This method fetches the saved coupons for the user based on their authenticated email address.
+            If the user is not authenticated or does not exist in the system, appropriate error messages are returned.
+            </remarks>
+            <returns>An API response containing the list of saved coupons for the current user.</returns>
+            <response code="200">Returns the saved coupons for the authenticated user.</response>
+            <response code="401">If the user is not authenticated.</response>
+            <response code="404">If the user or client entity is not found.</response>
+            <response code="500">If an internal server error occurs.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.SavedItemController.GetSavedOffersForCurrentUser">
+            <summary>
+            Retrieves the saved offers for the currently authenticated user.
+            </summary>
+            <remarks>
+            This method fetches the saved offers for the user based on their authenticated email address.
+            If the user is not authenticated or does not exist in the system, appropriate error messages are returned.
+            </remarks>
+            <returns>An API response containing the list of saved offers for the current user.</returns>
+            <response code="200">Returns the saved offers for the authenticated user.</response>
+            <response code="401">If the user is not authenticated.</response>
+            <response code="404">If the user or client entity is not found.</response>
+            <response code="500">If an internal server error occurs.</response>
         </member>
         <member name="T:ExpertOffers.API.FileServices.FileService">
             <summary>

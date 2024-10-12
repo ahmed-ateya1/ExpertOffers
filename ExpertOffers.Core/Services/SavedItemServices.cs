@@ -112,7 +112,7 @@ namespace ExpertOffers.Core.Services
                 result.CompanyID = offer.CompanyID;
                 result.CompanyName = offer.Company.CompanyName;
                 result.CompanyImageURL = offer.Company.CompanyLogoURL;
-
+                savedItem.ItemType = ItemOptions.OFFERS;
                 offer.TotalSaved++;
 
             }
@@ -139,6 +139,7 @@ namespace ExpertOffers.Core.Services
                 result.CompanyID = coupon.CompanyID;
                 result.CompanyName = coupon.Company.CompanyName;
                 result.CompanyImageURL = coupon.Company.CompanyLogoURL;
+                savedItem.ItemType = ItemOptions.COUPONS;
 
                 coupon.TotalSaved++;
 
@@ -177,105 +178,5 @@ namespace ExpertOffers.Core.Services
             });
             return result;
         }
-
-        public async Task<IEnumerable<SavedItemResponse>> GetAllAsync(Expression<Func<SavedItem, bool>>? predicate = null)
-        {
-            var savedItems = await _unitOfWork.Repository<SavedItem>()
-                .GetAllAsync(predicate, 
-                includeProperties: "Offer,Offer.Company,Coupon,Coupon.Company,Client");
-
-            var responseList = savedItems.Select(savedItem =>
-            {
-                var response = new SavedItemResponse
-                {
-                    SavedItemID = savedItem.SavedItemID,
-                    ClientID = savedItem.ClientID,
-                    SavedAt = savedItem.SavedAt
-                };
-                
-                if (savedItem.OfferId.HasValue)
-                {
-                    var date = (int)(savedItem.Offer.EndDate - DateTime.UtcNow).TotalDays;
-                    response.ItemType = ItemOptions.OFFERS.ToString();
-                    response.ItemID = savedItem.Offer.OfferID;
-                    response.ItemName = savedItem.Offer.OfferTitle;
-                    response.ItemImageURL = savedItem.Offer.OfferPictureURL;
-                    response.ItemPrice = savedItem.Offer.OfferPrice;
-                    response.ItemDiscount = savedItem.Offer.OfferDiscount;
-                    response.TotalDayRemaining =  date >0 ? date : 0;
-                    response.CompanyID = savedItem.Offer.CompanyID;
-                    response.CompanyName = savedItem.Offer.Company.CompanyName;
-                    response.CompanyImageURL = savedItem.Offer.Company.CompanyLogoURL;
-                }
-                else if (savedItem.CouponId.HasValue)
-                {
-                    var date = (int)(savedItem.Coupon.EndDate - DateTime.UtcNow).TotalDays;
-                    response.ItemType = ItemOptions.COUPONS.ToString();
-                    response.ItemID = savedItem.Coupon.CouponID;
-                    response.ItemName = savedItem.Coupon.CouponTitle;
-                    response.ItemImageURL = savedItem.Coupon.CouponePictureURL;
-                    response.ItemDiscount = savedItem.Coupon.DiscountPercentage;
-                    response.TotalDayRemaining = date > 0 ? date : 0;
-                    response.CompanyID = savedItem.Coupon.CompanyID;
-                    response.CompanyName = savedItem.Coupon.Company.CompanyName;
-                    response.CompanyImageURL = savedItem.Coupon.Company.CompanyLogoURL;
-                }
-
-                return response;
-            }).ToList();
-
-            return responseList;
-        }
-
-
-        public async Task<SavedItemResponse> GetByAsync(Expression<Func<SavedItem, bool>> predicate, bool isTracked = false)
-        {
-            
-            var savedItem = await _unitOfWork.Repository<SavedItem>()
-                .GetByAsync(predicate, includeProperties: "Offer,Coupon,Offer.Company,Coupon.Company,Client", isTracked: isTracked);
-
-            if (savedItem == null)
-            {
-                throw new KeyNotFoundException("Saved item not found.");
-            }
-
-            var result = new SavedItemResponse
-            {
-                SavedItemID = savedItem.SavedItemID,
-                ClientID = savedItem.ClientID,
-                SavedAt = savedItem.SavedAt
-            };
-            if (savedItem.OfferId.HasValue)
-            {
-                var date = (int)(savedItem.Coupon.EndDate - DateTime.UtcNow).TotalDays;
-                result.ItemType = ItemOptions.OFFERS.ToString();
-                result.ItemID = savedItem.Offer.OfferID;
-                result.ItemName = savedItem.Offer.OfferTitle;
-                result.ItemImageURL = savedItem.Offer.OfferPictureURL;
-                result.ItemPrice = savedItem.Offer.OfferPrice;
-                result.ItemDiscount = savedItem.Offer.OfferDiscount;
-                result.TotalDayRemaining = date > 0 ? date : 0;
-                result.CompanyID = savedItem.Offer.CompanyID;
-                result.CompanyName = savedItem.Offer.Company.CompanyName;
-                result.CompanyImageURL = savedItem.Offer.Company.CompanyLogoURL;
-            }
-            
-            else if (savedItem.CouponId.HasValue)
-            {
-                var date = (int)(savedItem.Coupon.EndDate - DateTime.UtcNow).TotalDays;
-                result.ItemType = ItemOptions.COUPONS.ToString();
-                result.ItemID = savedItem.Coupon.CouponID;
-                result.ItemName = savedItem.Coupon.CouponTitle;
-                result.ItemImageURL = savedItem.Coupon.CouponePictureURL;
-                result.ItemDiscount = savedItem.Coupon.DiscountPercentage;
-                result.TotalDayRemaining = date > 0 ? date : 0;
-                result.CompanyID = savedItem.Coupon.CompanyID;
-                result.CompanyName = savedItem.Coupon.Company.CompanyName;
-                result.CompanyImageURL = savedItem.Coupon.Company.CompanyLogoURL;
-            }
-            
-            return result;
-        }
-
     }
 }

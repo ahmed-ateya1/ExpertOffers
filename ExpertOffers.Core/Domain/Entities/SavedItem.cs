@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExpertOffers.Core.Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,9 @@ namespace ExpertOffers.Core.Domain.Entities
     public class SavedItem
     {
         public Guid SavedItemID { get; set; }
+        public ItemOptions ItemType { get; set; }
         public Guid ClientID { get; set; }
         public virtual Client Client { get; set; }
-
         public Guid? OfferId { get; set; }
         public Offer Offer { get; set; }
 

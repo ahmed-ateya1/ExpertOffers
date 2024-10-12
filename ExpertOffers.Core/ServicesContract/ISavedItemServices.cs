@@ -13,7 +13,5 @@ namespace ExpertOffers.Core.ServicesContract
     {
         Task<SavedItemResponse> CreateAsync(SavedItemAddRequest? request);
         Task<bool> DeleteAsync(Guid savedItemID);
-        Task<IEnumerable<SavedItemResponse>> GetAllAsync(Expression<Func<SavedItem, bool>>? predicate=null);
-        Task<SavedItemResponse> GetByAsync(Expression<Func<SavedItem, bool>>predicate , bool isTracked = false);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using ExpertOffers.Core.Domain.Entities;
 using ExpertOffers.Core.Domain.IdentityEntities;
+using ExpertOffers.Core.Dtos.CompanyDto;
+using ExpertOffers.Core.Dtos.FavoriteDto;
 using ExpertOffers.Core.Dtos.OfferDto;
 using ExpertOffers.Core.Helper;
 using ExpertOffers.Core.IUnitOfWorkConfig;
@@ -54,6 +56,38 @@ namespace ExpertOffers.Core.Services
                     await _unitOfWork.RollbackTransactionAsync();
                     throw;
                 }
+            }
+        }
+        private async Task<Client?> GetCurrentClientAsync()
+        {
+            var email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+
+            if (email == null)
+                return null;
+
+            var user = await _unitOfWork.Repository<ApplicationUser>()
+                .GetByAsync(x => x.Email == email, includeProperties: "Country,City");
+
+            if (user == null)
+                return null;
+
+            var client = await _unitOfWork.Repository<Client>()
+                .GetByAsync(x => x.ClientID == user.ClientID);
+
+            return client;
+        }
+
+        private async Task SetSavedItemAsync(List<OfferResponse> offers, Guid clientID)
+        {
+            var offerIds = offers.Select(o => o.OfferID).ToList();
+            var savedOffers = await _unitOfWork.Repository<SavedItem>()
+                    .GetAllAsync(s => s.ClientID == clientID && offerIds.Contains(s.OfferId.Value));
+
+            var ids = savedOffers.Select(s => s.OfferId).ToList();
+
+            foreach (var offer in offers)
+            {
+                offer.CurrentUserIsSaved = ids.Contains(offer.OfferID);
             }
         }
         private async Task<Company> GetCurrentCompanyAsync()
@@ -132,7 +166,13 @@ namespace ExpertOffers.Core.Services
             var result = await _unitOfWork.Repository<Offer>().GetAllAsync(expression,includeProperties: "Company,Genre");
             result = result.OrderByDescending(x=>x.OfferDiscount);
 
-            return _mapper.Map<IEnumerable<OfferResponse>>(result);
+            var res = _mapper.Map<IEnumerable<OfferResponse>>(result);
+            var client = await GetCurrentClientAsync();
+            if (client != null)
+            {
+                await SetSavedItemAsync(res.ToList(), client.ClientID);
+            }
+            return res;
         }
 
         public async Task<OfferResponse> GetByAsync(Expression<Func<Offer, bool>> expression, bool isTracked = true)
@@ -140,7 +180,16 @@ namespace ExpertOffers.Core.Services
             var result =  await _unitOfWork.Repository<Offer>().GetByAsync(expression, isTracked, includeProperties: "Company,Genre");
             result.TotalViews++;
             await _unitOfWork.CompleteAsync();
-            return _mapper.Map<OfferResponse>(result);
+
+            var res = _mapper.Map<OfferResponse>(result);
+            var client = await GetCurrentClientAsync();
+            if (client != null)
+            {
+                var savedItem = await _unitOfWork.Repository<SavedItem>()
+                    .GetByAsync(s => s.ClientID == client.ClientID && s.OfferId == result.OfferID);
+                res.CurrentUserIsSaved = savedItem != null;
+            }
+            return res;
         }
 
         public async Task<OfferResponse> UpdateAsync(OfferUpdateRequest? offerUpdateRequest)

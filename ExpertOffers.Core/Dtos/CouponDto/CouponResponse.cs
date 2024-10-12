@@ -25,6 +25,8 @@ namespace ExpertOffers.Core.Dtos.CouponDto
         public string CompayLogoURL { get; set; }
         public Guid GenreID { get; set; }
         public string GenreName { get; set; }
+        public bool CurrentUserIsSaved { get; set; }
+
 
     }
 }

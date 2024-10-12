@@ -3,6 +3,7 @@ using ExpertOffers.Core.Domain.Entities;
 using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.CompanyDto;
 using ExpertOffers.Core.Dtos.CouponDto;
+using ExpertOffers.Core.Dtos.OfferDto;
 using ExpertOffers.Core.Helper;
 using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
@@ -58,6 +59,38 @@ namespace ExpertOffers.Core.Services
                     await _unitOfWork.RollbackTransactionAsync();
                     throw;
                 }
+            }
+        }
+        private async Task<Client?> GetCurrentClientAsync()
+        {
+            var email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+
+            if (email == null)
+                return null;
+
+            var user = await _unitOfWork.Repository<ApplicationUser>()
+                .GetByAsync(x => x.Email == email, includeProperties: "Country,City");
+
+            if (user == null)
+                return null;
+
+            var client = await _unitOfWork.Repository<Client>()
+                .GetByAsync(x => x.ClientID == user.ClientID);
+
+            return client;
+        }
+
+        private async Task SetSavedItemAsync(List<CouponResponse> coupons, Guid clientID)
+        {
+            var couponIds = coupons.Select(o => o.CouponID).ToList();
+            var savedOffers = await _unitOfWork.Repository<SavedItem>()
+                    .GetAllAsync(s => s.ClientID == clientID && couponIds.Contains(s.CouponId.Value));
+
+            var ids = savedOffers.Select(s => s.CouponId).ToList();
+
+            foreach (var coupon in coupons)
+            {
+                coupon.CurrentUserIsSaved = ids.Contains(coupon.CouponID);
             }
         }
         private async Task<Company> GetCurrentCompanyAsync()
@@ -142,7 +175,13 @@ namespace ExpertOffers.Core.Services
         {
             var coupons = await _unitOfWork.Repository<Coupon>().GetAllAsync(expression,includeProperties: "Company,GenreCoupon");
             coupons = coupons.OrderByDescending(x => x.DiscountPercentage);
-            return _mapper.Map<IEnumerable<CouponResponse>>(coupons);
+            var result = _mapper.Map<IEnumerable<CouponResponse>>(coupons);
+            var client = await GetCurrentClientAsync();
+            if (client != null)
+            {
+                await SetSavedItemAsync(result.ToList(), client.ClientID);
+            }
+            return result;
         }
 
         public async Task<CouponResponse> GetByAsync(Expression<Func<Coupon, bool>> expression, bool isTracked = true)
@@ -154,7 +193,15 @@ namespace ExpertOffers.Core.Services
                 await _unitOfWork.CompleteAsync();
             }
             
-            return _mapper.Map<CouponResponse>(coupon);
+            var result =  _mapper.Map<CouponResponse>(coupon);
+            var client = await GetCurrentClientAsync();
+            if (client != null)
+            {
+                var savedItem = await _unitOfWork.Repository<SavedItem>()
+                    .GetByAsync(s => s.ClientID == client.ClientID && s.CouponId == coupon.CouponID);
+                result.CurrentUserIsSaved = savedItem != null;
+            }
+            return result;
         }
 
         public async Task<CouponResponse> UpdateAsync(CouponUpdateRequest? couponUpdateRequest)

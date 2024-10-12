@@ -1,5 +1,7 @@
-﻿using ExpertOffers.Core.Dtos.OfferDto;
+﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Dtos.OfferDto;
 using ExpertOffers.Core.DTOS;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,21 +19,26 @@ namespace ExpertOffers.API.Controllers
     {
         private readonly IOfferServices _offerServices;
         private readonly ILogger<OfferController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
         /// <summary>
         /// Initializes a new instance of the <see cref="OfferController"/> class.
         /// </summary>
         /// <param name="offerServices">Service for managing offers.</param>
         /// <param name="logger">Logger for capturing logs.</param>
-        public OfferController(IOfferServices offerServices, ILogger<OfferController> logger)
+        /// <param name="unitOfWork">Unit of work for managing transactions.</param>
+        public OfferController(IOfferServices offerServices, ILogger<OfferController> logger, IUnitOfWork unitOfWork)
         {
             _offerServices = offerServices;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
         /// <summary>
         /// Creates a new offer.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
-        /// <param name="request">The offer details to be created.</param>
+        /// <param name="request">The request containing the offer details.</param>
+        /// <response code="200">Offer created successfully.</response>
+        /// <response code="500">An error occurred while creating the offer.</response>
         /// <returns>An API response indicating the result of the offer creation.</returns>
         [HttpPost("createOffer")]
         [Authorize(Roles = "COMPANY")]
@@ -70,9 +77,12 @@ namespace ExpertOffers.API.Controllers
         }
         /// <summary>
         /// Updates an existing offer.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
         /// <param name="request">The updated offer details.</param>
+        /// <response code="200">Offer updated successfully.</response>
+        /// <response code="404">Offer not found.</response>
+        /// <response code="500">An error occurred while updating the offer.</response>
         /// <returns>An API response indicating the result of the offer update.</returns>
         [HttpPut("updateOffer")]
         [Authorize(Roles = "COMPANY")]
@@ -81,6 +91,17 @@ namespace ExpertOffers.API.Controllers
         {
             try
             {
+                var offer = await _unitOfWork.Repository<Offer>()
+                    .GetByAsync(x=>x.OfferID == request.OfferID);
+                if (offer == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Offer not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var response = await _offerServices.UpdateAsync(request);
                 if (response == null)
                 {
@@ -112,9 +133,13 @@ namespace ExpertOffers.API.Controllers
         }
         /// <summary>
         /// Deletes an existing offer by its ID.
-        /// "COMPANY" role is required to access this endpoint
+        /// "COMPANY" role is required to access this endpoint.
         /// </summary>
         /// <param name="offerID">The unique ID of the offer to be deleted.</param>
+        /// <response code="200">Offer deleted successfully.</response>
+        /// <response code="400">Offer ID is required.</response>
+        /// <response code="404">Offer not found.</response>
+        /// <response code="500">An error occurred while deleting the offer.</response>
         /// <returns>An API response indicating the result of the offer deletion.</returns>
         [HttpDelete("deleteOffer/{offerID}")]
         [Authorize(Roles = "COMPANY")]
@@ -128,6 +153,17 @@ namespace ExpertOffers.API.Controllers
                        IsSuccess = false,
                        Messages = "Offer ID is required",
                        StatusCode = HttpStatusCode.BadRequest
+                    });
+                }
+                var offer = await _unitOfWork.Repository<Offer>()
+                    .GetByAsync(x => x.OfferID == offerID);
+                if (offer == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Offer not found",
+                        StatusCode = HttpStatusCode.NotFound
                     });
                 }
                 var response = await _offerServices.DeleteAsync(offerID);
@@ -161,6 +197,8 @@ namespace ExpertOffers.API.Controllers
         /// <summary>
         /// Retrieves all available offers.
         /// </summary>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="500">An error occurred while retrieving the offers.</response>
         /// <returns>An API response with the list of offers.</returns>
         [HttpGet("getOffers")]
         public async Task<ActionResult<ApiResponse>> GetOffers()
@@ -192,6 +230,9 @@ namespace ExpertOffers.API.Controllers
         /// Retrieves offers based on the offer name.
         /// </summary>
         /// <param name="offerName">The name of the offer to search.</param>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="400">Offer name is required.</response>
+        /// <response code="500">An error occurred while retrieving the offers.</response>
         /// <returns>An API response with the matching offers.</returns>
         [HttpGet("getOffersBy/{offerName}")]
         public async Task<ActionResult<ApiResponse>> GetOffersBy(string offerName)
@@ -231,6 +272,10 @@ namespace ExpertOffers.API.Controllers
         /// Retrieves an offer by its ID.
         /// </summary>
         /// <param name="offerID">The unique ID of the offer.</param>
+        /// <response code="200">Offer retrieved successfully.</response>
+        /// <response code="400">Offer ID is required.</response>
+        /// <response code="404">Offer not found.</response>
+        /// <response code="500">An error occurred while retrieving the offer.</response>
         /// <returns>An API response with the requested offer details.</returns>
         [HttpGet("getOffer/{offerID}")]
         public async Task<ActionResult<ApiResponse>> GetOffer(Guid offerID)
@@ -246,8 +291,9 @@ namespace ExpertOffers.API.Controllers
                         StatusCode = HttpStatusCode.BadRequest
                     });
                 }
-                var response = await _offerServices.GetByAsync(x => x.OfferID == offerID);
-                if (response == null)
+                var offer = await _unitOfWork.Repository<Offer>()
+                    .GetByAsync(x => x.OfferID == offerID);
+                if (offer == null)
                 {
                     return NotFound(new ApiResponse()
                     {
@@ -256,6 +302,8 @@ namespace ExpertOffers.API.Controllers
                         StatusCode = HttpStatusCode.NotFound
                     });
                 }
+                var response = await _offerServices.GetByAsync(x => x.OfferID == offerID);
+              
                 return Ok(new ApiResponse
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -276,9 +324,12 @@ namespace ExpertOffers.API.Controllers
             }
         }
         /// <summary>
-        /// Retrieves an offers by genre ID.
+        /// Retrieves offers by genre ID.
         /// </summary>
-        /// <param name="genreID">The unique ID of the genreOffer.</param>
+        /// <param name="genreID">The unique ID of the genre.</param>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="400">Genre ID is required.</response>
+        /// <response code="404">Genre not found.</response>
         /// <returns>An API response with the requested offer details.</returns>
         [HttpGet("getOffersByGenre/{genreID}")]
         public async Task<ActionResult<ApiResponse>> GetOffersByGenre(Guid genreID)
@@ -292,6 +343,17 @@ namespace ExpertOffers.API.Controllers
                     StatusCode = HttpStatusCode.BadRequest
                 });
             }
+            var genre = await _unitOfWork.Repository<GenreOffer>()
+                .GetByAsync(x => x.GenreID == genreID);
+            if (genre == null)
+            {
+                return NotFound(new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Messages = "Genre not found",
+                    StatusCode = HttpStatusCode.NotFound
+                });
+            }
             var genres = await _offerServices.GetAllAsync(x=>x.GenreID == genreID);
             return Ok(new ApiResponse
             {
@@ -302,9 +364,12 @@ namespace ExpertOffers.API.Controllers
             });
         }
         /// <summary>
-        /// Retrieves an offers by company ID.
+        /// Retrieves offers by company ID.
         /// </summary>
         /// <param name="companyID">The unique ID of the company.</param>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="400">Company ID is required.</response>
+        /// <response code="404">Company not found.</response>
         /// <returns>An API response with the requested offer details.</returns>
         [HttpGet("getOffersByCompany/{companyID}")]
         public async Task<ActionResult<ApiResponse>> GetOffersByCompany(Guid companyID)
@@ -316,6 +381,17 @@ namespace ExpertOffers.API.Controllers
                     IsSuccess = false,
                     Messages = "Company ID is required",
                     StatusCode = HttpStatusCode.BadRequest
+                });
+            }
+            var company = await _unitOfWork.Repository<Company>()
+                .GetByAsync(x => x.CompanyID == companyID);
+            if (company == null)
+            {
+                return NotFound(new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Messages = "Company not found",
+                    StatusCode = HttpStatusCode.NotFound
                 });
             }
             var companies = await _offerServices.GetAllAsync(x => x.CompanyID == companyID);
@@ -331,6 +407,8 @@ namespace ExpertOffers.API.Controllers
         /// <summary>
         /// Retrieves active offers only.
         /// </summary>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="500">An error occurred while retrieving active offers.</response>
         /// <returns>An API response with the list of active offers.</returns>
         [HttpGet("getOffersActiveOnly")]
         public async Task<ActionResult<ApiResponse>> GetOffersActiveOnly()
@@ -360,6 +438,8 @@ namespace ExpertOffers.API.Controllers
         /// <summary>
         /// Retrieves inactive offers only.
         /// </summary>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="500">An error occurred while retrieving inactive offers.</response>
         /// <returns>An API response with the list of inactive offers.</returns>
         [HttpGet("getOffersInactiveOnly")]
         public async Task<ActionResult<ApiResponse>> GetOffersInactiveOnly()
@@ -390,6 +470,9 @@ namespace ExpertOffers.API.Controllers
         /// Retrieves active offers by company ID.
         /// </summary>
         /// <param name="companyID">The unique ID of the company.</param>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="400">Company ID is required.</response>
+        /// <response code="404">Company not found.</response>
         /// <returns>An API response with the list of active offers for the specified company.</returns>
         [HttpGet("getOffersByCompanyActiveOnly/{companyID}")]
         public async Task<ActionResult<ApiResponse>> GetOffersByCompanyActiveOnly(Guid companyID)
@@ -401,6 +484,17 @@ namespace ExpertOffers.API.Controllers
                     IsSuccess = false,
                     Messages = "Company ID is required",
                     StatusCode = HttpStatusCode.BadRequest
+                });
+            }
+            var company = await _unitOfWork.Repository<Company>()
+                .GetByAsync(x => x.CompanyID == companyID);
+            if (company == null)
+            {
+                return NotFound(new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Messages = "Company not found",
+                    StatusCode = HttpStatusCode.NotFound
                 });
             }
             var companies = await _offerServices.GetAllAsync(x => x.CompanyID == companyID && x.IsActive == true);
@@ -416,6 +510,9 @@ namespace ExpertOffers.API.Controllers
         /// Retrieves inactive offers by company ID.
         /// </summary>
         /// <param name="companyID">The unique ID of the company.</param>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="400">Company ID is required.</response>
+        /// <response code="404">Company not found.</response>
         /// <returns>An API response with the list of inactive offers for the specified company.</returns>
         [HttpGet("getOffersByCompanyInactiveOnly/{companyID}")]
         public async Task<ActionResult<ApiResponse>> GetOffersByCompanyInactiveOnly(Guid companyID)
@@ -427,6 +524,17 @@ namespace ExpertOffers.API.Controllers
                     IsSuccess = false,
                     Messages = "Company ID is required",
                     StatusCode = HttpStatusCode.BadRequest
+                });
+            }
+            var company = await _unitOfWork.Repository<Company>()
+                .GetByAsync(x => x.CompanyID == companyID);
+            if (company == null)
+            {
+                return NotFound(new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Messages = "Company not found",
+                    StatusCode = HttpStatusCode.NotFound
                 });
             }
             var companies = await _offerServices.GetAllAsync(x => x.CompanyID == companyID && x.IsActive == false);
@@ -442,6 +550,9 @@ namespace ExpertOffers.API.Controllers
         /// Retrieves active offers by genre ID.
         /// </summary>
         /// <param name="genreID">The unique ID of the genre.</param>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="400">Genre ID is required.</response>
+        /// <response code="404">Genre not found.</response>
         /// <returns>An API response with the list of active offers for the specified genre.</returns>
         [HttpGet("getOffersByGenreActiveOnly/{genreID}")]
         public async Task<ActionResult<ApiResponse>> GetOffersByGenreActiveOnly(Guid genreID)
@@ -453,6 +564,17 @@ namespace ExpertOffers.API.Controllers
                     IsSuccess = false,
                     Messages = "Genre ID is required",
                     StatusCode = HttpStatusCode.BadRequest
+                });
+            }
+            var genre = await _unitOfWork.Repository<GenreOffer>()
+                .GetByAsync(x => x.GenreID == genreID);
+            if (genre == null)
+            {
+                return NotFound(new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Messages = "Genre not found",
+                    StatusCode = HttpStatusCode.NotFound
                 });
             }
             var genres = await _offerServices.GetAllAsync(x => x.GenreID == genreID && x.IsActive == true);
@@ -468,6 +590,9 @@ namespace ExpertOffers.API.Controllers
         /// Retrieves inactive offers by genre ID.
         /// </summary>
         /// <param name="genreID">The unique ID of the genre.</param>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="400">Genre ID is required.</response>
+        /// <response code="404">Genre not found.</response>
         /// <returns>An API response with the list of inactive offers for the specified genre.</returns>
         [HttpGet("getOffersByGenreInactiveOnly/{genreID}")]
         public async Task<ActionResult<ApiResponse>> GetOffersByGenreInactiveOnly(Guid genreID)
@@ -479,6 +604,17 @@ namespace ExpertOffers.API.Controllers
                     IsSuccess = false,
                     Messages = "Genre ID is required",
                     StatusCode = HttpStatusCode.BadRequest
+                });
+            }
+            var genre = await _unitOfWork.Repository<GenreOffer>()
+               .GetByAsync(x => x.GenreID == genreID);
+            if (genre == null)
+            {
+                return NotFound(new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Messages = "Genre not found",
+                    StatusCode = HttpStatusCode.NotFound
                 });
             }
             var genres = await _offerServices.GetAllAsync(x => x.GenreID == genreID && x.IsActive == false);
