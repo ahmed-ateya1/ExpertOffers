@@ -12,6 +12,6 @@ namespace ExpertOffers.Core.ServicesContract
     public interface ISavedItemServices
     {
         Task<SavedItemResponse> CreateAsync(SavedItemAddRequest? request);
-        Task<bool> DeleteAsync(Guid savedItemID);
+        Task<bool> DeleteAsync(Guid itemID);
     }
 }

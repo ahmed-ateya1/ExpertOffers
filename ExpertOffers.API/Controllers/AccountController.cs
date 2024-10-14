@@ -1,4 +1,5 @@
-﻿using ExpertOffers.Core.Domain.IdentityEntities;
+﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.AuthenticationDto;
 using ExpertOffers.Core.DTOS.AuthenticationDTO;
 using ExpertOffers.Core.DTOS.CityDto;
@@ -99,10 +100,15 @@ namespace ExpertOffers.API.Controllers
                 var errors = string.Join("|", ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
                 return BadRequest(errors);
             }
-
+            var industrial = await _unitOfWork.Repository<Industrial>()
+                .GetByAsync(x=>x.IndustrialID == registerDTO.IndustrialID);
+            if (industrial == null)
+            {
+                return NotFound(registerDTO.IndustrialID + " Not Found");
+            }
             var result = await _authenticationServices.RegisterCompanyAsync(registerDTO);
             if (!result.IsAuthenticated)
-                return Problem(result.Message);
+                return BadRequest(result.Message);
 
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {

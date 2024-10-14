@@ -24,9 +24,9 @@ namespace ExpertOffers.Core.ServicesContract
         /// <summary>
         /// Removes a favorite.
         /// </summary>
-        /// <param name="favoriteID">The ID of the favorite to remove.</param>
+        /// <param name="id">The ID of the item to remove.</param>
         /// <returns>A boolean indicating whether the favorite was successfully removed.</returns>
-        Task<bool> RemoveFavorite(Guid? favoriteID);
+        Task<bool> RemoveFavorite(Guid? id);
 
         /// <summary>
         /// Gets all favorites.

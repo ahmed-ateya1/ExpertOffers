@@ -884,7 +884,7 @@
             Removes a company from favorites.
             "USER" role is required to access this endpoint.
             </summary>
-            <param name="favoriteID">The ID of the favorite to remove.</param>
+            <param name="companyID">The ID of the Company to remove from favorite.</param>
             <returns>The result of the operation.</returns>
             <response code="200">Company removed from favorites successfully.</response>
             <response code="404">Favorite not found.</response>
@@ -1327,7 +1327,7 @@
             <summary>
             Deletes an item from the user's saved items.
             </summary>
-            <param name="savedItemID">The ID of the saved item to delete.</param>
+            <param name="itemID">The ID of Coupon or Offer to delete from Saved.</param>
             <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing the result of the deletion.</returns>
             <response code="200">Indicates the saved item was deleted successfully.</response>
             <response code="404">Indicates the saved item was not found.</response>

@@ -136,16 +136,26 @@ namespace ExpertOffers.Core.Services
             return _mapper.Map<FavoriteResponse>(result);
         }
 
-        public async Task<bool> RemoveFavorite(Guid? favoriteID)
+        public async Task<bool> RemoveFavorite(Guid? id)
         {
-            if(favoriteID == null)
+            var client = await GetCurrentClientAsync();
+            if (id == null)
             {
-                throw new ArgumentNullException(nameof(favoriteID));
+                throw new ArgumentNullException(nameof(id));
             }
-            var favorite = await _unitOfWork.Repository<Favorite>()
-                .GetByAsync(f => f.FavoriteID == favoriteID)
-                ?? throw new KeyNotFoundException("Favorite not found.");
+            var company = await _unitOfWork.Repository<Company>()
+                .GetByAsync(x => x.CompanyID == id);
+            if(company == null)
+            {
+                return false;
+            }
 
+            var favorite = await _unitOfWork.Repository<Favorite>()
+                .GetByAsync(f => f.CompanyID == company.CompanyID && f.ClientID == client.ClientID);
+            if (favorite == null)
+            {
+                return false;
+            }
             bool result = false;
             await ExecuteWithTransaction(async () =>
             {

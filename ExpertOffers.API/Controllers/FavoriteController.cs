@@ -76,28 +76,29 @@ namespace ExpertOffers.API.Controllers
         /// Removes a company from favorites.
         /// "USER" role is required to access this endpoint.
         /// </summary>
-        /// <param name="favoriteID">The ID of the favorite to remove.</param>
+        /// <param name="companyID">The ID of the Company to remove from favorite.</param>
         /// <returns>The result of the operation.</returns>
         /// <response code="200">Company removed from favorites successfully.</response>
         /// <response code="404">Favorite not found.</response>
         /// <response code="500">An error occurred while removing the favorite.</response>
         [Authorize(Roles = "USER")]
-        [HttpDelete("removeFromFavorite/{favoriteID}")]
-        public async Task<ActionResult<ApiResponse>> RemoveFavorite(Guid favoriteID)
+        [HttpDelete("removeFromFavorite/{companyID}")]
+        public async Task<ActionResult<ApiResponse>> RemoveFavorite(Guid companyID)
         {
             try
             {
-                var fav = await _unitOfWork.Repository<Favorite>().GetByAsync(x => x.FavoriteID == favoriteID);
-                if (fav == null)
+                var company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(x=>x.CompanyID == companyID);
+                if (company == null)
                 {
                     return NotFound(new ApiResponse
                     {
                         IsSuccess = false,
-                        Messages = "Favorite not found",
+                        Messages = "Company not found",
                         StatusCode = HttpStatusCode.NotFound
                     });
                 }
-                var result = await _favoriteServices.RemoveFavorite(favoriteID);
+                var result = await _favoriteServices.RemoveFavorite(companyID);
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,

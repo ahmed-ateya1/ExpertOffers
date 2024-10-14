@@ -13,6 +13,7 @@ namespace ExpertOffers.Core.Dtos.CompanyDto
         public string CompanyName { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public string CompanyLogoURL { get; set; }
         public string CountryName { get; set; }
         public string CityName { get; set; }
         public string IndustrialName { get; set; }

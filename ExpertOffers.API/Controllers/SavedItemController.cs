@@ -90,29 +90,31 @@ namespace ExpertOffers.API.Controllers
         /// <summary>
         /// Deletes an item from the user's saved items.
         /// </summary>
-        /// <param name="savedItemID">The ID of the saved item to delete.</param>
+        /// <param name="itemID">The ID of Coupon or Offer to delete from Saved.</param>
         /// <returns>An <see cref="ActionResult"/> containing the result of the deletion.</returns>
         /// <response code="200">Indicates the saved item was deleted successfully.</response>
         /// <response code="404">Indicates the saved item was not found.</response>
         /// <response code="500">Indicates an internal server error occurred.</response>
         [Authorize(Roles = "USER")]
-        [HttpDelete("deleteSavedItem/{savedItemID}")]
-        public async Task<ActionResult<ApiResponse>> DeleteSavedItem(Guid savedItemID)
+        [HttpDelete("deleteSavedItem/{itemID}")]
+        public async Task<ActionResult<ApiResponse>> DeleteSavedItem(Guid itemID)
         {
             try
             {
-                var saved = await _unitOfWork.Repository<SavedItem>()
-                    .GetByAsync(x => x.SavedItemID == savedItemID);
-                if (saved == null)
+                var offer = await _unitOfWork.Repository<Offer>()
+                    .GetByAsync(x => x.OfferID == itemID);
+                var coupon = await _unitOfWork.Repository<Coupon>()
+                    .GetByAsync(x => x.CouponID == itemID);
+                if (offer == null && coupon == null)
                 {
                     return NotFound(new ApiResponse
                     {
                         IsSuccess = false,
-                        Messages = "Saved Item not found",
+                        Messages = "Item not found",
                         StatusCode = HttpStatusCode.NotFound
                     });
                 }
-                var result = await _savedItemServices.DeleteAsync(savedItemID);
+                var result = await _savedItemServices.DeleteAsync(itemID);
                 return Ok(new ApiResponse()
                 {
                     StatusCode = HttpStatusCode.OK,
