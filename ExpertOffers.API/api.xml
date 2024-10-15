@@ -231,13 +231,14 @@
             Controller for managing bulletin operations.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.BulletinController.#ctor(ExpertOffers.Core.ServicesContract.IBulletinServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BulletinController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.#ctor(ExpertOffers.Core.ServicesContract.IBulletinServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BulletinController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.BulletinController"/> class.
             </summary>
             <param name="bulletinService">The bulletin service.</param>
             <param name="logger">The logger.</param>
             <param name="unitOfWork">The unit of work.</param>
+            <param name="httpContextAccessor">The HTTP context accessor.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.CreateBulletin(ExpertOffers.Core.Dtos.BulletinDto.BulletinAddRquest)">
             <summary>
@@ -298,6 +299,27 @@
             <response code="200">Returns bulletins matching the genre ID.</response>
             <response code="500">If an error occurs while processing the request.</response>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsByCompany">
+            <summary>
+            Retrieves all bulletins created by the authenticated company.
+            </summary>
+            <remarks>
+            This endpoint allows a company to fetch all bulletins they have created. 
+            The user must be authenticated and associated with a company. 
+            The endpoint returns a list of bulletins belonging to the company.
+            </remarks>
+            <returns>
+            Returns an ActionResult containing an ApiResponse:
+            - 200 OK: When bulletins are successfully retrieved.
+            - 401 Unauthorized: If the user is not authenticated.
+            - 404 Not Found: If the user or company is not found.
+            - 500 Internal Server Error: If an error occurred while processing the request.
+            </returns>
+            <response code="200">Bulletins retrieved successfully.</response>
+            <response code="401">User not authenticated.</response>
+            <response code="404">User or company not found.</response>
+            <response code="500">An error occurred while retrieving bulletins.</response>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsByCompany(System.Guid)">
             <summary>
             Gets bulletins by company ID.
@@ -353,6 +375,23 @@
             <response code="200">Returns active bulletins matching the company ID.</response>
             <response code="404">Returns when country not found.</response>
             <response code="500">If an error occurs while processing the request.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsActiveByCompany">
+            <summary>
+            Retrieves all active bulletins created by the authenticated company.
+            </summary>
+            <remarks>
+            This endpoint allows a company to fetch only the active bulletins they have created. 
+            The user must be authenticated and have the "COMPANY" role to access this endpoint. 
+            Active coupons are those where the "IsActive" flag is set to true.
+            </remarks>
+            <returns>
+            Returns an ActionResult containing an ApiResponse:
+            - 200 OK: If active bulletins are successfully retrieved.
+            - 401 Unauthorized: If the user is not authenticated.
+            - 404 Not Found: If the user or company is not found.
+            - 500 Internal Server Error: If an error occurred while processing the request.
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.GetBulletinsInActiveByCompany(System.Guid)">
             <summary>
@@ -583,6 +622,23 @@
             <response code="404">Company not found.</response>
             <response code="500">An error occurred while fetching the company.</response>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.GetCompnay">
+            <summary>
+            Retrieves the company details of the authenticated user.
+            </summary>
+            <remarks>
+            This endpoint allows a user with the "COMPANY" role to fetch their company details. 
+            The user must be authenticated via an email-based identity. If the user is not associated 
+            with a company, a 404 status will be returned.
+            </remarks>
+            <returns>
+            Returns an ActionResult containing an ApiResponse:
+            - 200 OK: If the company details are successfully retrieved.
+            - 401 Unauthorized: If the user is not authenticated.
+            - 404 Not Found: If the user or the company is not found.
+            - 500 Internal Server Error: If an error occurs while fetching the company details.
+            </returns>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.CompanyController.SearchCompanies(System.String)">
             <summary>
             Searches for companies by name.
@@ -712,13 +768,14 @@
             Represents the controller for managing coupons.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.CouponController.#ctor(ExpertOffers.Core.ServicesContract.ICouponServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CouponController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
+        <member name="M:ExpertOffers.API.Controllers.CouponController.#ctor(ExpertOffers.Core.ServicesContract.ICouponServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.CouponController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.CouponController"/> class.
             </summary>
             <param name="couponServices">The coupon services.</param>
             <param name="logger">The logger.</param>
             <param name="unitOfWork">The unit of work.</param>
+            <param name="httpContextAccessor">The HTTP context accessor.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.CreateCoupon(ExpertOffers.Core.Dtos.CouponDto.CouponAddRequest)">
             <summary>
@@ -761,6 +818,27 @@
             <response code="200">Coupon found successfully.</response>
             <response code="404">Coupon not found.</response>
             <response code="500">An error occurred while retrieving the coupon.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponByCompany">
+            <summary>
+            Retrieves all coupons created by the authenticated company.
+            </summary>
+            <remarks>
+            This endpoint is used by a company to fetch all the coupons they have created. 
+            The user must be authenticated and associated with a company. 
+            The endpoint returns a list of coupons belonging to the company.
+            </remarks>
+            <returns>
+            Returns an ActionResult containing an ApiResponse:
+            - 200 OK: When coupons are successfully retrieved.
+            - 401 Unauthorized: If the user is not authenticated.
+            - 404 Not Found: If the user or company is not found.
+            - 500 Internal Server Error: If an error occurred while processing the request.
+            </returns>
+            <response code="200">Coupons retrieved successfully.</response>
+            <response code="401">User not authenticated.</response>
+            <response code="404">User or company not found.</response>
+            <response code="500">An error occurred while retrieving coupons.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponByCompany(System.Guid)">
             <summary>
@@ -814,6 +892,23 @@
             <returns>
             <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
             <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
+            </returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.GetActiveCouponsByCompany">
+            <summary>
+            Retrieves all active coupons created by the authenticated company.
+            </summary>
+            <remarks>
+            This endpoint allows a company to fetch only the active coupons they have created. 
+            The user must be authenticated and have the "COMPANY" role to access this endpoint. 
+            Active coupons are those where the "IsActive" flag is set to true.
+            </remarks>
+            <returns>
+            Returns an ActionResult containing an ApiResponse:
+            - 200 OK: If active coupons are successfully retrieved.
+            - 401 Unauthorized: If the user is not authenticated.
+            - 404 Not Found: If the user or company is not found.
+            - 500 Internal Server Error: If an error occurred while processing the request.
             </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetInactiveCouponsByCompany(System.Guid)">
@@ -1152,13 +1247,14 @@
             Controller responsible for managing offers.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.OfferController.#ctor(ExpertOffers.Core.ServicesContract.IOfferServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.OfferController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
+        <member name="M:ExpertOffers.API.Controllers.OfferController.#ctor(ExpertOffers.Core.ServicesContract.IOfferServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.OfferController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.OfferController"/> class.
             </summary>
             <param name="offerServices">Service for managing offers.</param>
             <param name="logger">Logger for capturing logs.</param>
             <param name="unitOfWork">Unit of work for managing transactions.</param>
+            <param name="httpContextAccessor">Accessor for managing HTTP context.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.CreateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferAddRequest)">
             <summary>
@@ -1232,6 +1328,27 @@
             <response code="404">Genre not found.</response>
             <returns>An API response with the requested offer details.</returns>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompany">
+            <summary>
+            Retrieves all offers created by the authenticated company.
+            </summary>
+            <remarks>
+            This endpoint is used by a company to fetch all the offers they have created. 
+            The user must be authenticated and have the "COMPANY" role. 
+            The endpoint returns a list of offers associated with the company.
+            </remarks>
+            <returns>
+            Returns an ActionResult containing an ApiResponse:
+            - 200 OK: When offers are successfully retrieved.
+            - 401 Unauthorized: If the user is not authenticated.
+            - 404 Not Found: If the user or company is not found.
+            - 500 Internal Server Error: If an error occurred while processing the request.
+            </returns>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="401">User not authenticated.</response>
+            <response code="404">User or company not found.</response>
+            <response code="500">An error occurred while retrieving offers.</response>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompany(System.Guid)">
             <summary>
             Retrieves offers by company ID.
@@ -1267,6 +1384,23 @@
             <response code="400">Company ID is required.</response>
             <response code="404">Company not found.</response>
             <returns>An API response with the list of active offers for the specified company.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompanyActiveOnly">
+            <summary>
+            Retrieves all active offers created by the authenticated company.
+            </summary>
+            <remarks>
+            This endpoint allows a company to fetch only the active offers they have created. 
+            The user must be authenticated and have the "COMPANY" role to access this endpoint. 
+            Active offers are those where the "IsActive" flag is set to true.
+            </remarks>
+            <returns>
+            Returns an ActionResult containing an ApiResponse:
+            - 200 OK: If active offers are successfully retrieved.
+            - 401 Unauthorized: If the user is not authenticated.
+            - 404 Not Found: If the user or company is not found.
+            - 500 Internal Server Error: If an error occurred while processing the request.
+            </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.GetOffersByCompanyInactiveOnly(System.Guid)">
             <summary>

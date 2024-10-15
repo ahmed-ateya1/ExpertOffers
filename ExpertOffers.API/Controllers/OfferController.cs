@@ -1,4 +1,5 @@
 ﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.OfferDto;
 using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.IUnitOfWorkConfig;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace ExpertOffers.API.Controllers
 {  
@@ -20,17 +22,20 @@ namespace ExpertOffers.API.Controllers
         private readonly IOfferServices _offerServices;
         private readonly ILogger<OfferController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         /// <summary>
         /// Initializes a new instance of the <see cref="OfferController"/> class.
         /// </summary>
         /// <param name="offerServices">Service for managing offers.</param>
         /// <param name="logger">Logger for capturing logs.</param>
         /// <param name="unitOfWork">Unit of work for managing transactions.</param>
-        public OfferController(IOfferServices offerServices, ILogger<OfferController> logger, IUnitOfWork unitOfWork)
+        /// <param name="httpContextAccessor">Accessor for managing HTTP context.</param>
+        public OfferController(IOfferServices offerServices, ILogger<OfferController> logger, IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
             _offerServices = offerServices;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
         }
         /// <summary>
         /// Creates a new offer.
@@ -364,6 +369,84 @@ namespace ExpertOffers.API.Controllers
             });
         }
         /// <summary>
+        /// Retrieves all offers created by the authenticated company.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is used by a company to fetch all the offers they have created. 
+        /// The user must be authenticated and have the "COMPANY" role. 
+        /// The endpoint returns a list of offers associated with the company.
+        /// </remarks>
+        /// <returns>
+        /// Returns an ActionResult containing an ApiResponse:
+        /// - 200 OK: When offers are successfully retrieved.
+        /// - 401 Unauthorized: If the user is not authenticated.
+        /// - 404 Not Found: If the user or company is not found.
+        /// - 500 Internal Server Error: If an error occurred while processing the request.
+        /// </returns>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="401">User not authenticated.</response>
+        /// <response code="404">User or company not found.</response>
+        /// <response code="500">An error occurred while retrieving offers.</response>
+        [HttpGet("getOffersByCompany")]
+        [Authorize(Roles = "COMPANY")]
+        public async Task<ActionResult<ApiResponse>> GetOffersByCompany()
+        {
+            try
+            {
+                var email = _httpContextAccessor.HttpContext.
+                    User.FindFirstValue(ClaimTypes.Email);
+                if(email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(x => x.UserID == user.Id);
+                if (company == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Company not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var response = await _offerServices.GetAllAsync(x => x.CompanyID == company.CompanyID);
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Offers retrieved successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "getOffersByCompany method: An error occurred while get Offers");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while get Offers"
+                });
+            }
+        }
+        /// <summary>
         /// Retrieves offers by company ID.
         /// </summary>
         /// <param name="companyID">The unique ID of the company.</param>
@@ -505,6 +588,80 @@ namespace ExpertOffers.API.Controllers
                 Messages = "Offers retrieved successfully",
                 Result = companies
             });
+        }
+        /// <summary>
+        /// Retrieves all active offers created by the authenticated company.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint allows a company to fetch only the active offers they have created. 
+        /// The user must be authenticated and have the "COMPANY" role to access this endpoint. 
+        /// Active offers are those where the "IsActive" flag is set to true.
+        /// </remarks>
+        /// <returns>
+        /// Returns an ActionResult containing an ApiResponse:
+        /// - 200 OK: If active offers are successfully retrieved.
+        /// - 401 Unauthorized: If the user is not authenticated.
+        /// - 404 Not Found: If the user or company is not found.
+        /// - 500 Internal Server Error: If an error occurred while processing the request.
+        /// </returns>
+        [HttpGet("getOffersByCompanyActiveOnly")]
+        [Authorize(Roles="COMPANY")]
+        public async Task<ActionResult<ApiResponse>> GetOffersByCompanyActiveOnly()
+        {
+            try
+            {
+                var email = _httpContextAccessor.HttpContext.
+                    User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(x => x.UserID == user.Id);
+                if (company == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Company not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var response = await _offerServices.GetAllAsync(x => x.CompanyID == company.CompanyID&&x.IsActive==true);
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Offers retrieved successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "getOffersByCompanyActiveOnly method: An error occurred while get Offers");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while get Offers"
+                });
+            }
         }
         /// <summary>
         /// Retrieves inactive offers by company ID.

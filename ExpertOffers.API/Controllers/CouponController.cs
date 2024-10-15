@@ -1,12 +1,15 @@
 ﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.CouponDto;
 using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.IUnitOfWorkConfig;
+using ExpertOffers.Core.Services;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace ExpertOffers.API.Controllers
 {
@@ -21,6 +24,7 @@ namespace ExpertOffers.API.Controllers
         private readonly ICouponServices _couponServices;
         private readonly ILogger<CouponController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CouponController"/> class.
@@ -28,14 +32,17 @@ namespace ExpertOffers.API.Controllers
         /// <param name="couponServices">The coupon services.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="unitOfWork">The unit of work.</param>
+        /// <param name="httpContextAccessor">The HTTP context accessor.</param>
         public CouponController(
             ICouponServices couponServices,
             ILogger<CouponController> logger,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IHttpContextAccessor httpContextAccessor)
         {
             _couponServices = couponServices;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -218,7 +225,84 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
-
+        /// <summary>
+        /// Retrieves all coupons created by the authenticated company.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is used by a company to fetch all the coupons they have created. 
+        /// The user must be authenticated and associated with a company. 
+        /// The endpoint returns a list of coupons belonging to the company.
+        /// </remarks>
+        /// <returns>
+        /// Returns an ActionResult containing an ApiResponse:
+        /// - 200 OK: When coupons are successfully retrieved.
+        /// - 401 Unauthorized: If the user is not authenticated.
+        /// - 404 Not Found: If the user or company is not found.
+        /// - 500 Internal Server Error: If an error occurred while processing the request.
+        /// </returns>
+        /// <response code="200">Coupons retrieved successfully.</response>
+        /// <response code="401">User not authenticated.</response>
+        /// <response code="404">User or company not found.</response>
+        /// <response code="500">An error occurred while retrieving coupons.</response>
+        [HttpGet("getCouponsByCompany")]
+        [Authorize(Roles="COMPANY")]
+        public async Task<ActionResult<ApiResponse>> GetCouponByCompany()
+        {
+            try
+            {
+                var email = _httpContextAccessor.HttpContext.
+                    User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(x => x.UserID == user.Id);
+                if (company == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Company not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var result = await _couponServices.GetAllAsync(x => x.CompanyID == company.CompanyID);
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Coupons found successfully",
+                    Result = result
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetCouponByCompany method: An error occurred while retrieving Coupons");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while retrieving Coupons"
+                });
+            }
+        }
         /// <summary>
         /// Gets coupons by company ID.
         /// </summary>
@@ -413,6 +497,81 @@ namespace ExpertOffers.API.Controllers
                     StatusCode = HttpStatusCode.InternalServerError,
                     IsSuccess = false,
                     Messages = "An error occurred while fetching active coupons by company"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all active coupons created by the authenticated company.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint allows a company to fetch only the active coupons they have created. 
+        /// The user must be authenticated and have the "COMPANY" role to access this endpoint. 
+        /// Active coupons are those where the "IsActive" flag is set to true.
+        /// </remarks>
+        /// <returns>
+        /// Returns an ActionResult containing an ApiResponse:
+        /// - 200 OK: If active coupons are successfully retrieved.
+        /// - 401 Unauthorized: If the user is not authenticated.
+        /// - 404 Not Found: If the user or company is not found.
+        /// - 500 Internal Server Error: If an error occurred while processing the request.
+        /// </returns>
+        [HttpGet("getActiveCouponsByCompany")]
+        [Authorize(Roles = "COMPANY")]
+        public async Task<ActionResult<ApiResponse>> GetActiveCouponsByCompany()
+        {
+            try
+            {
+                var email = _httpContextAccessor.HttpContext.
+                    User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(x => x.UserID == user.Id);
+                if (company == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Company not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var response = await _couponServices.GetAllAsync(x => x.CompanyID == company.CompanyID && x.IsActive == true);
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Coupons retrieved successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "getActiveCouponsByCompany method: An error occurred while get Coupons");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while get Coupons"
                 });
             }
         }

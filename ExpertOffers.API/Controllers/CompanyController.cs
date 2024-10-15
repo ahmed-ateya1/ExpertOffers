@@ -118,6 +118,84 @@ namespace ExpertOffers.API.Controllers
         }
 
         /// <summary>
+        /// Retrieves the company details of the authenticated user.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint allows a user with the "COMPANY" role to fetch their company details. 
+        /// The user must be authenticated via an email-based identity. If the user is not associated 
+        /// with a company, a 404 status will be returned.
+        /// </remarks>
+        /// <returns>
+        /// Returns an ActionResult containing an ApiResponse:
+        /// - 200 OK: If the company details are successfully retrieved.
+        /// - 401 Unauthorized: If the user is not authenticated.
+        /// - 404 Not Found: If the user or the company is not found.
+        /// - 500 Internal Server Error: If an error occurs while fetching the company details.
+        /// </returns>
+        [HttpGet("getCompany")]
+        [Authorize(Roles = "COMPANY")]
+        public async Task<ActionResult<ApiResponse>> GetCompnay()
+        {
+            try
+            {
+                // Retrieve the authenticated user's email
+                var email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User is not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+
+                // Get the user details using the email
+                var user = await _unitOfWork.Repository<ApplicationUser>().GetByAsync(u => u.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User is not authenticated",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                // Get the company details based on the user's ID
+                var company = await _companyServices.GetByAsync(x => x.UserID == user.Id);
+                if (company == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Company not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                // Return the company details
+                return Ok(new ApiResponse
+                {
+                    IsSuccess = true,
+                    Messages = "Company fetched successfully",
+                    Result = company,
+                    StatusCode = HttpStatusCode.OK
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetCompany method: An error occurred while fetching the company.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while fetching the company."
+                });
+            }
+        }
+
+        /// <summary>
         /// Searches for companies by name.
         /// </summary>
         /// <param name="companyName">The name of the company to search for.</param>

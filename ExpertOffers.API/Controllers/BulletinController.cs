@@ -1,4 +1,5 @@
 ﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.BulletinDto;
 using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.IUnitOfWorkConfig;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace ExpertOffers.API.Controllers
 {
@@ -22,6 +24,7 @@ namespace ExpertOffers.API.Controllers
         private readonly IBulletinServices _bulletinService;
         private readonly ILogger<BulletinController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BulletinController"/> class.
@@ -29,13 +32,16 @@ namespace ExpertOffers.API.Controllers
         /// <param name="bulletinService">The bulletin service.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="unitOfWork">The unit of work.</param>
+        /// <param name="httpContextAccessor">The HTTP context accessor.</param>
         public BulletinController(IBulletinServices bulletinService,
             ILogger<BulletinController> logger,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IHttpContextAccessor httpContextAccessor)
         {
             _bulletinService = bulletinService;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
         }
         /// <summary>
         /// Creates a new bulletin.
@@ -320,7 +326,84 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
-
+        /// <summary>
+        /// Retrieves all bulletins created by the authenticated company.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint allows a company to fetch all bulletins they have created. 
+        /// The user must be authenticated and associated with a company. 
+        /// The endpoint returns a list of bulletins belonging to the company.
+        /// </remarks>
+        /// <returns>
+        /// Returns an ActionResult containing an ApiResponse:
+        /// - 200 OK: When bulletins are successfully retrieved.
+        /// - 401 Unauthorized: If the user is not authenticated.
+        /// - 404 Not Found: If the user or company is not found.
+        /// - 500 Internal Server Error: If an error occurred while processing the request.
+        /// </returns>
+        /// <response code="200">Bulletins retrieved successfully.</response>
+        /// <response code="401">User not authenticated.</response>
+        /// <response code="404">User or company not found.</response>
+        /// <response code="500">An error occurred while retrieving bulletins.</response>
+        [HttpGet("getBulletinsByCompany")]
+        [Authorize(Roles = "COMPANY")]
+        public async Task<ActionResult<ApiResponse>> GetBulletinsByCompany()
+        {
+            try
+            {
+                var email = _httpContextAccessor.HttpContext.
+                    User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(x => x.UserID == user.Id);
+                if (company == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Company not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var result = await _bulletinService.GetAllAsync(x => x.CompanyID == company.CompanyID);
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Bulletins found successfully",
+                    Result = result
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetBulletinsByCompany method: An error occurred while retrieving Coupons");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while retrieving Bulletins"
+                });
+            }
+        }
         /// <summary>
         /// Gets bulletins by company ID.
         /// </summary>
@@ -398,6 +481,8 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+
 
         /// <summary>
         /// Gets inactive bulletins.
@@ -573,7 +658,80 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
-
+        /// <summary>
+        /// Retrieves all active bulletins created by the authenticated company.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint allows a company to fetch only the active bulletins they have created. 
+        /// The user must be authenticated and have the "COMPANY" role to access this endpoint. 
+        /// Active coupons are those where the "IsActive" flag is set to true.
+        /// </remarks>
+        /// <returns>
+        /// Returns an ActionResult containing an ApiResponse:
+        /// - 200 OK: If active bulletins are successfully retrieved.
+        /// - 401 Unauthorized: If the user is not authenticated.
+        /// - 404 Not Found: If the user or company is not found.
+        /// - 500 Internal Server Error: If an error occurred while processing the request.
+        /// </returns>
+        [HttpGet("getBulletinsActiveByCompany")]
+        [Authorize(Roles = "COMPANY")]
+        public async Task<ActionResult<ApiResponse>> GetBulletinsActiveByCompany()
+        {
+            try
+            {
+                var email = _httpContextAccessor.HttpContext.
+                    User.FindFirstValue(ClaimTypes.Email);
+                if (email == null)
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not authenticated",
+                        StatusCode = HttpStatusCode.Unauthorized
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email);
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(x => x.UserID == user.Id);
+                if (company == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Company not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var response = await _bulletinService.GetAllAsync(x => x.CompanyID == company.CompanyID && x.IsActive == true);
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Bulletins retrieved successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "getBulletinsActiveByCompany method: An error occurred while get Bulletins");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while get Bulletins"
+                });
+            }
+        }
         /// <summary>
         /// Gets inactive bulletins by company ID.
         /// </summary>
@@ -620,6 +778,8 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+
         /// <summary>
         /// Gets bulletins by title.
         /// </summary>
