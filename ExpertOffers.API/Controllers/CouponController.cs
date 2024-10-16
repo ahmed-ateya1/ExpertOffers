@@ -79,6 +79,42 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+        /// <summary>
+        /// Creates a new coupon.
+        /// "ADMIN" role is required to access this endpoint.
+        /// </summary>
+        /// <param name="couponAddRequest">The coupon add request.</param>
+        /// <returns>The created coupon.</returns>
+        /// <response code="200">Coupon created successfully.</response>
+        /// <response code="500">An error occurred while creating the coupon.</response>
+        [Authorize(Roles= "ADMIN")]
+        [HttpPost("createCouponByAdmin")]
+        public async Task<ActionResult<ApiResponse>> CreateCouponByAdmin([FromForm] CouponAddRequest couponAddRequest)
+        {
+            try
+            {
+                var response = await _couponServices.CreateAsync(couponAddRequest);
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Coupon created successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "createCouponByAdmin method: An error occurred while creating Coupon");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while creating Coupon"
+                });
+            }
+        }
+
+        
 
         /// <summary>
         /// Updates an existing coupon.
@@ -92,6 +128,53 @@ namespace ExpertOffers.API.Controllers
         [Authorize(Roles = "COMPANY")]
         [HttpPut("updateCoupon")]
         public async Task<ActionResult<ApiResponse>> UpdateCoupon([FromForm] CouponUpdateRequest couponUpdateRequest)
+        {
+            try
+            {
+                var coupon = await _unitOfWork.Repository<Coupon>()
+                    .GetByAsync(x => x.CouponID == couponUpdateRequest.CouponID);
+                if (coupon == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Coupon not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var response = await _couponServices.UpdateAsync(couponUpdateRequest);
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Coupon updated successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "updateCoupon method: An error occurred while updating Coupon");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while updating Coupon"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing coupon.
+        /// "ADMIN" role is required to access this endpoint.
+        /// </summary>
+        /// <param name="couponUpdateRequest">The coupon update request.</param>
+        /// <returns>The updated coupon.</returns>
+        /// <response code="200">Coupon updated successfully.</response>
+        /// <response code="404">Coupon not found.</response>
+        /// <response code="500">An error occurred while updating the coupon.</response>
+        [Authorize(Roles = "ADMIN")]
+        [HttpPut("createCouponByAdmin")]
+        public async Task<ActionResult<ApiResponse>> UpdateCouponByAdmin([FromForm] CouponUpdateRequest couponUpdateRequest)
         {
             try
             {

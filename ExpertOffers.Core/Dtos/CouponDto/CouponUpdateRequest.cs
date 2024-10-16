@@ -33,5 +33,7 @@ namespace ExpertOffers.Core.Dtos.CouponDto
         public string CouponeURL { get; set; }
         [Required(ErrorMessage = "Genre ID is Required")]
         public Guid GenreID { get; set; }
+
+        public Guid? CompanyID { get; set; }
     }
 }

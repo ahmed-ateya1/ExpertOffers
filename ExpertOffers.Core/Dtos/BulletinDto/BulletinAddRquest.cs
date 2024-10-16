@@ -25,5 +25,6 @@ namespace ExpertOffers.Core.Dtos.BulletinDto
         public IFormFile BulletinPdf { get; set; }
         [Required(ErrorMessage = "Genre ID is required")]
         public Guid GenreID { get; set; }
+        public Guid? CompanyID { get; set; }
     }
 }

@@ -250,6 +250,16 @@
             <response code="200">Bulletin created successfully.</response>
             <response code="500">An error occurred while creating the bulletin.</response>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.BulletinController.CreateBulletinAdmin(ExpertOffers.Core.Dtos.BulletinDto.BulletinAddRquest)">
+            <summary>
+            Creates a new bulletin.
+            "ADMIN" role is required to access this endpoint.
+            </summary>
+            <param name="request">The bulletin add request.</param>
+            <returns>An ApiResponse containing the created bulletin.</returns>
+            <response code="200">Bulletin created successfully.</response>
+            <response code="500">An error occurred while creating the bulletin.</response>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.BulletinController.UpdateBulletin(ExpertOffers.Core.Dtos.BulletinDto.BulletinUpdateRequest)">
             <summary>
             Updates an existing bulletin.
@@ -604,6 +614,21 @@
             <param name="unitOfWork">Unit of work instance to handle database operations.</param>
             <param name="httpContextAccessor">HTTP context accessor instance to access HTTP context data.</param>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.CompanyController.AddCompany(ExpertOffers.Core.Dtos.CompanyDto.CompanyAddRequest)">
+            <summary>
+            Adds a new company to the system.
+            </summary>
+            <param name="companyAddRequest">The request object containing company details to be added.</param>
+            <returns>
+            An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing an <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> object, indicating whether the company was successfully added or if an error occurred.
+            </returns>
+            <remarks>
+            This method requires the user to have the "ADMIN" role. The method attempts to create a new company and, upon success, returns a 200 OK response.
+            If there is an issue during the creation process, a 500 Internal Server Error is returned.
+            </remarks>
+            <response code="200">Company was added successfully.</response>
+            <response code="500">An error occurred while adding the company.</response>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.CompanyController.GetCompanies">
             <summary>
             Fetches a list of all companies.
@@ -787,10 +812,31 @@
             <response code="200">Coupon created successfully.</response>
             <response code="500">An error occurred while creating the coupon.</response>
         </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.CreateCouponByAdmin(ExpertOffers.Core.Dtos.CouponDto.CouponAddRequest)">
+            <summary>
+            Creates a new coupon.
+            "ADMIN" role is required to access this endpoint.
+            </summary>
+            <param name="couponAddRequest">The coupon add request.</param>
+            <returns>The created coupon.</returns>
+            <response code="200">Coupon created successfully.</response>
+            <response code="500">An error occurred while creating the coupon.</response>
+        </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.UpdateCoupon(ExpertOffers.Core.Dtos.CouponDto.CouponUpdateRequest)">
             <summary>
             Updates an existing coupon.
             "COMPANY" role is required to access this endpoint.
+            </summary>
+            <param name="couponUpdateRequest">The coupon update request.</param>
+            <returns>The updated coupon.</returns>
+            <response code="200">Coupon updated successfully.</response>
+            <response code="404">Coupon not found.</response>
+            <response code="500">An error occurred while updating the coupon.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.CouponController.UpdateCouponByAdmin(ExpertOffers.Core.Dtos.CouponDto.CouponUpdateRequest)">
+            <summary>
+            Updates an existing coupon.
+            "ADMIN" role is required to access this endpoint.
             </summary>
             <param name="couponUpdateRequest">The coupon update request.</param>
             <returns>The updated coupon.</returns>
@@ -1265,6 +1311,37 @@
             <response code="200">Offer created successfully.</response>
             <response code="500">An error occurred while creating the offer.</response>
             <returns>An API response indicating the result of the offer creation.</returns>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.CreateOfferByAdmin(ExpertOffers.Core.Dtos.OfferDto.OfferAddRequest)">
+            <summary>
+            Creates a new offer by an admin.
+            </summary>
+            <param name="request">The request object containing the details of the offer to be created.</param>
+            <returns>
+            An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing an <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> object, which indicates whether the offer was successfully created or if an error occurred.
+            </returns>
+            <remarks>
+            This method requires the user to have the "ADMIN" role. If the offer creation is successful, a 200 OK response is returned with the created offer data.
+            If an error occurs during the creation process, a 500 Internal Server Error is returned.
+            </remarks>
+            <response code="200">Offer was created successfully.</response>
+            <response code="500">An error occurred while creating the offer.</response>
+        </member>
+        <member name="M:ExpertOffers.API.Controllers.OfferController.UpdateOfferByAdmin(ExpertOffers.Core.Dtos.OfferDto.OfferUpdateRequest)">
+            <summary>
+            Update existing offer by an admin.
+            </summary>
+            <param name="request">The request object containing the details of the offer to be updated.</param>
+            <returns>
+            An <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult"/> containing an <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> object, which indicates whether the offer was successfully created or if an error occurred.
+            </returns>
+            <remarks>
+            This method requires the user to have the "ADMIN" role. If the offer creation is successful, a 200 OK response is returned with the created offer data.
+            If an error occurs during the creation process, a 500 Internal Server Error is returned.
+            </remarks>
+            <response code="200">Offer updated successfully.</response>
+            <response code="404">offer not found</response>
+            <response code="500">An error occurred while updateing the offer.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.OfferController.UpdateOffer(ExpertOffers.Core.Dtos.OfferDto.OfferUpdateRequest)">
             <summary>

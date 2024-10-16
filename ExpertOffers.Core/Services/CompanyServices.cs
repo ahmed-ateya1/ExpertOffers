@@ -272,4 +272,27 @@ public class CompanyServices : ICompanyServices
         return true;
     }
 
+    public async Task<bool> CreateAsync(CompanyAddRequest? request)
+    {
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+        ValidationHelper.ValidateModel(request);
+        var user = await GetUserAsync();
+        var file = await _fileServices.CreateFile(request.CompanyLogo);
+        var company = new Company
+        {
+            UserID = user.Id,
+            CompanyName = request.CompanyName,
+            IndustrialID = request.IndustrialID,
+            CompanyLogoURL = file,
+            CompanyID = Guid.NewGuid(),
+        };
+        await ExecuteWithTransaction(async () =>
+        {
+            await _unitOfWork.Repository<Company>().CreateAsync(company);
+        });
+        return true;
+    }
 }

@@ -33,5 +33,7 @@ namespace ExpertOffers.Core.Dtos.OfferDto
         public DateTime EndDate { get; set; }
 
         public IFormFile? OfferPicture { get; set; }
+
+        public Guid? CompanyID { get; set; }
     }
 }

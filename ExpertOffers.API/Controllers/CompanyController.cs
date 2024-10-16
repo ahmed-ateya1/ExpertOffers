@@ -41,6 +41,53 @@ namespace ExpertOffers.API.Controllers
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
         }
+        /// <summary>
+        /// Adds a new company to the system.
+        /// </summary>
+        /// <param name="companyAddRequest">The request object containing company details to be added.</param>
+        /// <returns>
+        /// An <see cref="ActionResult"/> containing an <see cref="ApiResponse"/> object, indicating whether the company was successfully added or if an error occurred.
+        /// </returns>
+        /// <remarks>
+        /// This method requires the user to have the "ADMIN" role. The method attempts to create a new company and, upon success, returns a 200 OK response.
+        /// If there is an issue during the creation process, a 500 Internal Server Error is returned.
+        /// </remarks>
+        /// <response code="200">Company was added successfully.</response>
+        /// <response code="500">An error occurred while adding the company.</response>
+        [HttpPost("addCompany")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult<ApiResponse>> AddCompany([FromForm] CompanyAddRequest companyAddRequest)
+        {
+            try
+            {
+                var result = await _companyServices.CreateAsync(companyAddRequest);
+                if (result)
+                {
+                    return Ok(new ApiResponse
+                    {
+                        IsSuccess = true,
+                        Messages = "Company added successfully",
+                        StatusCode = HttpStatusCode.OK
+                    });
+                }
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while adding the company."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AddCompany method: An error occurred while adding the company.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while adding the company."
+                });
+            }
+        }
 
         /// <summary>
         /// Fetches a list of all companies.

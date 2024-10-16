@@ -88,6 +88,89 @@ namespace ExpertOffers.API.Controllers
         }
 
         /// <summary>
+        /// Creates a new bulletin.
+        /// "ADMIN" role is required to access this endpoint.
+        /// </summary>
+        /// <param name="request">The bulletin add request.</param>
+        /// <returns>An ApiResponse containing the created bulletin.</returns>
+        /// <response code="200">Bulletin created successfully.</response>
+        /// <response code="500">An error occurred while creating the bulletin.</response>
+        [Authorize(Roles= "ADMIN")]
+        [HttpPost("createBulletinAdmin")]
+        public async Task<ActionResult<ApiResponse>> CreateBulletinAdmin([FromForm] BulletinAddRquest request)
+        {
+            try
+            {
+                var response = await _bulletinService.CreateAsync(request);
+                if (response == null)
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        IsSuccess = false,
+                        Messages = "An error occurred while creating Bulletin"
+                    });
+                }
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Bulletin created successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "createBulletin method: An error occurred while creating the bulletin");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while creating Bulletin"
+                });
+            }
+        }
+
+        [Authorize(Roles= "ADMIN")]
+        [HttpPut("updateBulletinAdmin")]
+        public async Task<ActionResult<ApiResponse>> UpdateBulletinAdmin([FromForm] BulletinUpdateRequest request)
+        {
+            try
+            {
+                var bulletin = await _unitOfWork.Repository<Bulletin>()
+                   .GetByAsync(x => x.BulletinID == request.BulletinID);
+
+                if (bulletin == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Bulletin not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var result = await _bulletinService.UpdateAsync(request);
+                return Ok(new ApiResponse()
+                {
+                    IsSuccess = true,
+                    Messages = "Bulletin updated successfully",
+                    Result = result,
+                    StatusCode = HttpStatusCode.OK
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "updateBulletin method: An error occurred while updating the bulletin");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while updating the bulletin"
+                });
+            }
+        }
+
+        /// <summary>
         /// Updates an existing bulletin.
         /// "COMPANY" role is required to access this endpoint.
         /// </summary>

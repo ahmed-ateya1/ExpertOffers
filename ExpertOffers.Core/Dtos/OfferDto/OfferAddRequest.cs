@@ -32,5 +32,7 @@ namespace ExpertOffers.Core.Dtos.OfferDto
 
         [Required(ErrorMessage = "Offer Picture is required")]
         public IFormFile OfferPicture { get; set; }
+
+        public Guid? CompanyID { get; set; }
     }
 }

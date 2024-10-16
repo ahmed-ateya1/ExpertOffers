@@ -147,7 +147,16 @@ namespace ExpertOffers.Core.Services
             }
             ValidationHelper.ValidateModel(offerAddRequest);
 
-            var company = await GetCurrentCompanyAsync();
+            Company company = null;
+            if (offerAddRequest.CompanyID==null)
+            {
+               company = await GetCurrentCompanyAsync();
+            }
+            else
+            {
+                company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(c => c.CompanyID == offerAddRequest.CompanyID);
+            }
             var genreOffer = await CheckGenreIsValid(offerAddRequest.GenreID)
                 ?? throw new ArgumentNullException(nameof(offerAddRequest.GenreID));
 
@@ -239,7 +248,17 @@ namespace ExpertOffers.Core.Services
                 .GetByAsync(x => x.OfferID == offerUpdateRequest.OfferID) 
                 ?? throw new ArgumentNullException(nameof(offerUpdateRequest.OfferID));
 
-            var company = await GetCurrentCompanyAsync();
+
+            Company company = null;
+            if (offerUpdateRequest.CompanyID == null)
+            {
+                company = await GetCurrentCompanyAsync();
+            }
+            else
+            {
+                company = await _unitOfWork.Repository<Company>()
+                    .GetByAsync(c => c.CompanyID == offerUpdateRequest.CompanyID);
+            }
             var genreOffer = await CheckGenreIsValid(offerUpdateRequest.GenreID)
                 ?? throw new ArgumentNullException(nameof(offerUpdateRequest.GenreID));
 

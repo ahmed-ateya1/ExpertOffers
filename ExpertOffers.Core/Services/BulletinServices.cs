@@ -110,7 +110,16 @@ namespace ExpertOffers.Core.Services
             }
             ValidationHelper.ValidateModel(request);
 
-            var company = await GetCurrentCompanyAsync();
+            Company company = null;
+            if (request.CompanyID != null)
+            {
+                company = await _unitOfWork.Repository<Company>().GetByAsync(c => c.CompanyID == request.CompanyID)
+                    ?? throw new KeyNotFoundException("Company not found.");
+            }
+            else
+            {
+                company = await GetCurrentCompanyAsync();
+            }
             var genre = await CheckGenreIsValid(request.GenreID);
 
             var bulletin = _mapper.Map<Bulletin>(request);
@@ -197,7 +206,16 @@ namespace ExpertOffers.Core.Services
 
             ValidationHelper.ValidateModel(request);
 
-            var company = await GetCurrentCompanyAsync();
+            Company company = null;
+            if (request.CompanyID != null)
+            {
+                company = await _unitOfWork.Repository<Company>().GetByAsync(c => c.CompanyID == request.CompanyID)
+                    ?? throw new KeyNotFoundException("Company not found.");
+            }
+            else
+            {
+                company = await GetCurrentCompanyAsync();
+            }
             var genre = await CheckGenreIsValid(request.GenreID);
 
             var bulletin = await _unitOfWork.Repository<Bulletin>()

@@ -80,6 +80,116 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Creates a new offer by an admin.
+        /// </summary>
+        /// <param name="request">The request object containing the details of the offer to be created.</param>
+        /// <returns>
+        /// An <see cref="ActionResult"/> containing an <see cref="ApiResponse"/> object, which indicates whether the offer was successfully created or if an error occurred.
+        /// </returns>
+        /// <remarks>
+        /// This method requires the user to have the "ADMIN" role. If the offer creation is successful, a 200 OK response is returned with the created offer data.
+        /// If an error occurs during the creation process, a 500 Internal Server Error is returned.
+        /// </remarks>
+        /// <response code="200">Offer was created successfully.</response>
+        /// <response code="500">An error occurred while creating the offer.</response>
+        [HttpPost("createOfferByAdmin")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult<ApiResponse>> CreateOfferByAdmin([FromForm] OfferAddRequest request)
+        {
+            try
+            {
+                var response = await _offerServices.CreateAsync(request);
+                if (response == null)
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        IsSuccess = false,
+                        Messages = "An error occurred while create Offer"
+                    });
+                }
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Offer created successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "createOfferByAdmin method: An error occurred while Create Offer");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while create Offer"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Update existing offer by an admin.
+        /// </summary>
+        /// <param name="request">The request object containing the details of the offer to be updated.</param>
+        /// <returns>
+        /// An <see cref="ActionResult"/> containing an <see cref="ApiResponse"/> object, which indicates whether the offer was successfully created or if an error occurred.
+        /// </returns>
+        /// <remarks>
+        /// This method requires the user to have the "ADMIN" role. If the offer creation is successful, a 200 OK response is returned with the created offer data.
+        /// If an error occurs during the creation process, a 500 Internal Server Error is returned.
+        /// </remarks>
+        /// <response code="200">Offer updated successfully.</response>
+        /// <response code="404">offer not found</response>
+        /// <response code="500">An error occurred while updateing the offer.</response>
+        [HttpPut("updateOfferByAdmin")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult<ApiResponse>> UpdateOfferByAdmin([FromForm] OfferUpdateRequest request)
+        {
+            try
+            {
+                var offer = await _unitOfWork.Repository<Offer>()
+                    .GetByAsync(x => x.OfferID == request.OfferID);
+                if (offer == null)
+                {
+                    return NotFound(new ApiResponse()
+                    {
+                        IsSuccess = false,
+                        Messages = "Offer not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var response = await _offerServices.UpdateAsync(request);
+                if (response == null)
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        IsSuccess = false,
+                        Messages = "An error occurred while update Offer"
+                    });
+                }
+                return Ok(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Messages = "Offer updated successfully",
+                    Result = response
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "updateOfferByAdmin method: An error occurred while Update Offer");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                    Messages = "An error occurred while update Offer"
+                });
+            }
+        }
         /// <summary>
         /// Updates an existing offer.
         /// "COMPANY" role is required to access this endpoint.

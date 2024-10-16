@@ -147,7 +147,19 @@ namespace ExpertOffers.Core.Services
             }
             ValidationHelper.ValidateModel(couponAddRequest);
 
-            var company = await GetCurrentCompanyAsync();
+            Company company = null;
+            if(couponAddRequest.CompanyID != null)
+            {
+                company = await _unitOfWork.Repository<Company>().GetByAsync(c => c.CompanyID == couponAddRequest.CompanyID);
+                if (company == null)
+                {
+                    throw new ArgumentNullException(nameof(company));
+                }
+            }
+            else
+            {
+                company = await GetCurrentCompanyAsync();
+            }
             var genreCoupon = await CheckGenreIsValid(couponAddRequest.GenreID)
                 ?? throw new ArgumentNullException(nameof(couponAddRequest.GenreID));
 
@@ -237,7 +249,19 @@ namespace ExpertOffers.Core.Services
                 throw new ArgumentNullException(nameof(couponUpdateRequest));
             }
             ValidationHelper.ValidateModel(couponUpdateRequest);
-            var company = await GetCurrentCompanyAsync();
+            Company company = null;
+            if (couponUpdateRequest.CompanyID != null)
+            {
+                company = await _unitOfWork.Repository<Company>().GetByAsync(c => c.CompanyID == couponUpdateRequest.CompanyID);
+                if (company == null)
+                {
+                    throw new ArgumentNullException(nameof(company));
+                }
+            }
+            else
+            {
+                company = await GetCurrentCompanyAsync();
+            }
             var genreCoupon = await CheckGenreIsValid(couponUpdateRequest.GenreID)
                 ?? throw new ArgumentNullException(nameof(couponUpdateRequest.GenreID));
 
