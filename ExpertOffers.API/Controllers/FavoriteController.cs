@@ -1,4 +1,5 @@
 ﻿using ExpertOffers.Core.Domain.Entities;
+using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.FavoriteDto;
 using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.IUnitOfWorkConfig;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace ExpertOffers.API.Controllers
 {
@@ -20,6 +22,7 @@ namespace ExpertOffers.API.Controllers
         private readonly IFavoriteServices _favoriteServices;
         private readonly ILogger<FavoriteController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FavoriteController"/> class.
@@ -27,14 +30,17 @@ namespace ExpertOffers.API.Controllers
         /// <param name="favoriteServices">The favorite services.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="unitOfWork">The unit of work.</param>
+        /// <param name="httpContextAccessor">The HTTP context accessor.</param>
         public FavoriteController(
             IFavoriteServices favoriteServices,
             ILogger<FavoriteController> logger,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IHttpContextAccessor httpContextAccessor)
         {
             _favoriteServices = favoriteServices;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -122,16 +128,34 @@ namespace ExpertOffers.API.Controllers
         /// <summary>
         /// Gets all favorites for a client.
         /// </summary>
-        /// <param name="clientID">The ID of the client.</param>
         /// <returns>The result of the operation.</returns>
         /// <response code="200">Favorites retrieved successfully.</response>
         /// <response code="500">An error occurred while retrieving favorites.</response>
-        [HttpGet("getAllFavorites/{clientID}")]
-        public async Task<ActionResult<ApiResponse>> GetAllFavorites(Guid clientID)
+        [HttpGet("getAllFavorite")]
+        public async Task<ActionResult<ApiResponse>> GetAllFavorites()
         {
             try
             {
-                var result = await _favoriteServices.GetAllAsync(x => x.ClientID == clientID);
+                var email = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not authenticated"
+                    });
+                }
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(x => x.Email == email, includeProperties: "Client");
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found"
+                    });
+                }
+                var result = await _favoriteServices.GetAllAsync(x => x.ClientID == user.ClientID);
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,

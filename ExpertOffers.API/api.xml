@@ -1002,13 +1002,14 @@
             Controller for managing favorite operations.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.FavoriteController.#ctor(ExpertOffers.Core.ServicesContract.IFavoriteServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.FavoriteController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
+        <member name="M:ExpertOffers.API.Controllers.FavoriteController.#ctor(ExpertOffers.Core.ServicesContract.IFavoriteServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.FavoriteController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork,Microsoft.AspNetCore.Http.IHttpContextAccessor)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.FavoriteController"/> class.
             </summary>
             <param name="favoriteServices">The favorite services.</param>
             <param name="logger">The logger.</param>
             <param name="unitOfWork">The unit of work.</param>
+            <param name="httpContextAccessor">The HTTP context accessor.</param>
         </member>
         <member name="M:ExpertOffers.API.Controllers.FavoriteController.AddFavorite(ExpertOffers.Core.Dtos.FavoriteDto.FavoriteAddRequest)">
             <summary>
@@ -1031,11 +1032,10 @@
             <response code="404">Favorite not found.</response>
             <response code="500">An error occurred while removing the favorite.</response>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.FavoriteController.GetAllFavorites(System.Guid)">
+        <member name="M:ExpertOffers.API.Controllers.FavoriteController.GetAllFavorites">
             <summary>
             Gets all favorites for a client.
             </summary>
-            <param name="clientID">The ID of the client.</param>
             <returns>The result of the operation.</returns>
             <response code="200">Favorites retrieved successfully.</response>
             <response code="500">An error occurred while retrieving favorites.</response>

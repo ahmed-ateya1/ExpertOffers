@@ -106,7 +106,7 @@ namespace ExpertOffers.Core.Services
             var notifications = favorites.Select(f => new Notification
             {
                 ClientID = f.Client.ClientID,
-                CouponId = coupon.CompanyID,
+                CouponId = coupon.CouponID,
                 Message = $"New Coupon from {coupon.Company.CompanyName}",
                 CreatedDate = DateTime.Now,
                 IsRead = false,
@@ -166,6 +166,7 @@ namespace ExpertOffers.Core.Services
             var coupon = _mapper.Map<Coupon>(couponAddRequest);
             coupon.GenreCoupon = genreCoupon;
             coupon.Company = company;
+            coupon.CompanyID = company.CompanyID;
 
             await ExecuteWithTransaction(async () =>
             {
@@ -274,6 +275,7 @@ namespace ExpertOffers.Core.Services
             _mapper.Map(couponUpdateRequest, coupon);
             coupon.GenreCoupon = genreCoupon;
             coupon.Company = company;
+            coupon.CompanyID = company.CompanyID;
             await ExecuteWithTransaction(async () =>
             {
                 if (couponUpdateRequest.CouponePicture != null

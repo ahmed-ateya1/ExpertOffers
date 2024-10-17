@@ -100,12 +100,13 @@ namespace ExpertOffers.Core.Services
             var user = await _unitOfWork.Repository<ApplicationUser>()
                 .GetByAsync(u => u.Email == email)
                 ?? throw new UnauthorizedAccessException("User is not authenticated.");
-            
+
             var company = await _unitOfWork.Repository<Company>()
-                .GetByAsync(c => c.UserID == user.Id)
-                ??throw new UnauthorizedAccessException("User is not authenticated.");
-            
-            return company;
+                .GetByAsync(c => c.CompanyID == user.ComapnyID)??
+                throw new UnauthorizedAccessException("User is not a company.");
+
+
+            return user.Company;
         }
         private async Task<GenreOffer> CheckGenreIsValid(Guid genreID)
         {

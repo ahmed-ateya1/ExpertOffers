@@ -221,7 +221,8 @@ namespace ExpertOffers.Core.Services
             var bulletin = await _unitOfWork.Repository<Bulletin>()
                 .GetByAsync(x => x.BulletinID == request.BulletinID, includeProperties: "Company,Genre");
 
-            if(request.BulletinPdf != null)
+         
+            if (request.BulletinPdf != null)
             {
                 string fileName = new Uri(bulletin.BulletinPdfUrl).Segments.Last();
                 await _fileServices.UpdateFile(request.BulletinPdf,fileName);
@@ -232,6 +233,10 @@ namespace ExpertOffers.Core.Services
                 await _fileServices.UpdateFile(request.BulletinPicture, fileName);
             }
             _mapper.Map(request, bulletin);
+            bulletin.CompanyID = company.CompanyID;
+            bulletin.Company = company;
+            bulletin.Genre = genre;
+            bulletin.GenreID = genre.GenreID;
             await ExecuteWithTransaction(async() =>
             {
                 await _unitOfWork.Repository<Bulletin>().UpdateAsync(bulletin);

@@ -3,6 +3,7 @@ using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.NotificationDto;
 using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
@@ -12,6 +13,7 @@ namespace ExpertOffers.Core.Hubs
     /// <summary>
     /// Represents a SignalR hub for handling notifications.
     /// </summary>
+    [Authorize]
     public class NotificationHub : Hub
     {
         private readonly INotificationServices _notificationServices;
