@@ -167,13 +167,11 @@ namespace ExpertOffers.Core.Services
             }
             await ExecuteWithTransaction(async () =>
             {
-                var tasks = new List<Task>();
                 if (bulletin.Notifications.Any())
                 {
-                    tasks.Add(_unitOfWork.Repository<Notification>().RemoveRangeAsync(bulletin.Notifications));
+                    await _unitOfWork.Repository<Notification>().RemoveRangeAsync(bulletin.Notifications);
                 }
-                tasks.Add(_unitOfWork.Repository<Bulletin>().DeleteAsync(bulletin));
-                await Task.WhenAll(tasks);
+                await _unitOfWork.Repository<Bulletin>().DeleteAsync(bulletin);
             });
             return true;
         }

@@ -186,7 +186,8 @@ namespace ExpertOffers.Core.Services
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var coupon = await _unitOfWork.Repository<Coupon>().GetByAsync(c => c.CouponID == id);
+            var coupon = await _unitOfWork.Repository<Coupon>().GetByAsync(c => c.CouponID == id,
+                includeProperties: "SavedItems,Notifications");
             if (coupon == null)
             {
                 throw new ArgumentNullException(nameof(coupon));

@@ -26,7 +26,7 @@ namespace ExpertOffers.API.StartupExtensions
             services.AddSignalR();
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(configuration.GetConnectionString("HostingString"));
             });
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {

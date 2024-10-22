@@ -398,7 +398,7 @@ namespace ExpertOffers.API.Controllers
         {
             try
             {
-                var result = await _couponServices.GetAllAsync(x => x.CouponID == companyID);
+                var result = await _couponServices.GetAllAsync(x => x.CompanyID == companyID);
                 return Ok(new ApiResponse
                 {
                     StatusCode = HttpStatusCode.OK,

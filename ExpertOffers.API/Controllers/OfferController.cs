@@ -257,7 +257,7 @@ namespace ExpertOffers.API.Controllers
         /// <response code="500">An error occurred while deleting the offer.</response>
         /// <returns>An API response indicating the result of the offer deletion.</returns>
         [HttpDelete("deleteOffer/{offerID}")]
-        [Authorize(Roles = "COMPANY")]
+        [Authorize(Roles = "COMPANY,ADMIN")]
         public async Task<ActionResult<ApiResponse>> DeleteOffer(Guid offerID)
         {
             try

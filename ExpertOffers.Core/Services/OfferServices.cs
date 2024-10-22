@@ -193,13 +193,23 @@ namespace ExpertOffers.Core.Services
         public async Task<bool> DeleteAsync(Guid? offerID)
         {
             var offer = await _unitOfWork.Repository<Offer>()
-                .GetByAsync(o => o.OfferID == offerID)
+                .GetByAsync(o => o.OfferID == offerID,includeProperties: "SavedItems,Notifications")
                 ?? throw new ArgumentNullException(nameof(offerID));
             var result = false;
             await ExecuteWithTransaction(async () =>
             {
                 string fileName = new Uri(offer.OfferPictureURL).Segments.Last();
                 await _fileServices.DeleteFile(fileName);
+                if(offer.SavedItems != null)
+                {
+                    await _unitOfWork.Repository<SavedItem>()
+                    .RemoveRangeAsync(offer.SavedItems);    
+                }
+                if (offer.Notifications != null)
+                {
+                    await _unitOfWork.Repository<Notification>()
+                    .RemoveRangeAsync(offer.Notifications);
+                }
                 result = await _unitOfWork.Repository<Offer>().DeleteAsync(offer);
                 await _unitOfWork.CompleteAsync();
             });
