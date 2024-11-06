@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ExpertOffers.Core.Domain.Entities
 {
@@ -25,5 +22,21 @@ namespace ExpertOffers.Core.Domain.Entities
         public virtual GenreCoupon GenreCoupon { get; set; }
         public virtual ICollection<SavedItem> SavedItems { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
+        public int GetDaysRemaining()
+        {
+            TimeSpan timeRemaining = EndDate - DateTime.Now;
+
+            if (timeRemaining.TotalSeconds <= 0)
+                return 0;
+
+            return timeRemaining.Days;
+        }
+
+        public bool CheckIsActive()
+        {
+            var currentDate = DateTime.UtcNow;
+            return StartDate <= currentDate && EndDate >= currentDate;
+        }
+
     }
 }

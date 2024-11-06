@@ -176,9 +176,11 @@ namespace ExpertOffers.Core.Services
 
                 await _unitOfWork.Repository<Offer>().CreateAsync(offer);
 
-                await HandleNotificationAsync(offer);
 
                 await _unitOfWork.CompleteAsync();
+
+                await HandleNotificationAsync(offer);
+
 
             });
 
@@ -218,7 +220,7 @@ namespace ExpertOffers.Core.Services
 
         public async Task<IEnumerable<OfferResponse>> GetAllAsync(Expression<Func<Offer, bool>>? expression = null)
         {
-            var result = await _unitOfWork.Repository<Offer>().GetAllAsync(expression,includeProperties: "Company,Genre");
+            var result = await _unitOfWork.Repository<Offer>().GetAllAsync(expression,includeProperties: "Company,Genre,Company.User,Company.User.Country");
             result = result.OrderByDescending(x=>x.OfferDiscount);
 
             var res = _mapper.Map<IEnumerable<OfferResponse>>(result);

@@ -24,5 +24,20 @@ namespace ExpertOffers.Core.Domain.Entities
         public virtual GenreOffer Genre { get; set; }
         public ICollection<SavedItem> SavedItems { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
+        public int GetDaysRemaining()
+        {
+            TimeSpan timeRemaining = EndDate - DateTime.Now;
+
+            if (timeRemaining.TotalSeconds <= 0)
+                return 0;
+
+            return timeRemaining.Days;
+        }
+
+        public bool CheckIsActive()
+        {
+            var currentDate = DateTime.UtcNow;
+            return StartDate <= currentDate && EndDate >= currentDate;
+        }
     }
 }

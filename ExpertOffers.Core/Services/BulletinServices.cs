@@ -72,6 +72,25 @@ namespace ExpertOffers.Core.Services
 
             return company;
         }
+        private async Task<Client?> GetCurrentClientAsync()
+        {
+            var email = _httpContextAccessor.HttpContext
+               .User.FindFirstValue(ClaimTypes.Email)
+               ?? throw new UnauthorizedAccessException("User is not authenticated.");
+
+            var user = await _unitOfWork.Repository<ApplicationUser>()
+                .GetByAsync(u => u.Email == email);
+            if(user == null)
+            {
+                return null;
+            }
+
+            var client = await _unitOfWork.Repository<Client>()
+                .GetByAsync(c => c.UserID == user.Id);
+
+
+            return client;
+        }
         private async Task<BulletinGenre> CheckGenreIsValid(Guid genreID)
         {
             var genre = await _unitOfWork.Repository<BulletinGenre>()
@@ -145,6 +164,7 @@ namespace ExpertOffers.Core.Services
                 result = _mapper.Map<BulletinResponse>(bulletin);
                 bulletin.IsActive = result.IsActive;
                 await _unitOfWork.CompleteAsync();
+                await HandleNotificationAsync(bulletin);
             });
             return result;
         }
@@ -189,9 +209,20 @@ namespace ExpertOffers.Core.Services
         public async Task<BulletinResponse> GetByAsync(Expression<Func<Bulletin, bool>> expression, bool isTracked = false)
         {
             var bulletin = await _unitOfWork.Repository<Bulletin>()
-                .GetByAsync(expression, isTracked ,includeProperties: "Company,Genre")
+                .GetByAsync(expression, isTracked ,includeProperties: "Company,Genre,Notifications")
                 ?? throw new KeyNotFoundException("Bulletin not found.");
             bulletin.TotalViews++;
+
+            //var user = await GetCurrentClientAsync();
+            //if (user != null)
+            //{
+            //   var notification = await _unitOfWork.Repository<Notification>()
+            //        .GetByAsync(n => n.ClientID == user.ClientID && n.BulletinId == bulletin.BulletinID);
+            //    if (notification != null)
+            //    {
+            //        notification.IsRead = true;
+            //    }
+            //}
             await _unitOfWork.CompleteAsync();
 
             return _mapper.Map<BulletinResponse>(bulletin); 

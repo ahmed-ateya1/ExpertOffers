@@ -34,12 +34,13 @@ namespace ExpertOffers.API
 
             app.UseHttpsRedirection();
 
-            app.UseCors(options =>
-            {
-                options.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
-            });
+            //app.UseCors(options =>
+            //{
+            //    options.AllowAnyOrigin()
+            //           .AllowAnyMethod()
+            //           .AllowAnyHeader();
+            //});
+            app.UseCors("AllowAll");
             app.UseStaticFiles();
             app.UseHttpsRedirection();
 
@@ -49,8 +50,6 @@ namespace ExpertOffers.API
             app.UseAuthorization();
             app.MapControllers();
             app.MapHub<NotificationHub>("/notificationHub");
-
-
             app.Run();
         }
     }

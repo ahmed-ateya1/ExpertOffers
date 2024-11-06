@@ -575,17 +575,15 @@
         <!-- Badly formed XML comment ignored for member "M:ExpertOffers.API.Controllers.ClientController.#ctor(ExpertOffers.Core.ServicesContract.IClientServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.ClientController},Microsoft.AspNetCore.Http.IHttpContextAccessor,ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)" -->
         <member name="M:ExpertOffers.API.Controllers.ClientController.UpdateClient(ExpertOffers.Core.DTOS.ClientDto.ClientUpdateRequest)">
             <summary>
-            Updates a client's information.
-            "USER" role is required to access this endpoint
+            Updates the details of an existing client.
             </summary>
-            <param name="clientDto">Client data to update.</param>
+            <param name="clientDto">An object containing the updated client information.</param>
             <returns>
-            An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> containing the status of the update operation.
-            If successful, the response will include the updated client data.
+            An <see cref="T:ExpertOffers.Core.DTOS.ApiResponse"/> indicating the success or failure of the update operation.
             </returns>
-            <response code="200">Client updated successfully.</response>
-            <response code="404">Client not found.</response>
-            <response code="500">Internal server error during the update operation.</response>
+            <response code="200">Returns an ApiResponse with success status and the updated client information.</response>
+            <response code="404">Returns an ApiResponse indicating that the country, city, or client was not found.</response>
+            <response code="500">Returns an ApiResponse indicating an internal server error occurred.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.ClientController.getClient">
             <summary>
@@ -897,11 +895,12 @@
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetCouponByGenre(System.Guid)">
             <summary>
-            Gets coupons by genre ID.
+            Gets coupons by genre ID and filters by Country.
             </summary>
             <param name="genreID">The ID of the genre.</param>
             <returns>The coupons found.</returns>
             <response code="200">Coupons found successfully.</response>
+            <response code="404">User not found.</response>
             <response code="500">An error occurred while retrieving the coupons.</response>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetAllCoupons">
@@ -969,21 +968,23 @@
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetActiveCouponsByGenre(System.Guid)">
             <summary>
-            Gets active coupons by genre ID.
+            Gets active coupons by genre ID and filters by the user's country.
             </summary>
             <param name="genreID">The ID of the genre.</param>
             <returns>
             <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="404">Status Code: 404 Not Found - User not found.</response>
             <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
             </returns>
         </member>
         <member name="M:ExpertOffers.API.Controllers.CouponController.GetInactiveCouponsByGenre(System.Guid)">
             <summary>
-            Gets inactive coupons by genre ID.
+            Gets inactive coupons by genre ID and filters by the user's country.
             </summary>
             <param name="genreID">The ID of the genre.</param>
             <returns>
             <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+            <response code="404">Status Code: 404 Not Found - User not found.</response>
             <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
             </returns>
         </member>

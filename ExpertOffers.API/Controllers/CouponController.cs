@@ -420,18 +420,53 @@ namespace ExpertOffers.API.Controllers
         }
 
         /// <summary>
-        /// Gets coupons by genre ID.
+        /// Gets coupons by genre ID and filters by Country.
         /// </summary>
         /// <param name="genreID">The ID of the genre.</param>
         /// <returns>The coupons found.</returns>
         /// <response code="200">Coupons found successfully.</response>
+        /// <response code="404">User not found.</response>
         /// <response code="500">An error occurred while retrieving the coupons.</response>
         [HttpGet("getCouponsByGenre/{genreID}")]
+        [Authorize]
         public async Task<ActionResult<ApiResponse>> GetCouponByGenre(Guid genreID)
         {
             try
             {
-                var result = await _couponServices.GetAllAsync(x => x.GenreID == genreID);
+                var userEmail = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(
+                        x => x.Email == userEmail,
+                        includeProperties: "Country"
+                    );
+
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var result = await _couponServices.GetAllAsync(
+                    x => x.GenreID == genreID &&
+                         x.Company != null &&
+                         x.Company.User != null &&
+                         x.Company.User.CountryID == user.CountryID
+                );
+
                 return Ok(new ApiResponse
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -451,6 +486,7 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
 
         /// <summary>
         /// Gets all coupons.
@@ -692,32 +728,67 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
-
         /// <summary>
-        /// Gets active coupons by genre ID.
+        /// Gets active coupons by genre ID and filters by the user's country.
         /// </summary>
         /// <param name="genreID">The ID of the genre.</param>
         /// <returns>
         /// <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+        /// <response code="404">Status Code: 404 Not Found - User not found.</response>
         /// <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
         /// </returns>
         [HttpGet("getActiveCouponsByGenre/{genreID}")]
+        [Authorize]
         public async Task<ActionResult<ApiResponse>> GetActiveCouponsByGenre(Guid genreID)
         {
             try
             {
-                var result = await _couponServices.GetAllAsync(x => x.GenreID == genreID && x.IsActive == true);
+                var userEmail = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(
+                        x => x.Email == userEmail,
+                        includeProperties: "Country"
+                    );
+
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                
+                var result = await _couponServices.GetAllAsync(
+                    x => x.GenreID == genreID &&
+                         x.IsActive == true &&
+                         x.Company != null &&
+                         x.Company.User != null &&
+                         x.Company.User.CountryID == user.CountryID
+                );
+
                 return Ok(new ApiResponse
                 {
                     StatusCode = HttpStatusCode.OK,
                     IsSuccess = true,
-                    Messages = "Coupons found successfully",
+                    Messages = "Active coupons found successfully",
                     Result = result
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "getActiveCouponsByGenre method: An error occurred while fetching active coupons by genre");
+                _logger.LogError(ex, "GetActiveCouponsByGenre method: An error occurred while fetching active coupons by genre");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
@@ -727,31 +798,68 @@ namespace ExpertOffers.API.Controllers
             }
         }
 
+
         /// <summary>
-        /// Gets inactive coupons by genre ID.
+        /// Gets inactive coupons by genre ID and filters by the user's country.
         /// </summary>
         /// <param name="genreID">The ID of the genre.</param>
         /// <returns>
         /// <response code="200">Status Code: 200 OK - Coupons found successfully.</response>
+        /// <response code="404">Status Code: 404 Not Found - User not found.</response>
         /// <response code="500">Status Code: 500 Internal Server Error - An error occurred while fetching coupons.</response>
         /// </returns>
         [HttpGet("getInactiveCouponsByGenre/{genreID}")]
+        [Authorize]
         public async Task<ActionResult<ApiResponse>> GetInactiveCouponsByGenre(Guid genreID)
         {
             try
             {
-                var result = await _couponServices.GetAllAsync(x => x.GenreID == genreID && x.IsActive == false);
+                var userEmail = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var user = await _unitOfWork.Repository<ApplicationUser>()
+                    .GetByAsync(
+                        x => x.Email == userEmail,
+                        includeProperties: "Country"
+                    );
+
+                if (user == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "User not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+
+                var result = await _couponServices.GetAllAsync(
+                    x => x.GenreID == genreID &&
+                         x.IsActive == false &&
+                         x.Company != null &&
+                         x.Company.User != null &&
+                         x.Company.User.CountryID == user.CountryID
+                );
+
                 return Ok(new ApiResponse
                 {
                     StatusCode = HttpStatusCode.OK,
                     IsSuccess = true,
-                    Messages = "Coupons found successfully",
+                    Messages = "Inactive coupons found successfully",
                     Result = result
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "getInactiveCouponsByGenre method: An error occurred while fetching inactive coupons by genre");
+                _logger.LogError(ex, "GetInactiveCouponsByGenre method: An error occurred while fetching inactive coupons by genre");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
@@ -760,6 +868,7 @@ namespace ExpertOffers.API.Controllers
                 });
             }
         }
+
 
         /// <summary>
         /// Gets coupons by title.

@@ -158,7 +158,8 @@ public class CompanyServices : ICompanyServices
         {
             throw new ArgumentNullException(nameof(IsExistInCountry), "City not found in this country.");
         }
-
+        var industrial = await _unitOfWork.Repository<Industrial>()
+            .GetByAsync(x => x.IndustrialID == request.IndustrialID) ?? throw new ArgumentNullException("Industrial not found.");
 
         var user = await GetUserAsync();
         var companyUpdate = await GetComapnyByUserIdAsync(user.Id);

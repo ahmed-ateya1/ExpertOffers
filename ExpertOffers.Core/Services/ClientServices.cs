@@ -154,10 +154,12 @@ namespace ExpertOffers.Core.Services
                 user.City = city;
                 user.Country = country;
                 user.CountryID = clientUpdateRequest.CountryID;
-                user.PhoneNumber = clientUpdateRequest.PhoneNumber;
+                client.User = user;
+
+                if (!string.IsNullOrEmpty(clientUpdateRequest.PhoneNumber))
+                    user.PhoneNumber = clientUpdateRequest.PhoneNumber;
 
                 _mapper.Map(clientUpdateRequest, client);
-                client.User = user;
 
                 await _unitOfWork.Repository<Client>().UpdateAsync(client);
                 await _unitOfWork.CompleteAsync();

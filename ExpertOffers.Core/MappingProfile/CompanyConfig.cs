@@ -15,7 +15,8 @@ namespace ExpertOffers.Core.MappingProfile
         public CompanyConfig()
         {
             CreateMap<CompanyUpdateRequest, Company>()
-               .ForPath(dest => dest.User.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber));
+               .ForPath(dest => dest.User.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+               .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.CompanyName));
 
 
             CreateMap<Company, CompanyResponse>()

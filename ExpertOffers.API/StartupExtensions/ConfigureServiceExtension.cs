@@ -67,12 +67,20 @@ namespace ExpertOffers.API.StartupExtensions
             {
                 options.TokenLifespan = TimeSpan.FromHours(1);
             });
+            //services.AddCors(options =>
+            //{
+            //    options.AddDefaultPolicy(policy =>
+            //    {
+            //        policy.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+            //    });
+            //});
             services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
-                {
-                    policy.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
-                });
+                options.AddPolicy("AllowAll",
+                    builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
             });
             services.Configure<JwtDTO>(configuration.GetSection("JWT"));
             services.AddAutoMapper(typeof(CountryConfig));

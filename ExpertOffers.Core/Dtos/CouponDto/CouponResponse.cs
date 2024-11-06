@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ExpertOffers.Core.Dtos.CouponDto
 {
@@ -14,7 +10,7 @@ namespace ExpertOffers.Core.Dtos.CouponDto
         public double DiscountPercentage { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public long NumOfDaysRemaining { get; set; }
+        public int NumOfDaysRemaining { get; set; }
         public string CouponePictureURL { get; set; }
         public string CouponeURL { get; set; }
         public long TotalViews { get; set; }
@@ -26,7 +22,5 @@ namespace ExpertOffers.Core.Dtos.CouponDto
         public Guid GenreID { get; set; }
         public string GenreName { get; set; }
         public bool CurrentUserIsSaved { get; set; }
-
-
     }
 }

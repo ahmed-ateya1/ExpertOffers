@@ -44,8 +44,8 @@ namespace ExpertOffers.Core.MappingProfile
                 .ForMember(dest=>dest.CompanyName, opt => opt.MapFrom(src => src.Company.CompanyName))
                 .ForMember(dest=>dest.CompanyLogoURL, opt => opt.MapFrom(src => src.Company.CompanyLogoURL))
                 .ForMember(dest=>dest.CompanyID, opt => opt.MapFrom(src => src.CompanyID))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.StartDate <= DateTime.Now && src.EndDate >= DateTime.Now))
-                .ForMember(dest => dest.NumOfDaysRemaining, opt => opt.MapFrom(src => src.EndDate > DateTime.Now ? (src.EndDate - DateTime.Now).Days : 0))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.CheckIsActive()))
+                .ForMember(dest => dest.NumOfDaysRemaining, opt => opt.MapFrom(src => src.GetDaysRemaining()))
                 .ReverseMap();
 
 

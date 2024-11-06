@@ -50,6 +50,7 @@ public class NotificationServices : INotificationServices
         }
         else if(notification.Company != null)
         {
+
             return HandleCommonNotification(notification, "", "", 0, Guid.Empty, notification.Company);
         }
 

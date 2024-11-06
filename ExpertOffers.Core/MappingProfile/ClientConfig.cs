@@ -15,9 +15,15 @@ namespace ExpertOffers.Core.MappingProfile
         {
 
             CreateMap<ClientUpdateRequest, Client>()
-                .ForPath(dest => dest.User.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber));
+                .ForPath(dest => dest.User.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+                .ForPath(dest => dest.User.CountryID, opt => opt.MapFrom(src => src.CountryID))
+                .ForPath(dest => dest.User.CityID, opt => opt.MapFrom(src => src.CityID));
 
-            
+
+
+
             CreateMap<Client, ClientReponse>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))

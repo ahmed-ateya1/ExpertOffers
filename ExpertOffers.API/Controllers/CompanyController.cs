@@ -324,11 +324,21 @@ namespace ExpertOffers.API.Controllers
                         StatusCode = HttpStatusCode.NotFound
                     });
                 }
+                var result = await _companyServices.UpdateAsync(companyUpdate);
+                if (result == null)
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        IsSuccess = false,
+                        Messages = "An error occurred while updating the company."
+                    });
+                }
                 return Ok(new ApiResponse
                 {
                     IsSuccess = true,
                     Messages = "Company updated successfully",
-                    Result = company,
+                    Result = result,
                     StatusCode = HttpStatusCode.OK
                 });
             }

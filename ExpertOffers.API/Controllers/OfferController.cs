@@ -3,6 +3,7 @@ using ExpertOffers.Core.Domain.IdentityEntities;
 using ExpertOffers.Core.Dtos.OfferDto;
 using ExpertOffers.Core.DTOS;
 using ExpertOffers.Core.IUnitOfWorkConfig;
+using ExpertOffers.Core.Services;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -447,6 +448,7 @@ namespace ExpertOffers.API.Controllers
         /// <response code="404">Genre not found.</response>
         /// <returns>An API response with the requested offer details.</returns>
         [HttpGet("getOffersByGenre/{genreID}")]
+        [Authorize]
         public async Task<ActionResult<ApiResponse>> GetOffersByGenre(Guid genreID)
         {
             if(genreID == Guid.Empty)
@@ -458,6 +460,33 @@ namespace ExpertOffers.API.Controllers
                     StatusCode = HttpStatusCode.BadRequest
                 });
             }
+            var userEmail = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return NotFound(new ApiResponse
+                {
+                    IsSuccess = false,
+                    Messages = "User not found",
+                    StatusCode = HttpStatusCode.NotFound
+                });
+            }
+
+            var user = await _unitOfWork.Repository<ApplicationUser>()
+                .GetByAsync(
+                    x => x.Email == userEmail,
+                    includeProperties: "Country"
+                );
+
+            if (user == null)
+            {
+                return NotFound(new ApiResponse
+                {
+                    IsSuccess = false,
+                    Messages = "User not found",
+                    StatusCode = HttpStatusCode.NotFound
+                });
+            }
+
             var genre = await _unitOfWork.Repository<GenreOffer>()
                 .GetByAsync(x => x.GenreID == genreID);
             if (genre == null)
@@ -469,13 +498,18 @@ namespace ExpertOffers.API.Controllers
                     StatusCode = HttpStatusCode.NotFound
                 });
             }
-            var genres = await _offerServices.GetAllAsync(x=>x.GenreID == genreID);
+            var result = await _offerServices.GetAllAsync(
+                     x => x.GenreID == genreID &&
+                          x.Company != null &&
+                          x.Company.User != null &&
+                          x.Company.User.CountryID == user.CountryID
+                 );
             return Ok(new ApiResponse
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Messages = "Offers retrieved successfully",
-                Result = genres
+                Result = result
             });
         }
         /// <summary>
@@ -608,6 +642,7 @@ namespace ExpertOffers.API.Controllers
         {
             try
             {
+
                 var response = await _offerServices.GetAllAsync(x => x.IsActive == true);
                 return Ok(new ApiResponse
                 {
@@ -822,6 +857,7 @@ namespace ExpertOffers.API.Controllers
         /// <response code="404">Genre not found.</response>
         /// <returns>An API response with the list of active offers for the specified genre.</returns>
         [HttpGet("getOffersByGenreActiveOnly/{genreID}")]
+        [Authorize]
         public async Task<ActionResult<ApiResponse>> GetOffersByGenreActiveOnly(Guid genreID)
         {
             if (genreID == Guid.Empty)
@@ -829,10 +865,37 @@ namespace ExpertOffers.API.Controllers
                 return BadRequest(new ApiResponse()
                 {
                     IsSuccess = false,
-                    Messages = "Genre ID is required",
+                    Messages = "genreID ID is required",
                     StatusCode = HttpStatusCode.BadRequest
                 });
             }
+            var userEmail = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return NotFound(new ApiResponse
+                {
+                    IsSuccess = false,
+                    Messages = "User not found",
+                    StatusCode = HttpStatusCode.NotFound
+                });
+            }
+
+            var user = await _unitOfWork.Repository<ApplicationUser>()
+                .GetByAsync(
+                    x => x.Email == userEmail,
+                    includeProperties: "Country"
+                );
+
+            if (user == null)
+            {
+                return NotFound(new ApiResponse
+                {
+                    IsSuccess = false,
+                    Messages = "User not found",
+                    StatusCode = HttpStatusCode.NotFound
+                });
+            }
+
             var genre = await _unitOfWork.Repository<GenreOffer>()
                 .GetByAsync(x => x.GenreID == genreID);
             if (genre == null)
@@ -844,13 +907,19 @@ namespace ExpertOffers.API.Controllers
                     StatusCode = HttpStatusCode.NotFound
                 });
             }
-            var genres = await _offerServices.GetAllAsync(x => x.GenreID == genreID && x.IsActive == true);
+            var result = await _offerServices.GetAllAsync(
+                     x => x.GenreID == genreID &&
+                          x.IsActive == true &&
+                          x.Company != null &&
+                          x.Company.User != null &&
+                          x.Company.User.CountryID == user.CountryID
+                 );
             return Ok(new ApiResponse
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Messages = "Offers retrieved successfully",
-                Result = genres
+                Result = result
             });
         }
         /// <summary>
@@ -862,6 +931,7 @@ namespace ExpertOffers.API.Controllers
         /// <response code="404">Genre not found.</response>
         /// <returns>An API response with the list of inactive offers for the specified genre.</returns>
         [HttpGet("getOffersByGenreInactiveOnly/{genreID}")]
+        [Authorize]
         public async Task<ActionResult<ApiResponse>> GetOffersByGenreInactiveOnly(Guid genreID)
         {
             if (genreID == Guid.Empty)
@@ -869,12 +939,39 @@ namespace ExpertOffers.API.Controllers
                 return BadRequest(new ApiResponse()
                 {
                     IsSuccess = false,
-                    Messages = "Genre ID is required",
+                    Messages = "genreID ID is required",
                     StatusCode = HttpStatusCode.BadRequest
                 });
             }
+            var userEmail = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return NotFound(new ApiResponse
+                {
+                    IsSuccess = false,
+                    Messages = "User not found",
+                    StatusCode = HttpStatusCode.NotFound
+                });
+            }
+
+            var user = await _unitOfWork.Repository<ApplicationUser>()
+                .GetByAsync(
+                    x => x.Email == userEmail,
+                    includeProperties: "Country"
+                );
+
+            if (user == null)
+            {
+                return NotFound(new ApiResponse
+                {
+                    IsSuccess = false,
+                    Messages = "User not found",
+                    StatusCode = HttpStatusCode.NotFound
+                });
+            }
+
             var genre = await _unitOfWork.Repository<GenreOffer>()
-               .GetByAsync(x => x.GenreID == genreID);
+                .GetByAsync(x => x.GenreID == genreID);
             if (genre == null)
             {
                 return NotFound(new ApiResponse()
@@ -884,13 +981,19 @@ namespace ExpertOffers.API.Controllers
                     StatusCode = HttpStatusCode.NotFound
                 });
             }
-            var genres = await _offerServices.GetAllAsync(x => x.GenreID == genreID && x.IsActive == false);
+            var result = await _offerServices.GetAllAsync(
+                     x => x.GenreID == genreID &&
+                          x.IsActive == false &&
+                          x.Company != null &&
+                          x.Company.User != null &&
+                          x.Company.User.CountryID == user.CountryID
+                 );
             return Ok(new ApiResponse
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Messages = "Offers retrieved successfully",
-                Result = genres
+                Result = result
             });
         }
 

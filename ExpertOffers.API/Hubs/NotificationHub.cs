@@ -48,9 +48,9 @@ namespace ExpertOffers.Core.Hubs
             {
                 _connections[Context.ConnectionId] = email;
 
-                var notifications = await FetchNotifications(email);
+                //var notifications = await FetchNotifications(email);
 
-                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveNotifications", notifications);
+                //await Clients.Client(Context.ConnectionId).SendAsync("ReceiveNotifications", notifications);
 
                 int unreadCount = await GetUnreadNotificationCount();
                 await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUnreadNotificationCount", unreadCount);

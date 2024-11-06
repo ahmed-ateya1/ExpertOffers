@@ -39,23 +39,43 @@ namespace ExpertOffers.API.Controllers
             _unitOfWork = unitOfWork;
         }
         /// <summary>
-        /// Updates a client's information.
-        /// "USER" role is required to access this endpoint
+        /// Updates the details of an existing client.
         /// </summary>
-        /// <param name="clientDto">Client data to update.</param>
+        /// <param name="clientDto">An object containing the updated client information.</param>
         /// <returns>
-        /// An <see cref="ApiResponse"/> containing the status of the update operation.
-        /// If successful, the response will include the updated client data.
+        /// An <see cref="ApiResponse"/> indicating the success or failure of the update operation.
         /// </returns>
-        /// <response code="200">Client updated successfully.</response>
-        /// <response code="404">Client not found.</response>
-        /// <response code="500">Internal server error during the update operation.</response>
+        /// <response code="200">Returns an ApiResponse with success status and the updated client information.</response>
+        /// <response code="404">Returns an ApiResponse indicating that the country, city, or client was not found.</response>
+        /// <response code="500">Returns an ApiResponse indicating an internal server error occurred.</response>
         [HttpPut("updateClient")]
-        [Authorize(Roles = "USER")]
+        [Authorize(Roles = "USER,ADMIN")]
         public async Task<ActionResult<ApiResponse>> UpdateClient(ClientUpdateRequest clientDto)
         {
             try
             {
+                var county = await _unitOfWork.Repository<Country>()
+                    .GetByAsync(x => x.CountryID == clientDto.CountryID);
+                if (county == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Country not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
+                var city = await _unitOfWork.Repository<City>()
+                    .GetByAsync(x => x.CityID == clientDto.CityID);
+                if (city == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "City not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var client = await _clientServices.UpdateAsync(clientDto);
                 if (client == null)
                 {

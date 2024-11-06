@@ -213,7 +213,7 @@ namespace ExpertOffers.Core.Services
 
         public async Task<IEnumerable<CouponResponse>> GetAllAsync(Expression<Func<Coupon, bool>>? expression = null)
         {
-            var coupons = await _unitOfWork.Repository<Coupon>().GetAllAsync(expression,includeProperties: "Company,GenreCoupon");
+            var coupons = await _unitOfWork.Repository<Coupon>().GetAllAsync(expression,includeProperties: "Company,GenreCoupon,Company.User,Company.User.Country");
             coupons = coupons.OrderByDescending(x => x.DiscountPercentage);
             var result = _mapper.Map<IEnumerable<CouponResponse>>(coupons);
             var client = await GetCurrentClientAsync();
