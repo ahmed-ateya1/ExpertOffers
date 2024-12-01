@@ -8,6 +8,7 @@ using ExpertOffers.Core.Helper;
 using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using System.Security.Claims;
@@ -19,13 +20,15 @@ public class CompanyServices : ICompanyServices
     private readonly IMapper _mapper;
     private readonly IFileServices _fileServices;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<CompanyServices> _logger;
 
-    public CompanyServices(IUnitOfWork unitOfWork, IMapper mapper, IFileServices fileServices, IHttpContextAccessor httpContextAccessor)
+    public CompanyServices(IUnitOfWork unitOfWork, IMapper mapper, IFileServices fileServices, IHttpContextAccessor httpContextAccessor, ILogger<CompanyServices> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _fileServices = fileServices;
         _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
     }
     private async Task ExecuteWithTransaction(Func<Task> action)
     {
@@ -203,64 +206,75 @@ public class CompanyServices : ICompanyServices
         return _mapper.Map<CompanyResponse>(companyUpdate);
     }
 
-    public async Task<bool> DeleteAsync(Guid CompanyID)
+    public async Task<bool> DeleteAsync(Guid companyID)
     {
         var company = await _unitOfWork.Repository<Company>()
-            .GetByAsync(x => x.CompanyID == CompanyID, includeProperties: "Coupons,Bulletins,Branches,Offers,Notifications,Favorites,User");
+            .GetByAsync(
+                x => x.CompanyID == companyID,
+                includeProperties: "Coupons,Bulletins,Branches,Offers,Notifications,Favorites,User"
+            );
+
+        if (company == null)
+            throw new ArgumentException("Company not found.");
 
         await ExecuteWithTransaction(async () =>
         {
-            string fileName = null;
+            await DeleteFileAsync(company.CompanyLogoURL);
 
-            if (company.CompanyLogoURL != null)
-            {
-                fileName = new Uri(company.CompanyLogoURL).Segments.Last();
-                await _fileServices.DeleteFile(fileName);
-            }
-
-            if (company.Coupons.Any())
+            if (company.Coupons?.Any() == true)
             {
                 foreach (var coupon in company.Coupons)
                 {
-                    fileName = new Uri(coupon.CouponePictureURL).Segments.Last();
-                    await _fileServices.DeleteFile(fileName);
+                    await DeleteNotificationsAsync(
+                        await _unitOfWork.Repository<Notification>()
+                            .GetAllAsync(n => n.CouponId == coupon.CouponID)
+                    );
+                    await DeleteFileAsync(coupon.CouponePictureURL);
                 }
+
                 await _unitOfWork.Repository<Coupon>().RemoveRangeAsync(company.Coupons);
             }
 
-            if (company.Favorites.Any())
+            if (company.Favorites?.Any() == true)
             {
                 await _unitOfWork.Repository<Favorite>().RemoveRangeAsync(company.Favorites);
             }
 
-            if (company.Bulletins.Any())
+            if (company.Bulletins?.Any() == true)
             {
                 foreach (var bulletin in company.Bulletins)
                 {
-                    string fileName1 = new Uri(bulletin.BulletinPictureUrl).Segments.Last();
-                    string fileName2 = new Uri(bulletin.BulletinPdfUrl).Segments.Last();
-                    await _fileServices.DeleteFile(fileName1);
-                    await _fileServices.DeleteFile(fileName2);
+                    await DeleteNotificationsAsync(
+                        await _unitOfWork.Repository<Notification>()
+                            .GetAllAsync(n => n.BulletinId == bulletin.BulletinID)
+                    );
+                    await DeleteFileAsync(bulletin.BulletinPictureUrl);
+                    await DeleteFileAsync(bulletin.BulletinPdfUrl);
                 }
+
                 await _unitOfWork.Repository<Bulletin>().RemoveRangeAsync(company.Bulletins);
             }
 
-            if (company.Branches.Any())
+            if (company.Branches?.Any() == true)
             {
                 await _unitOfWork.Repository<Branch>().RemoveRangeAsync(company.Branches);
             }
 
-            if (company.Offers.Any())
+            if (company.Offers?.Any() == true)
             {
                 foreach (var offer in company.Offers)
                 {
-                    fileName = new Uri(offer.OfferPictureURL).Segments.Last();
-                    await _fileServices.DeleteFile(fileName);
+                    await DeleteNotificationsAsync(
+                        await _unitOfWork.Repository<Notification>()
+                            .GetAllAsync(n => n.OfferId == offer.OfferID)
+                    );
+                    await DeleteFileAsync(offer.OfferPictureURL);
                 }
+
                 await _unitOfWork.Repository<Offer>().RemoveRangeAsync(company.Offers);
             }
 
-            if (company.Notifications.Any())
+            if (company.Notifications?.Any() == true)
             {
                 await _unitOfWork.Repository<Notification>().RemoveRangeAsync(company.Notifications);
             }
@@ -268,10 +282,38 @@ public class CompanyServices : ICompanyServices
             await _unitOfWork.Repository<Company>().DeleteAsync(company);
         });
 
-        await _unitOfWork.Repository<ApplicationUser>().DeleteAsync(company.User);
+        if (company.User != null)
+        {
+            await _unitOfWork.Repository<ApplicationUser>().DeleteAsync(company.User);
+        }
 
         return true;
     }
+
+    private async Task DeleteFileAsync(string fileUrl)
+    {
+        if (string.IsNullOrEmpty(fileUrl)) return;
+
+        try
+        {
+            var fileName = new Uri(fileUrl).Segments.Last();
+            await _fileServices.DeleteFile(fileName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Failed to delete file: {fileUrl}");
+        }
+    }
+
+    private async Task DeleteNotificationsAsync(IEnumerable<Notification> notifications)
+    {
+        if (notifications?.Any() == true)
+        {
+            await _unitOfWork.Repository<Notification>().RemoveRangeAsync(notifications);
+        }
+    }
+
+
 
     public async Task<bool> CreateAsync(CompanyAddRequest? request)
     {

@@ -154,7 +154,7 @@
             Controller for managing branch operations.
             </summary>
         </member>
-        <member name="M:ExpertOffers.API.Controllers.BranchController.#ctor(ExpertOffers.Core.ServicesContract.IBranchServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BranchController})">
+        <member name="M:ExpertOffers.API.Controllers.BranchController.#ctor(ExpertOffers.Core.ServicesContract.IBranchServices,Microsoft.Extensions.Logging.ILogger{ExpertOffers.API.Controllers.BranchController},ExpertOffers.Core.IUnitOfWorkConfig.IUnitOfWork)">
             <summary>
             Initializes a new instance of the <see cref="T:ExpertOffers.API.Controllers.BranchController"/> class.
             </summary>

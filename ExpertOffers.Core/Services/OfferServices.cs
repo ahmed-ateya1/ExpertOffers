@@ -16,7 +16,6 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using static Azure.Core.HttpHeader;
 
 namespace ExpertOffers.Core.Services
 {

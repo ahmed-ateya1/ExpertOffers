@@ -15,9 +15,8 @@ namespace ExpertOffers.Core.Dtos.BranchDto
         [Required(ErrorMessage = "Branch Name is required")]
         [StringLength(50, ErrorMessage = "Branch Name must be less than 50 characters")]
         public string BranchName { get; set; }
-        [Required(ErrorMessage = "Phone Number is required")]
         [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Phone Number is not valid. It should be in international format.")]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
         [Required(ErrorMessage = "Location is required")]
         public string Location { get; set; }
     }

@@ -94,31 +94,39 @@ namespace ExpertOffers.Core.Services
         public async Task<bool> DeleteAsync(Guid clientID)
         {
             var client = await _unitOfWork.Repository<Client>()
-                .GetByAsync(x => x.ClientID == clientID,includeProperties: "Favorites,Notifications,SavedItems,User");
+                .GetByAsync(
+                    x => x.ClientID == clientID,
+                    includeProperties: "Favorites,Notifications,SavedItems,User"
+                );
+
             if (client == null)
-                throw new UnauthorizedAccessException("Client not found");
+                throw new ArgumentException("Client not found.");
 
             await ExecuteWithTransaction(async () =>
             {
-                if (client.Favorites.Any())
-                {
-                    await _unitOfWork.Repository<Favorite>().RemoveRangeAsync(client.Favorites);
-                }
-                if (client.Notifications.Any())
-                {
-                    await _unitOfWork.Repository<Notification>().RemoveRangeAsync(client.Notifications);
-                }
-                if (client.SavedItems.Any())
-                {
-                    await _unitOfWork.Repository<SavedItem>().RemoveRangeAsync(client.SavedItems);
-                }
+                await RemoveRelatedEntitiesAsync(client.Favorites);
+                await RemoveRelatedEntitiesAsync(client.Notifications);
+                await RemoveRelatedEntitiesAsync(client.SavedItems);
+
                 await _unitOfWork.Repository<Client>().DeleteAsync(client);
             });
 
-            await _unitOfWork.Repository<ApplicationUser>().DeleteAsync(client.User);
+            if (client.User != null)
+            {
+                await _unitOfWork.Repository<ApplicationUser>().DeleteAsync(client.User);
+            }
 
             return true;
         }
+
+        private async Task RemoveRelatedEntitiesAsync<T>(ICollection<T> entities) where T : class
+        {
+            if (entities?.Any() == true)
+            {
+                await _unitOfWork.Repository<T>().RemoveRangeAsync(entities);
+            }
+        }
+
 
         public async Task<ClientReponse> GetByAsync(Expression<Func<Client, bool>> expression, bool isTracking = true)
         {

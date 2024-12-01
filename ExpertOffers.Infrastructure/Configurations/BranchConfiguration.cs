@@ -24,7 +24,7 @@ namespace ExpertOffers.Infrastructure.Configurations
 
             builder.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(e => e.Location)
                 .HasMaxLength(200)

@@ -1,6 +1,7 @@
 ﻿using ExpertOffers.Core.Domain.Entities;
 using ExpertOffers.Core.Dtos.BranchDto;
 using ExpertOffers.Core.DTOS;
+using ExpertOffers.Core.IUnitOfWorkConfig;
 using ExpertOffers.Core.ServicesContract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,16 +19,17 @@ namespace ExpertOffers.API.Controllers
     {
         private readonly IBranchServices _branchServices;
         private readonly ILogger<BranchController> _logger;
-
+        private readonly IUnitOfWork _unitOfWork;
         /// <summary>
         /// Initializes a new instance of the <see cref="BranchController"/> class.
         /// </summary>
         /// <param name="branchServices">The branch services.</param>
         /// <param name="logger">The logger.</param>
-        public BranchController(IBranchServices branchServices, ILogger<BranchController> logger)
+        public BranchController(IBranchServices branchServices, ILogger<BranchController> logger, IUnitOfWork unitOfWork)
         {
             _branchServices = branchServices;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -44,6 +46,16 @@ namespace ExpertOffers.API.Controllers
         {
             try
             {
+                var company = await _unitOfWork.Repository<Company>().GetByAsync(c => c.CompanyID == branchAddRequest.CompanyID);
+                if (company == null)
+                {
+                    return NotFound(new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Messages = "Company not found",
+                        StatusCode = HttpStatusCode.NotFound
+                    });
+                }
                 var response = await _branchServices.CreateAsync(branchAddRequest);
 
                 return Ok(new ApiResponse
